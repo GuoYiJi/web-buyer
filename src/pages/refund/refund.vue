@@ -1,24 +1,31 @@
 <template>
   <div class="wrapper">
-    <p class="refundReason" @click="wellShow = true">退款原因
-      <span class="reason">{{reason}}</span>
+    <p class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
+    <p class="refundPrice">
+      退款金额：<span class="price">￥{{price}}</span>
+      <span v-if="type == '0'" class="freight">含邮费￥{{freight}}</span>
+      <span v-else class="freight">不含邮费￥{{freight}}</span>
     </p>
-    <p class="refundPrice">退款金额：
-      <span class="price">￥39.9</span>
-    </p>
-    <p class="refundMsg">最多可退￥39.9，含邮费￥0.00</p>
+    <!--<p v-if="type == '0'" class="refundMsg">含邮费￥{{freight}}</p>-->
+    <!--<p v-else class="refundMsg">不含邮费￥{{freight}}</p>-->
     <div class="refundExplain">
-      <p class="title">退款说明：
-        <span>(最多可输入50个字)</span>
-      </p>
-      <textarea v-model="explain" class="explain" name="" id="" maxlength=50></textarea>
+      <p class="title">退款说明：<span>(最多可输入50个字)</span></p>
+      <textarea v-model="explain"  class="explain" name="" id="" maxlength=50>
+
+      </textarea>
     </div>
-    <div class="refundVoucher">
-      <p class="title">上传凭证：
-        <span>(最多可上传3张)</span>
-      </p>
-      <div class="images">
-        <div class="img"></div>
+    <div v-if="type == '1'" class="refundVoucher">
+      <p class="title">上传凭证：<span>(最多可上传3张)</span></p>
+      <div class="images" >
+        <div  class="img" @click="chooseImg(1)">
+          <img :src="img1" alt="">
+        </div>
+        <div v-if="img1" class="img" @click="chooseImg(2)">
+          <img :src="img2" alt="">
+        </div>
+        <div v-if="img2" class="img" @click="chooseImg(3)">
+          <img :src="img3" alt="">
+        </div>
       </div>
     </div>
     <div class="submit" @click="submit">提交</div>
@@ -30,8 +37,8 @@
           <span>{{item.text}}</span>
         </p>
         <!--<p class="select" @click="check(1)">-->
-        <!--<span class="check" :class="{checked : isCheck == 1}"></span>-->
-        <!--<span>原因2</span>-->
+          <!--<span class="check" :class="{checked : isCheck == 1}"></span>-->
+          <!--<span>原因2</span>-->
         <!--</p>-->
       </div>
     </div>
@@ -41,59 +48,143 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import API from "@/api/httpJchan";
+import wx from 'wx'
+import API from '@/api/httpShui'
+import config from '@/config'
 export default {
-  data() {
+  data () {
     return {
+      orderId: '',
+      type: '',
+      freight: '',
+      price: '',
       isCheck: 0,
       reasonList: [
-        { id: 1, text: "原因一" },
-        { id: 2, text: "原因二" },
-        { id: 3, text: "原因三" },
-        { id: 4, text: "原因四" }
+        {id: 1, text: '原因一'},
+        {id: 2, text: '原因二'},
+        {id: 3, text: '原因三'},
+        {id: 4, text: '原因四'}
       ],
-      reason: "",
+      img1: null,
+      img2: null,
+      img3: null,
+      reason: '',
       wellShow: false,
       wellMsgShow: false,
-      msg: "",
-      explain: ""
-    };
+      msg: '',
+      explain: ''
+    }
   },
-  components: {},
+  components: {
+
+  },
   methods: {
     // 退款原因选择
-    check(i, text) {
-      this.isCheck = i;
-      this.reason = text;
-      this.wellShow = false;
+    check (i, text) {
+      this.isCheck = i
+      this.reason = text
+      this.wellShow = false
+    },
+    chooseImg (num) {
+      const self = this
+      wx.chooseImage({
+        count: 1,
+        success: function (file) {
+          console.log(file)
+          // self.img = file.tempFilePaths[0]
+          self.uploadImg (file.tempFilePaths[0], function (url) {
+            self.img = url
+            if (num == 1) {
+              self.img1 = url
+            }
+            if (num == 2) {
+              self.img2 = url
+            }
+            if (num == 3) {
+              self.img3 = url
+            }
+          })
+        }
+      })
+    },
+    uploadImg (tempFilePath, callback) {
+      let that = this
+      wx.uploadFile({
+        url: config.uploadImageUrl,
+        filePath: tempFilePath,
+        name: 'file',
+        formData: {
+          name: tempFilePath.substring(10),
+          key: 'img/${filename}',
+          policy: config.imgPolicy,
+          OSSAccessKeyId: '6MKOqxGiGU4AUk44',
+          success_action_status: '200',
+          signature: config.imgSignature
+        },
+        success: function (res) {
+          console.log(res)
+          if (res.statusCode === 400) {
+            that.handleError('上传的图片大小不能超过2m!')
+          } else if (res.statusCode === 200) {
+            if (that.maxNum && that.imgList.length >= that.maxNum) {
+              that.handleError('不能超过3张图片噢！')
+              return
+            }
+            callback (
+              config.uploadImageUrl + '/img' + tempFilePath.substring(10)
+            )
+          }
+        },
+        fail: function (err) {
+          console.log(err)
+        }
+      })
     },
     // 提交按钮
-    async submit() {
-      if (this.reason === "") {
-        this.mySetTimeout("请选择退款原因!");
-        return false;
+    async submit () {
+      // if (this.reason === '') {
+      //   this.mySetTimeout('请选择退款原因!')
+      //   return false
+      // }
+      if (this.explain === '') {
+        this.mySetTimeout('请填写退款说明!')
+        return false
       }
-      if (this.explain === "") {
-        this.mySetTimeout("请填写退款说明!");
-        return false;
+      const data = await API.retreatGoods({
+        orderId: this.orderId,
+        refundType: this.type,
+        result: this.explain
+      })
+      console.log('退款', data)
+      if (data.code === 1) {
+        this.$router.push('/pages/my/after')
       }
-      this.$router.push({ path: "/pages/refund/refundDetails" });
-      var doubleBack = await API.doubleBack({});
-      console.log(doubleBack);
     },
     // 定时器弹窗
-    mySetTimeout(msg) {
-      let that = this;
-      that.wellMsgShow = true;
-      that.msg = msg;
-      setTimeout(function() {
-        that.wellMsgShow = false;
-        that.msg = "";
-      }, 1000);
+    mySetTimeout (msg) {
+      let that = this
+      that.wellMsgShow = true
+      that.msg = msg
+      setTimeout(function () {
+        that.wellMsgShow = false
+        that.msg = ''
+      }, 1000)
     }
+  },
+  mounted () {
+    this.orderId = this.$route.query.orderId
+    this.type = this.$route.query.type
+    this.price = Number(this.$route.query.price)
+    this.freight = Number(this.$route.query.freight)
+    if (this.type === '1') {
+      this.price -= this.freight
+    }
+    // console.log(this.orderId)
+    // console.log(this.type)
+    // console.log(this.price)
+    // console.log(this.freight)
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
@@ -123,9 +214,13 @@ export default {
   color: #333333
   padding: 0 24px
   background: #FFFFFF
-  margin-top: 2px
+  margin-top: 15px
   .price
     color: #FF0000
+  .freight
+    float: right
+    font-size: 28px
+    color: #999
 .refundMsg
   height: 64px
   line-height: 64px
@@ -136,6 +231,7 @@ export default {
   height: 310px
   padding: 0 24px
   background: #ffffff
+  margin-top: 15px
   .explain
     width: 100%
     height: 240px

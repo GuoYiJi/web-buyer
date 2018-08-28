@@ -19,7 +19,8 @@
       </div>
       <div v-else-if="tag == 3">
         <p>
-          <myCouponD />
+          <myCoupon />
+          <myCouponT />
         </p>
       </div>
     </div>
@@ -29,13 +30,11 @@
 import wx from "wx";
 import myCoupon from "@/components/m_myCoupon";
 import myCouponT from "@/components/m_myCouponT";
-import myCouponD from "@/components/m_myCouponD";
 import API from "@/api/httpJchan";
 export default {
   components: {
     myCoupon,
-    myCouponT,
-    myCouponD
+    myCouponT
   },
   data() {
     return {

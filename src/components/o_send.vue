@@ -31,13 +31,12 @@
         </div>
       </div>
       <div class="btn">
-        <span class="b-sc" @click="torefund()">退款</span>
-        <span class="b-xq" @click="bxq(2)">查看详情</span>
+        <span class="b-sc" @click="retreat(item.id,0)">退款</span>
+        <span class="b-xq" @click="bxq(item.id,2)">查看详情</span>
       </div>
       <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
         <div class="m_tips">确定取消订单</div>
       </i-modal>
-
     </div>
     <!-- 2 -->
     <!-- <div class="kuang">
@@ -291,14 +290,19 @@ export default {
     }
   },
   methods: {
-    bxq (xq) {
+    bxq (id, xq) {
+      // console.log(id)
+      // console.log(xq)
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
-        query: { xq: xq }
+        query: { id: id, xq: xq }
       })
     },
-    torefund () {
-      this.$router.push({ path: '/pages/refund/refund' })
+    retreat (id, type) {
+      this.$router.push({
+        path: '/pages/refund/refund',
+        query: {orderId: id, type: type}
+      })
     },
     toClose (name) {
       this[name] = false
@@ -328,8 +332,8 @@ export default {
   },
   // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 5 })
-    this.myorderList = myorder.data.list
+    const Myorder = await API.myorder({state: 5, isPing: 0})
+    this.myorderList = Myorder.data.list
     this.myord()
   }
 }
