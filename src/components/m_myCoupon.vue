@@ -12,7 +12,6 @@
         </p>
         <p class="discount">{{item.name}}</p>
         <p class="purchases">购满{{item.limitCount}}可使用</p>
-        <!-- <p class="time">有效期 {{startTime[index]}}-{{endTime[index]}}</p> -->
         <p class="time">有效期 {{startTime}}-{{endTime}}</p>
       </div>
       <div class="right">未使用</div>
