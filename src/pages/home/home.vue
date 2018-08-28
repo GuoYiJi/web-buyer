@@ -66,7 +66,7 @@
   </div>
 </template>
 <script>
-import wx from "wx"
+import wx from 'wx'
 import API from '@/api/httpShui'
 import mixin from '@/mixin'
 import colligate from '@/components/h_colligate'

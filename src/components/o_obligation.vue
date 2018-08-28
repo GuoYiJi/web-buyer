@@ -26,7 +26,7 @@
           <span class="b-sc" @click="toOpen('visible2')">取消订单</span>
           <span class="b-qr" @click="toOpen('visible1')">确认付款</span>
         </div>
-        <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
+        <i-modal :visible="visible2" @ok="cancelOrder()" @cancel="toClose('visible2')">
           <div class="m_tips">确定取消订单</div>
         </i-modal>
         <i-modal :visible="visible1" @ok="toClose('visible1')" @cancel="toClose('visible1')">
@@ -34,44 +34,11 @@
         </i-modal>
       </div>
     </div>
-    <!-- <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">待付款</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span> 件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq" @click="bxq(1)">查看详情</span>
-          <span class="b-sc" @click="toOpen('visible2')">取消订单</span>
-          <span class="b-qr" @click="toOpen('visible1')">确认付款</span>
-        </div>
-        <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
-          <div class="m_tips">确定取消订单</div>
-        </i-modal>
-        <i-modal :visible="visible1" @ok="toClose('visible1')" @cancel="toClose('visible1')">
-          <div class="m_tips">确认付款</div>
-        </i-modal>
-      </div>
-    </div> -->
   </div>
 </template>
 <script>
-import wx from 'wx'
-import API from '@/api/httpJchan'
+// import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
   data () {
@@ -96,13 +63,25 @@ export default {
     },
     toClose (name) {
       this[name] = false
+    },
+    // 取消订单
+    async cancelOrder () {
+      const data = await API.cancelOrder({orderId: this.id})
+      console.log(data)
+      if (data.code === 1) {
+        this.visible2 = false
+        this.getOrder()
+      }
+    },
+    // 获取订单
+    async getOrder () {
+      const Myorder = await API.myOrder({state: 1, isPing: 0})
+      console.log('待付款', Myorder)
+      this.myorderList = Myorder.data.list
     }
   },
-  // 获取后台数据
   async mounted () {
-    const Myorder = await API.myorder({state: 1, isPing: 0})
-    console.log(Myorder)
-    this.myorderList = Myorder.data.list
+    this.getOrder()
   }
 }
 </script>

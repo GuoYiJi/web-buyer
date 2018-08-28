@@ -17,14 +17,29 @@
     <div v-if="type == '1'" class="refundVoucher">
       <p class="title">上传凭证：<span>(最多可上传3张)</span></p>
       <div class="images" >
-        <div  class="img" @click="chooseImg(1)">
-          <img :src="img1" alt="">
+        <div class="img" @click="chooseImg(1)">
+          <img v-if="img1" :src="img1" alt="">
+
+          <img v-else src="../../assets/img/my/upimg.png" alt="">
+
+          <span v-if="img1" class="close"@click="closeImg('img1',event)"></span>
+
         </div>
         <div v-if="img1" class="img" @click="chooseImg(2)">
-          <img :src="img2" alt="">
+          <img v-if="img2" :src="img2" alt="">
+
+          <img v-else src="../../assets/img/my/upimg.png" alt="">
+
+          <span v-if="img2" class="close"@click="closeImg('img2',event)"></span>
+
         </div>
         <div v-if="img2" class="img" @click="chooseImg(3)">
-          <img :src="img3" alt="">
+          <img v-if="img3" :src="img3" alt="">
+
+          <img v-else src="../../assets/img/my/upimg.png" alt="">
+
+          <span v-if="img3" class="close" @click="closeImg('img3',event)"></span>
+
         </div>
       </div>
     </div>
@@ -85,6 +100,7 @@ export default {
       this.reason = text
       this.wellShow = false
     },
+    // 上传图片
     chooseImg (num) {
       const self = this
       wx.chooseImage({
@@ -140,6 +156,11 @@ export default {
         }
       })
     },
+    // 清楚上传的图片
+    closeImg (name, event) {
+      event.stopPropagation()
+      this[name] = ''
+    },
     // 提交按钮
     async submit () {
       // if (this.reason === '') {
@@ -155,8 +176,8 @@ export default {
         refundType: this.type,
         result: this.explain,
         img1: this.img1,
-        img2: this.img1,
-        img3: this.img1
+        img2: this.img2,
+        img3: this.img3
       })
       console.log('退款', data)
       if (data.code === 1) {
@@ -247,10 +268,21 @@ export default {
   .images
     height: 240px
     .img
+      float: left
+      position: relative
+      margin-right: 20px
       width: 200px
       height: 200px
-      background: url('../../assets/img/my/upimg.png') no-repeat
-      background-size: 200px 200px
+      /*background: url('../../assets/img/my/upimg.png') no-repeat*/
+      /*background-size: 200px 200px*/
+      .close
+        position: absolute
+        top: 10px
+        right: 10px
+        width: 36px
+        height: 36px
+        background: url('../../assets/img/my/cancel.png') no-repeat
+        background-size: 36px 36px
 .title
   height: 70px
   line-height: 70px

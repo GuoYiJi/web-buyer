@@ -27,6 +27,8 @@ class API {
   getCardList = params => http.post('api/goods/card/selectGoodsCard', params)
   // 删除购物车
   deleteCard = params => http.post('api/goods/card/deleteGoodsCard', params)
+  // 我的订单
+  myOrder = params => http.post('api/order/selectMyOrderPage', params)
   // 获取订单详情
   getOrderDetails = params => http.post('api/order/selectMyOrderDetail', params)
   // 取消订单

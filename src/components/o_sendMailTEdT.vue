@@ -50,8 +50,8 @@
         <!--<p class="s-text">父订单编号：{{details.parent.orderNo}}</p>-->
         <p class="s-text">订单编号：{{details.orderNo}}</p>
         <p class="s-text">下单时间：{{details.createTime}}</p>
-        <p class="s-text">支付时间：2018-06-16 14:27:12</p>
-        <p class="s-text">发货时间：2018-06-16 14:27:12</p>
+        <p v-if="details.payTime" class="s-text">支付时间：{{details.payTime}}</p>
+        <p v-if="details.deliverTime" class="s-text">发货时间：{{details.deliverTime}}</p>
       </div>
     </div>
     <!--<div style="height: 100px"></div>-->

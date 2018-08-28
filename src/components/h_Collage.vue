@@ -37,16 +37,6 @@ export default {
   components: {},
   data () {
     return {
-      // upnewList: [
-      //   {
-      //     title: '标题标题标题标题标题标题标题标标题标题',
-      //     img:
-      //       'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-      //     Goods: '现货',
-      //     volume: '123',
-      //     money: '55'
-      //   }
-      // ],
       List: [],
       page: 1,
       totalPage: 0
@@ -59,7 +49,7 @@ export default {
         pageSize: 5,
         pageNumber: page
       })
-      console.log(data)
+      console.log('拼团商品', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)

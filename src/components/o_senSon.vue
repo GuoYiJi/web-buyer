@@ -98,7 +98,7 @@
       <div class="serial">
         <p class="s-text">订单编号：{{details.orderNo}}</p>
         <p class="s-text">下单时间：{{details.createTime}}</p>
-        <p class="s-text">支付时间：2018-06-16 14:27:12</p>
+        <p v-if="details.payTime" class="s-text">支付时间：{{details.payTime}}</p>
       </div>
     </div>
     <!--<div style="height: 100px"></div>-->

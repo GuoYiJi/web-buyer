@@ -79,16 +79,16 @@
   </div>
 </template>
 <script>
-import wx from 'wx'
-import API from '@/api/httpJchan'
+// import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
+  data () {
     return {
       visible1: false,
       visible2: false,
       myorderList: []
-    };
+    }
   },
   methods: {
     bxq (id, xq) {
@@ -99,23 +99,28 @@ export default {
         query: { id: id, xq: xq }
       })
     },
-    toOpen(name) {
-      this[name] = true;
+    toOpen (name) {
+      this[name] = true
     },
-    toClose(name) {
-      this[name] = false;
+    toClose (name) {
+      this[name] = false
     },
-    myord() {
-      const myorderList = this.myorderList;
+    myord () {
+      const myorderList = this.myorderList
+    },
+    // 获取订单
+    async getOrder () {
+      const Myorder = await API.myOrder({state: 6, isPing: 0})
+      console.log('待收货', Myorder)
+      this.myorderList = Myorder.data.list
     }
   },
   // 获取后台数据
   async mounted () {
-    const Myorder = await API.myorder({state: 6, isPing: 0})
-    this.myorderList = Myorder.data.list
+    this.getOrder()
     this.myord()
   }
-};
+}
 </script>
 <style type="text/sass" lang='sass' scoped>
 @import '~@/assets/css/mixin'

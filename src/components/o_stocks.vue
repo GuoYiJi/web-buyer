@@ -76,7 +76,7 @@
 </template>
 <script>
 // import wx from 'wx'
-import API from '@/api/httpJchan'
+import API from '@/api/httpShui'
 export default {
   components: {},
   data () {
@@ -101,12 +101,17 @@ export default {
         query: { id: id, xq: xq }
       })
     },
-    myord () {}
+    myord () {},
+    // 获取订单
+    async getOrder () {
+      const Myorder = await API.myOrder({state: 7, isPing: 0})
+      console.log('交易完成', Myorder)
+      this.myorderList = Myorder.data.list
+    }
   },
   // 获取后台数据
   async mounted () {
-    const Myorder = await API.myorder({state: 7, isPing: 0})
-    this.myorderList = Myorder.data.list
+    this.getOrder()
     this.myord()
   }
 }

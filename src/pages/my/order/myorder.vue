@@ -7,23 +7,23 @@
       </div>
     </div>
     <div class="content">
-      <div v-if="tag == 1">
+      <div v-if="tag == '1'">
         <obligation />
         <send />
         <receiving />
         <stocks />
         <!--<orderMgr />-->
       </div>
-      <div v-if="tag == 2">
+      <div v-if="tag == '2'">
         <obligation />
       </div>
-      <div v-if="tag == 3">
+      <div v-if="tag == '3'">
         <send />
       </div>
-      <div v-if="tag == 4">
+      <div v-if="tag == '4'">
         <receiving />
       </div>
-      <div v-if="tag == 5">
+      <div v-if="tag == '5'">
         <stocks />
       </div>
     </div>
@@ -31,14 +31,14 @@
 </template>
 <script>
 // import wx from 'wx'
-import orderMgr from '@/components/o_orderMgr'
+// import orderMgr from '@/components/o_orderMgr'
 import obligation from '@/components/o_obligation'
 import send from '@/components/o_send'
 import receiving from '@/components/o_receiving'
 import stocks from '@/components/o_stocks'
 export default {
   components: {
-    orderMgr,
+    // orderMgr,
     obligation,
     send,
     receiving,
@@ -84,7 +84,6 @@ export default {
     myTag () {
       let type = this.$route.query.tag
       this.tag = type
-      console.log('end', this.tag)
     }
   },
   mounted () {
