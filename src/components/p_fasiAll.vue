@@ -7,76 +7,105 @@
       <span class="h-title">{{item.name || '菲斯的小店'}}</span>
       <span class="h-text">{{item.state === 1 ? '未支付' : item.state === 2 ? '取消交易' : item.state === 5 ? '拼单成功，待发货' : item.state === 6 ? '拼单成功，待收货 ' : item.state === 7 ? '拼单成功，已完成' : item.state === 8 ? '交易关闭' : item.state === 9 ? '拼单中' : item.state === 10 ? '审核中' : '未知状态'}}</span>
     </div>
+    <!-- 商品图片展示 -->
     <div class="nav" v-if="item.layer === 1">
       <img class="n-img" v-for="(list, num) in item.goodsList" :key="list.goodsId" :src="list.image" v-if="num < 3">
       <i class="n-icon"></i>
     </div>
+    <!-- 商品详情展示 -->
     <div class="nav" v-else-if="item.layer === 2">
       <img class="n-img" v-for="(list, num) in item.goodsList" :key="list.goodsId" :src="list.image" v-if="num < 1">
       <div class="goodsDetail">
         <span class="title">{{item.goodsList[0].name}}</span>
         <span class="skuCode" v-for="(good, goodnum) in item.goodsList">
-          <p v-for="(skuItem, skuNum) in good.skuList">{{skuItem.skuCode}}</p>
+          <!-- <p v-for="(skuItem, skuNum) in good.skuList">{{skuItem.skuCode}}</p> -->
+        </span>
+      </div>
+    </div>
+    <!-- 商品信息展示 -->
+    <div class="below">
+      <div class="total">
+        <span class="t-left">共<p class="size">{{item.goodsListSize}}</p>个款式&emsp;<p class="piece">{{item.goodsList.length}}</p>件商品</span>
+        <span class="t-right">
+          <span class="money">合计: <strong>￥{{item.paid}}</strong>&emsp;<p>(含运费￥{{item.freight}})</p></span>
         </span>
       </div>
     </div>
 
-    <div class="below">
-      <div class="total">
-        <p class="t-left">共<span class="size">{{item.goodsListSize}}</span>个款式  <span class="piece">{{item.goodsList.length}}</span>件商品</p>
-        <p class="t-freight">（含运费￥{{item.freight}}）</p>
-        <p class="t-right">合计:
-          <span class="money">￥{{item.paid}}</span>
-        </p>
-      </div>
-    </div>
-    <!-- v-if="item.layer === 2" -->
-    <table class="skuCode">
-      <!-- <thead> -->
-        <tr>
-          <th>颜色</th>
-          <th>码数</th>
-          <th>总件数</th>
-          <th>已发</th>
-          <th>未发</th>
-        </tr>
-      <!-- </thead>
-      <tbody> -->
-        <tr v-for="(numb, ccnum) in 5">
-          <td>{{ccnum}}</td>
-          <td>{{ccnum}}</td>
-          <td>{{ccnum}}</td>
-          <td>{{ccnum}}</td>
-          <td>{{ccnum}}</td>
-        </tr>
-      <!-- </tbody> -->
+    <table class="skuCode" v-if="tag === 2 && item.layer === 2">
+      <tr>
+        <th></th>
+        <th>颜色</th>
+        <th>码数</th>
+        <th>总件数</th>
+        <th>已发</th>
+        <th>未发</th>
+        <th></th>
+      </tr>
+      <tr v-for="(skuChild, c1) in skuCodeList[index]" :key="c1">
+        <td></td>
+        <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
+        <td></td>
+      </tr>
     </table>
+    <ul class="itemOrder" v-if="item.layer === 2">
+      <li>子订单编号（已完成）：12345678</li>
+      <li>子订单编号（已完成）：12345678</li>
+    </ul>
 
+    <!-- 代付款 -->
     <div class="btn" v-if="item.state === 1">
       <span class="button">确认付款</span>
       <span class="button" @click="toOpen('visible2')">取消订单</span>
       <span class="button" @click="toPinDetails">查看详情</span>
     </div>
+    <!-- 关闭交易 -->
     <div class="btn" v-else-if="item.state === 2">
       <span class="button">删除订单</span>
       <span class="button" @click="toPinDetails">查看详情</span>
     </div>
+    <!-- 待发货 -->
     <div class="btn" v-else-if="item.state === 5">
       <span class="button" @click="toPinDetails">查看详情</span>
       <span><i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i></span>
     </div>
+    <!-- 待收货 -->
     <div class="btn" v-else-if="item.state === 6">
       <span class="button" @click="toPinDetails">查看详情</span>
       <span><i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i></span>
     </div>
+    <!-- 待收货已拆单 -->
+    <div v-else-if="item.state === 6 && item.layer ===2">
+      <div class="btn">
+        <span>
+          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head + ')'}"></i>
+        </span>
+      </div>
+      <div class="btn">
+        <span class="button" @click="toPinDetails">确认收货</span>
+        <span class="button" @click="toPinDetails">查看物流</span>
+        <span class="button" @click="toPinDetails">申请售后</span>
+        <span class="button" @click="toPinDetails">查看详情</span>
+      </div>
+    </div>
+    <!-- 交易成功 -->
     <div class="btn" v-else-if="item.state === 7">
+      <span><i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i></span>
       <span class="button">删除订单</span>
       <span class="button" @click="toPinDetails">查看详情</span>
     </div>
+    <!-- 交易成功已拆单 -->
+    <div class="btn" v-else-if="item.state === 7 && item.layer === 2">
+      <span><i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i></span>
+      <span class="button">删除订单</span>
+      <span class="button" @click="toPinDetails">查看详情</span>
+    </div>
+    <!-- 拼单中 -->
     <div class="btn" v-else-if="item.state === 9">
       <span class="button">取消订单</span>
       <span><i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i></span>
     </div>
+
     <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
       <div class="m_tips"></div>
     </i-modal>
@@ -90,16 +119,22 @@ export default {
   data() {
     return {
       visible1: false,
-      visible2: false
+      visible2: false,
+      skuCodeList: [], //商品规格状态
     };
   },
   props: {
     ordersValueList: {
       type: Array,
       default: []
+    },
+    tag: {
+      type: Number,
+      default: 0
     }
   },
   methods: {
+    //数据处理
     toOpen(name) {
       this[name] = true;
     },
@@ -114,7 +149,18 @@ export default {
     }
 
   },
-  mounted() {}
+  created() {
+    this.ordersValueList.forEach((Pitem, Pindex) => {
+      this.skuCodeList[Pindex] = [];
+      Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
+        console.log(Citem, Pindex, Cindex);
+        let color = Citem.skuCode.split(',')[0];
+        let size = Citem.skuCode.split(',')[1];
+        console.log(color, size);
+        this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
+      })
+    });
+  }
 };
 </script>
 <style lang="sass" scoped>
@@ -163,51 +209,53 @@ export default {
       text-align: left
       font-size: 24px
       color: #999999
-  // .n-icon
-  //   width: 14px
-  //   height: 25px
-  //   +bg-img("home/shanJiao.png")
-  //   vertical-align: middle
-  //   display: inline-block
-  //   position: absolute
-  //   right: 34px
-  //   top: 45%
 .below
   background: #fff
   .total
-    height: 82px
-    margin-left: 32px
+    // width: 100%
+    // height: 82px
+    padding: 30px
+    // margin-left: 32px
     overflow: hidden
     border-bottom: 1px solid #E5E5E5
-    p
+    display: flex
+    align-items: center
+    justify-content: space-between
+    p, strong
+      display: inline
+    span.t-left
+      width: 250px
       font-size: 24px
       color: #000
-    .t-left
-      float: left
-      padding-top: 20px
-    .t-right
-      float: right
-      padding-top: 15px
-      padding-right: 10px
-    .t-freight
-      float: right
-      padding-top: 20px
+      text-align: left
+      overflow: hidden
+      .piece, .size
+        font-size: 28px
+        color: #F67C2F
+    span.t-right
+      flex: 1
+      display: flex
+      justify-content: flex-end
+      align-items: center
       font-size: 24px
-      color: #666
-    .piece, .size
-      font-size: 28px
-      color: #F67C2F
-    .money
-      font-size: 32px
-      color: #FF0000
-
+      color: #000000
+      span.money
+        strong
+          font-size: 32px
+          color: #FF0000
+        p
+          color: #666666
 table.skuCode
   width: 100%
   border: none
   text-align: center
-  thead, tbody
+  tr
     width: 100%
+    display: flex
+    &:nth-of-type(2n)
+      background-color: #EEEEEE
     th, td
+      flex: 1
       padding: 10px 0
       font-size: 28px
     th
@@ -215,11 +263,19 @@ table.skuCode
       color: #999999
     td
       color: #666666
-      &:nth-of-type(2n)
-        background-color: #EEEEEE
-
-
-
+ul.itemOrder
+  padding: 0 24px
+  background-color: #ffffff
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  li
+    width: 95%
+    border-bottom: 1px solid #E5E5E5
+    padding: 25px 5px
+    font-size: 28px
+    background: url("~@/assets/img/my/shanJiao.png") no-repeat right
+    background-size: 11px 18px
 .orders
   height: 90px
   line-height: 90px
@@ -244,6 +300,8 @@ table.skuCode
   padding: 25px 0
   background: #fff
   overflow: hidden
+  &:first-of-type
+    border-bottom: 1px solid #E5E5E5
   span
     float: left
     padding-left: 5px

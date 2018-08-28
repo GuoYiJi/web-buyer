@@ -18,7 +18,7 @@
       <fasiAll :ordersValueList="ordersValueList" />
     </div>
     <div v-else-if="tag == 4">
-      <fasiAll :ordersValueList="ordersValueList" />
+      <fasiAll :ordersValueList="ordersValueList" :tag="tag" />
     </div>
     <div v-else-if="tag == 5">
       <fasiAll :ordersValueList="ordersValueList" />
@@ -106,13 +106,13 @@ export default {
         isPing: 1
       });
       console.log(response);
-      this.ordersValueList = response.data.list
+      this.ordersValueList = response.data.list;
     }
     // toRoute(path) {
     //   this.$router.push('/pages/home/' + path)
     // }
   },
-  mounted() {
+  created() {
     this.getOrderList(null);
   }
 };
