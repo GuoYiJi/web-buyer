@@ -4,7 +4,7 @@
     <div class="kuang" v-for="(item,index) in myorderList" :key="index">
       <div class="head">
         <span class="h-title">菲斯的小店</span>
-        <span class="h-text">待付款</span>
+        <span class="h-text">{{item.state==1 ? '待付款' : ''}}</span>
       </div>
       <div class="nav">
         <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
@@ -78,8 +78,8 @@ export default {
     return {
       visible1: false,
       visible2: false,
-      myorderList: []
-      // id: ""
+      myorderList: [],
+      id: ''
     }
   },
   methods: {
@@ -100,10 +100,9 @@ export default {
   },
   // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 1 })
-    this.myorderList = myorder.data.list
-    this.id = myorder.data.list.id
-    console.log(myorder.data.list.id)
+    const Myorder = await API.myorder({state: 1, isPing: 0})
+    console.log(Myorder)
+    this.myorderList = Myorder.data.list
   }
 }
 </script>

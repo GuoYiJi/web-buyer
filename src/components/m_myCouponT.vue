@@ -4,8 +4,8 @@
       <p class="title">~空空如也~</p>
       <i class="t_img"></i>
     </div>
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
-      <i class="bg hasCoupon"></i>
+    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title <= 1)">
+      <p class="bg hasCoupon"></p>
       <div class="left">
         <p class="money">￥
           <span class="money1">{{item.count}}</span>
@@ -29,8 +29,8 @@ export default {
       title: 0,
       Invalid: 1,
       myCouponList: [],
-      startTime: [],
-      endTime: []
+      startTime: "",
+      endTime: ""
     };
   },
   methods: {},
@@ -38,8 +38,7 @@ export default {
     const myCoupon = await API.myCoupon({
       isExchange: 2,
       pageSize: 10,
-      pageNumber: 1,
-      state: 1
+      pageNumber: 1
     });
     this.myCouponList = myCoupon.data.list;
     this.title = myCoupon.data.list.length;
@@ -47,8 +46,8 @@ export default {
     for (var i = 0; i < myCoupon.data.list.length; i++) {
       console.log(myCoupon.data.list[i].startTime.substring(0, 10));
       console.log(myCoupon.data.list[i].endTime.substring(0, 10));
-      this.startTime = myCoupon.data.list[i].startTime.split(" ")[0].toString();
-      this.endTime = myCoupon.data.list[i].endTime.split(" ")[0].toString();
+      this.startTime += myCoupon.data.list[i].startTime.substring(0, 10);
+      this.endTime += myCoupon.data.list[i].endTime.substring(0, 10);
     }
   }
 };
@@ -56,6 +55,8 @@ export default {
 
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'
+.hasCoupon
+  +bg-img('marketingMgt/yhq.png')
 .nav
   .head
     .title
@@ -81,8 +82,6 @@ export default {
       width: 689px
       height: 220px
       background: #000
-    .hasCoupon
-      // +bg-img('marketingMgt/yhq.png')
   .left
     position: absolute
     top: 62px

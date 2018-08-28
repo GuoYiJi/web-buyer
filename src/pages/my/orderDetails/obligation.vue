@@ -1,15 +1,15 @@
 <template>
   <div class="home">
     <!-- 订单详情-买家待付款 -->
-    <obliGat v-if="id===1" :id="id"/>
+    <obliGat v-if="xq==1" :id="id"/>
     <!-- 订单详情-待发货状态 -->
-    <senSon  v-if="id===2" :id="id"/>
+    <senSon  v-if="xq==2" :id="id"/>
     <!-- 订单详情-待收货状态-->
-    <sendMailTEdT v-if="id===3" :id="id"/>
+    <sendMailTEdT v-if="xq==3" :id="id"/>
     <!-- 订单详情-交易成功状态 -->
-    <succOrder />
+    <succOrder v-if="xq==4" :id="id" />
     <!-- 订单详情-交易取消状态-->
-    <cancelledMail v-if="id===4" :id="id"/>
+    <!--<cancelledMail  :id="id"/>-->
   </div>
 </template>
 <script>
@@ -26,21 +26,22 @@ export default {
     senSon,
     sendMailTEdT,
     succOrder,
-    cancelledMail,
+    cancelledMail
   },
   data () {
     return {
-      xq: 0,
+      xq: null,
       id: ''
     }
   },
   methods: {
     myXq () {
-      const _xq = this.$mp.query.xq
-      const _id = this.$mp.query.id
-      this.id = _id
-      this.xq = _xq
-      console.log(this)
+      this.id = this.$route.query.id
+      this.xq = this.$route.query.xq
+      // const _xq = this.$route.query.xq
+      // const _id = this.$route.query.id
+      // console.log(this.xq)
+      // console.log(this.id)
     }
   },
   mounted () {

@@ -12,22 +12,23 @@
       <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
     </div>
     <p class="title">菲斯的小店</p>
-    <div class="nav">
-      <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+    <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
+      <img v-if="item.image" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <div class="n-right">
-        <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-        <p class="yardage">白色：均码/2件</p>
-        <p class="yardage">黑色：均码/1件</p>
+        <p class="n-title">{{item.name}}</p>
+        <p class="yardage">{{item.skuCode}}</p>
+        <!--<p class="yardage">黑色：均码/1件</p>-->
       </div>
     </div>
     <div class="below">
       <div class="total">
         <p class="t-left">共
-          <span class="piece">3</span> 件商品</p>
+          <span class="piece">{{details.num}}</span> 件商品</p>
         <!-- 物流到付 -->
-        <p v-if="(wuliu == 1)" class="t-freight">（含运费￥10.00）</p>
+        <p v-if="(wuliu == 1)" class="t-freight">（含运费￥{{details.freight}}）</p>
         <p class="t-right">合计:
-          <span class="money">￥154.00</span>
+          <span class="money">￥{{details.count}}</span>
         </p>
       </div>
       <!-- 主订单 -->
@@ -45,27 +46,27 @@
           </li>
         </div>
       </div>
-      <p class="message">买家留言：包装好一点</p>
+      <p class="message">买家留言：{{details.remark ? details.remark : '没有留言信息！'}}</p>
     </div>
     <div class="prices">
       <p>
         <span class="left">商品总价</span>
-        <span class="right">￥154.00</span>
+        <span class="right">￥{{details.count - details.freight}}</span>
       </p>
       <p>
         <span class="left">优惠劵折扣</span>
-        <span class="right">- ￥10.00</span>
+        <span class="right">-￥{{details.couponMoney ? details.couponMoney : 0}}</span>
       </p>
       <!-- 物流到付 -->
       <p v-if="(wuliu == 1)">
         <span class="left">运费</span>
-        <span class="right">+ ￥10.00</span>
+        <span class="right">+￥{{details.freight}}</span>
       </p>
       <div class="serial">
         <!-- 子订单 -->
-        <p v-if="(zi == 1)" class="s-text">父订单编号：2018062712345678904</p>
-        <p class="s-text">订单编号：2018062712345678904</p>
-        <p class="s-text">下单时间：2018-06-16 12:27:12</p>
+        <!--<p v-if="(zi == 1)" class="s-text">父订单编号：{{details.parent.orderNo}}</p>-->
+        <p class="s-text">订单编号：{{details.orderNo}}</p>
+        <p class="s-text">下单时间：{{details.createTime}}</p>
         <p class="s-text">支付时间：2018-06-16 14:27:12</p>
         <p class="s-text">发货时间：2018-06-16 14:27:12</p>
         <p class="s-text">收货时间：2018-06-17 14:27:12</p>
@@ -79,17 +80,32 @@
   </div>
 </template>
 <script>
-import wx from "wx";
+// import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
-    return { zi: 0, wuliu: 0, zhu: 0 };
+  props: ['id'],
+  data () {
+    return {
+      zi: 0,
+      wuliu: 0,
+      zhu: 0,
+      details: {}
+    }
   },
-  methods: {},
-  mounted() {}
-};
+  methods: {
+    async getOrderDetails (id) {
+      const data = await API.getOrderDetails({orderId: id})
+      this.details = data.data
+      console.log('交易成功订单详情', this.details)
+    }
+  },
+  mounted () {
+    this.getOrderDetails(this.id)
+  }
+}
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .head
   color: #06BF04

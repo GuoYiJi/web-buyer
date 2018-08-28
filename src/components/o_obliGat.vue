@@ -3,7 +3,7 @@
   <div class="home">
     <div class="head">
       <i class="h-img"></i>
-      <span>等待买家付款（剩23小时59分自动关闭）</span>
+      <span>等待买家付款</span>
     </div>
     <div class="diz">
       <i class="dz-img"></i>
@@ -12,52 +12,57 @@
       <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
     </div>
     <p class="title">菲斯的小店</p>
-    <div class="nav">
-      <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+    <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
+      <img v-if="item.image" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <div class="n-right">
-        <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-        <p class="yardage">白色：均码/2件</p>
-        <p class="yardage">黑色：均码/1件</p>
+        <p class="n-title">{{item.name}}</p>
+        <p class="yardage">{{item.skuCode}}</p>
+        <!--<p class="yardage">黑色：均码/1件</p>-->
       </div>
     </div>
     <div class="below">
       <div class="total">
         <p class="t-left">共
-          <span class="piece">3</span> 件商品</p>
-        <p class="t-freight">（含运费￥10.00）</p>
+          <span class="piece">{{details.num}}</span> 件商品
+        </p>
+        <p class="t-freight">（含运费￥{{details.freight}}）</p>
         <p class="t-right">合计:
-          <span class="money">￥154.00</span>
+          <span class="money">￥{{details.count}}</span>
         </p>
       </div>
-      <p class="message">买家留言：包装好一点</p>
+      <p class="message">买家留言：{{details.remark ? details.remark : '没有留言信息！'}}</p>
     </div>
     <div class="prices">
       <p>
         <span class="left">商品总价</span>
-        <span class="right">￥154.00</span>
+        <span class="right">￥{{details.count - details.freight}}</span>
       </p>
       <p>
         <span class="left">优惠劵折扣</span>
-        <span class="right">- ￥10.00</span>
+        <span class="right">-￥{{details.couponMoney ? details.couponMoney : 0}}</span>
       </p>
       <p>
         <span class="left">运费</span>
-        <span class="right">+ ￥10.00</span>
+        <span class="right">+￥{{details.freight}}</span>
       </p>
       <div class="serial">
-        <p class="s-text">订单编号：2018062712345678904</p>
-        <p class="s-text">下单时间：2018-06-16 12:27:12</p>
+        <p class="s-text">订单编号：{{details.orderNo}}</p>
+        <p class="s-text">下单时间：{{details.createTime}}</p>
       </div>
     </div>
     <div class="foot">
       <span class="f-title">合计：
-        <span class="f-text">￥154.00</span>
+        <span class="f-text">￥{{details.paid}}</span>
       </span>
-      <span class="pay" @click="toOpen('visible2')">马上支付</span>
-      <span class="btn">取消订单</span>
+      <span class="pay" @click="toOpen('visible1')">马上支付</span>
+      <span class="btn" @click="toOpen('visible2')">取消订单</span>
     </div>
-    <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
+    <i-modal :visible="visible1" @ok="toClose('visible1')" @cancel="toClose('visible1')">
       <div class="m_tips">您的订单已提交，请与客服联系，完成线下付款！</div>
+    </i-modal>
+    <i-modal :visible="visible2" @ok="cancelOrder()" @cancel="toClose('visible2')">
+      <div class="m_tips">确定取消此订单！</div>
     </i-modal>
   </div>
 </template>
@@ -69,8 +74,9 @@ export default {
   props: ['id'],
   data () {
     return {
+      visible1: false,
       visible2: false,
-      orderId: ''
+      details: {}
     }
   },
   methods: {
@@ -80,21 +86,30 @@ export default {
     toClose (name) {
       this[name] = false
     },
-    async getOrderDetails () {
-      const data = await API.getOrderDetails({orderId: this.orderId})
-      console.log('订单详情', data)
+    async getOrderDetails (id) {
+      const data = await API.getOrderDetails({orderId: id})
+      this.details = data.data
+      console.log('待付款订单详情', this.details)
+    },
+    // 取消订单
+    async cancelOrder () {
+      const data = await API.cancelOrder({orderId: this.id})
+      console.log(data)
+      if (data.code === 1) {
+        this.visible2 = false
+        this.$router.push({
+          path: '/pages/my/order/myorder',
+          query: {tag: 2}
+        })
+      }
     }
   },
   mounted () {
-    // this.orderId = this.$route.query.id
-    // let xq = this.$route.query.xq
-    console.log(this.id)
-    // console.log(xq)
-    // this.getOrderDetails()
+    this.getOrderDetails(this.id)
   }
 }
 </script>
-<style  type="text/sass" lang='sass' scoped>
+<style type="text/sass" lang='sass' scoped>
 @import '~@/assets/css/mixin'
 .head
   color: #F67C2F
@@ -212,7 +227,7 @@ export default {
 .prices
   margin-top: 20px
   background: #fff
-  padding: 10px 33px
+  padding: 33px 33px
   p
    font-size: 28px
    display: inline-block

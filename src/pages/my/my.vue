@@ -80,7 +80,7 @@ import API from "@/api/httpJchan";
 export default {
   mixins: [mixin],
   components: { footers },
-  data() {
+  data () {
     return {
       prePayment: 0,
       delivery: 0,
@@ -90,11 +90,11 @@ export default {
     };
   },
   methods: {
-    order(tag) {
+    order (tag) {
       this.$router.push({
         path: "/pages/my/order/myorder",
         query: { tag: tag }
-      });
+      })
     },
     toRouteMyget() {
       this.$router.push("/pages/my/myget/get");
@@ -110,7 +110,6 @@ export default {
     },
     tuig() {
       this.$router.push("/pages/my/procedures");
-      // this.$router.push("/pages/my/sales");
     }
   },
   async mounted() {

@@ -12,18 +12,18 @@
         <send />
         <receiving />
         <stocks />
-        <orderMgr />
+        <!--<orderMgr />-->
       </div>
-      <div v-else-if="tag == 2">
+      <div v-if="tag == 2">
         <obligation />
       </div>
-      <div v-else-if="tag == 3">
+      <div v-if="tag == 3">
         <send />
       </div>
-      <div v-else-if="tag == 4">
+      <div v-if="tag == 4">
         <receiving />
       </div>
-      <div v-else-if="tag == 5">
+      <div v-if="tag == 5">
         <stocks />
       </div>
     </div>
@@ -46,7 +46,7 @@ export default {
   },
   data () {
     return {
-      tag: 1,
+      tag: null,
       navData: [
         {
           id: 1,
@@ -82,12 +82,14 @@ export default {
       this.mounted()
     },
     myTag () {
-      const tag = this.$mp.query.tag
-      this.tag = tag
+      let type = this.$route.query.tag
+      this.tag = type
+      console.log('end', this.tag)
     }
   },
   mounted () {
-    this.myTag()
+    let type = this.$route.query.tag
+    this.tag = type
   }
 }
 </script>

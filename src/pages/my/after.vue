@@ -193,21 +193,21 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import API from "@/api/httpJchan";
+import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
-    return {};
+  data () {
+    return {}
   },
   methods: {},
-  async mounted() {
-    const tabsList = await API.after();
-    console.log(tabsList);
+  async mounted () {
+    const tabsList = await API.afterService()
+    console.log(tabsList)
   }
-};
+}
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .head
   display: flex

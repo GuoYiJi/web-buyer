@@ -73,7 +73,7 @@
         </block>
       </div>
       <div class="btn">
-        <span class="b-xq2" @click="bxq(3)">查看详情</span>
+        <span class="b-xq2" @click="bxq(item.id,3)">查看详情</span>
       </div>
     </div>
   </div>
@@ -91,11 +91,13 @@ export default {
     };
   },
   methods: {
-    bxq(xq) {
+    bxq (id, xq) {
+      // console.log(id)
+      // console.log(xq)
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
-        query: { xq: xq }
-      });
+        query: { id: id, xq: xq }
+      })
     },
     toOpen(name) {
       this[name] = true;
@@ -108,10 +110,10 @@ export default {
     }
   },
   // 获取后台数据
-  async mounted() {
-    const myorder = await API.myorder({ state: 6 });
-    this.myorderList = myorder.data.list;
-    this.myord();
+  async mounted () {
+    const Myorder = await API.myorder({state: 6, isPing: 0})
+    this.myorderList = Myorder.data.list
+    this.myord()
   }
 };
 </script>

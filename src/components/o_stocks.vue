@@ -69,7 +69,7 @@
         </block>
       </div>
       <div class="btn">
-        <span class="b-xq2" @click="bxq(4)">查看详情</span>
+        <span class="b-xq2" @click="bxq(item.id,4)">查看详情</span>
       </div>
     </div>
   </div>
@@ -93,18 +93,20 @@ export default {
     toClose (name) {
       this[name] = false
     },
-    bxq (xq) {
+    bxq (id, xq) {
+      // console.log(id)
+      // console.log(xq)
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
-        query: { xq: xq }
+        query: { id: id, xq: xq }
       })
     },
     myord () {}
   },
   // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 7 })
-    this.myorderList = myorder.data.list
+    const Myorder = await API.myorder({state: 7, isPing: 0})
+    this.myorderList = Myorder.data.list
     this.myord()
   }
 }
