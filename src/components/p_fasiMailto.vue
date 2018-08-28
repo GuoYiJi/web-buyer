@@ -2,18 +2,20 @@
   <!-- 拼团交易完成-邮寄 -->
   <div class="home">
       <div class="head">
-        <div class="pin-completemsg">
-            <i class="icon"></i>
-            <span class="pinmsg">拼团成功，交易完成</span>
-        </div>
+        <i class="icon"></i>
+        <span class="pinmsg">拼团成功，交易完成</span>
       </div>
-      <div class="rec-Informa">        
+      <div class="rec-Informa">
           <i class="icon-Adr"></i>
-          <span class="rec-Name">收货人：朱先森</span>
-          <span class="rec-Num">15632168160</span>
-          <p class="rec-Adr">收货地址： 广州市越秀区 西城都荟三层3012</p>
+          <div class="box">
+            <div class="top">
+              <span class="rec-Name">收货人：朱先森</span>
+              <span class="rec-Num">15632168160</span>
+            </div>
+            <span class="rec-Adr">收货地址： 广州市越秀区 西城都荟三层3012</span>
+          </div>
       </div>
-      <p class="title">菲斯的小店</p>
+      <div class="title">菲斯的小店</div>
       <div class="nav">
         <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
         <div class="n-right">
@@ -73,17 +75,9 @@ export default {
   components: {},
   data() {
     return {
-      visible1: false,
-      visible2: false
     };
   },
   methods: {
-    toOpen(name) {
-      this[name] = true;
-    },
-    toClose(name) {
-      this[name] = false;
-    }
   },
   mounted() {}
 };
@@ -92,85 +86,69 @@ export default {
 @import '~@/assets/css/mixin'
 .head
   display: flex
+  align-items: center
   font-size: 28px
   // margin-top: 5px
-  padding: 0 34px
+  padding: 28px 32px
   background: #fff
-  height: 82px
-  line-height: 82px
   background: #fff
-  borde-top: 1px solid #e5e5e5
-  .pin-completemsg
-    width: 100%
-    height: 82px
-    line-height: 82px
-    .icon
-      width: 30px
-      height: 34px
-      +bg-img("my/xq-ok.png")
-      vertical-align: middle
-      display: inline-block
-      position: absolute
-      top: 25px
-      left: 1
-    .pinmsg
-      display:inline-block
-      font-size: 33px
-      font-weight: 500
-      color: #06BF04
-      margin-left: 50px
+  color: #06BF04
+  .icon
+    display: inline-block
+    width: 28px
+    height: 31px
+    margin-right: 24px
+    +bg-img("my/xq-ok.png")
+  .pinmsg
+    font-size: 28px
 .rec-Informa
-  // width: 100%
-  height: 122px     
+  width: 100%
   background: #f9f9f9
-  position: relative
+  padding: 25px 32px
+  display: flex
+  align-items: flex-start
   .icon-Adr
     width: 26px
     height: 32px
     +bg-img("my/dz.png")
-    position: absolute
-    top: 25px
-    left: 33px
-  .rec-Name
-    font-size: 28px
-    color: #000
-    position: absolute
-    top: 28px
-    left: 84px
-  .rec-Num
-    font-size: 28px
-    color: #000
-    position: absolute
-    top: 30px
-    left: 535px  
-  .rec-Adr
-    font-size: 24px
-    color: #666
-    position: absolute
-    top: 70px
-    left: 83px
+  .box
+    flex: 1
+    overflow: hidden
+    display: flex
+    flex-wrap: wrap
+    .top
+      width: 100%
+      color: #000
+      font-size: 28px
+      display: flex
+      justify-content: space-between
+      span.rec-Name
+        width: 200
+        text-align: left
+      span.rec-Num
+        flex: 1
+        text-align: right
+    span.rec-Adr
+      width: 100%
+      font-size: 24px
+      color: #666666
 .title
-  display: inline-block
   width: 100%
-  height: 82px
+  padding: 28px 32px
   background: #fff
-  line-height: 82px
   font-size: 28px
   color: #000
-  padding-left: 33px
 .nav
-  height: 202px
-  padding: 0 32px
-  position: relative
+  width: 100%
+  padding: 20px 32px
   display: flex
+  align-items: center
   .n-img
+    display: inline-block
     width: 160px
     height: 160px
     margin-right: 20px
-    margin-top: 20px
-    display: inline-block
   .n-right
-    display: inline-block
     padding-top: 13px
     flex: 1
     .n-title
@@ -266,5 +244,5 @@ export default {
       width: 72px
       height: 72px
       padding: 0 5px
-      vertical-align: middle   
+      vertical-align: middle
 </style>

@@ -6,6 +6,6 @@ const orderDetails = [{
       'i-modal': '/iview/modal/index',
     }
   }
-}, ]
+} ]
 
 module.exports = orderDetails

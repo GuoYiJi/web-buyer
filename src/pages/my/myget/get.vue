@@ -9,7 +9,7 @@
   </div>
   <div class="content">
     <div v-if="tag == 1">
-      <fasiAll :ordersValueList="ordersValueList" />
+      <fasiAll :ordersValueList="ordersValueList" :skuCodeList="skuCodeList"/>
     </div>
     <div v-else-if="tag == 2">
       <fasiAll :ordersValueList="ordersValueList" />
@@ -18,7 +18,7 @@
       <fasiAll :ordersValueList="ordersValueList" />
     </div>
     <div v-else-if="tag == 4">
-      <fasiAll :ordersValueList="ordersValueList" :tag="tag" />
+      <fasiAll :ordersValueList="ordersValueList" :skuCodeList="skuCodeList"/>
     </div>
     <div v-else-if="tag == 5">
       <fasiAll :ordersValueList="ordersValueList" />
@@ -32,25 +32,16 @@
 <script>
 import wx from "wx";
 import fasiAll from "@/components/p_fasiAll";
-// import fasiPay from "@/components/p_fasiPay";
-// import fasiPin from "@/components/p_fasiPin";
-// import fasiPu from "@/components/p_fasiPu";
-// import fasiWaitcheck from "@/components/p_fasiWaitcheck";
-// import fasiOk from "@/components/p_fasiOk";
 import api from '@/api/httpJchan'
 
 export default {
   components: {
     fasiAll,
-    // fasiPay,
-    // fasiPin,
-    // fasiPu,
-    // fasiWaitcheck,
-    // fasiOk
   },
   data() {
     return {
       tag: 1,
+      skuCodeList: [],
       navData: [{
           id: 1,
           text: "全部"
@@ -98,21 +89,27 @@ export default {
     },
     //获取相应拼单订单
     async getOrderList(state) {
-      console.log("我直行了");
       const response = await api.myorder({
         pageNumber: 1,
         pageSize: 20,
         state,
         isPing: 1
       });
-      console.log(response);
       this.ordersValueList = response.data.list;
+      this.ordersValueList.forEach((Pitem, Pindex) => {
+        this.skuCodeList[Pindex] = [];
+        Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
+          console.log(Citem, Pindex, Cindex);
+          let color = Citem.skuCode.split(',')[0];
+          let size = Citem.skuCode.split(',')[1];
+          console.log(color, size);
+          this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
+        });
+      });
+      console.log(this.skuCodeList);
     }
-    // toRoute(path) {
-    //   this.$router.push('/pages/home/' + path)
-    // }
   },
-  created() {
+  mounted() {
     this.getOrderList(null);
   }
 };
