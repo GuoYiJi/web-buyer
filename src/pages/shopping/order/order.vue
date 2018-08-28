@@ -153,11 +153,13 @@ export default {
     },
     // 立即购买
     buy () {
+      let that = this
       const TEST_URL = config.url
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
       let appId = config.appId
       if (this.isGroup === true) {
+        console.log('拼团商品')
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
@@ -181,6 +183,7 @@ export default {
           }
         })
       } else {
+        console.log('普通商品')
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
@@ -199,6 +202,28 @@ export default {
           },
           success: function (res) {
             console.log(res.data)
+            if (res.data.code === 1) {
+              that.wxSign(res.data.data.id)
+            }
+          }
+        })
+      }
+    },
+    // 微信支付
+    async wxSign (orderId) {
+      const data = await API.wxSign({orderId: orderId})
+      console.log(data)
+      if (data.code === 1) {
+        wx.requestPayment({
+          'timeStamp': '',
+          'nonceStr': '',
+          'package': '',
+          'signType': 'MD5',
+          'paySign': '',
+          'success': function (res) {
+            console.log('调取支付返回结果', res)
+          },
+          'fail': function (res) {
           }
         })
       }

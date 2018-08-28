@@ -118,11 +118,11 @@ export default {
     console.log('获取所有普通订单', myorder.data)
     let order = myorder.data.list
     for (var i = 0, prePayment = 0, delivery = 0, receive = 0; i < order.length; i++) {
-      if (order[i].state == 1) {
+      if (order[i].state === 1) {
         prePayment += 1
-      } else if (order[i].state == 5) {
+      } else if (order[i].state === 5) {
         delivery += 1
-      } else if (order[i].state == 6) {
+      } else if (order[i].state === 6) {
         receive += 1
       }
     }

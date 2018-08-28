@@ -34,7 +34,9 @@ class API {
   // 取消订单
   cancelOrder = params => http.post('api/order/cancelOrder', params)
   // 确认订单
-  sureOrder = params => http.post('api/order /sureOrder', params)
+  sureOrder = params => http.post('api/order/sureOrder', params)
+  // 支付
+  wxSign = params => http.post('api/order/wechatPay', params)
   // 退款退货
   retreatGoods = params => http.post('api/order/doubleBack', params)
   // 售后列表

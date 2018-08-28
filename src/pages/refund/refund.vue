@@ -3,18 +3,18 @@
     <p class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
     <p class="refundPrice">
       退款金额：<span class="price">￥{{price}}</span>
-      <span v-if="type == '0'" class="freight">含邮费￥{{freight}}</span>
-      <span v-else class="freight">不含邮费￥{{freight}}</span>
+      <span v-if="isType" class="freight">含邮费 ￥{{freight}}</span>
+      <span v-if="!isType" class="freight">不含邮费 ￥{{freight}}</span>
     </p>
     <!--<p v-if="type == '0'" class="refundMsg">含邮费￥{{freight}}</p>-->
     <!--<p v-else class="refundMsg">不含邮费￥{{freight}}</p>-->
     <div class="refundExplain">
       <p class="title">退款说明：<span>(最多可输入50个字)</span></p>
-      <textarea v-model="explain"  class="explain" name="" id="" maxlength=50>
+      <textarea v-model="explain" class="explain" name="" id="" maxlength=50>
 
       </textarea>
     </div>
-    <div v-if="type == '1'" class="refundVoucher">
+    <div v-if="!isType" class="refundVoucher">
       <p class="title">上传凭证：<span>(最多可上传3张)</span></p>
       <div class="images" >
         <div class="img" @click="chooseImg(1)">
@@ -73,6 +73,7 @@ export default {
       type: '',
       freight: '',
       price: '',
+      isType: true,
       isCheck: 0,
       reasonList: [
         {id: 1, text: '原因一'},
@@ -156,7 +157,7 @@ export default {
         }
       })
     },
-    // 清楚上传的图片
+    // 清除选择的图片
     closeImg (name, event) {
       event.stopPropagation()
       this[name] = ''
@@ -202,6 +203,7 @@ export default {
     this.freight = Number(this.$route.query.freight)
     if (this.type === '1') {
       this.price -= this.freight
+      this.isType = false
     }
     // console.log(this.orderId)
     // console.log(this.type)
