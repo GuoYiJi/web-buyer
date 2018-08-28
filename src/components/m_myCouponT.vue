@@ -5,7 +5,8 @@
       <i class="t_img"></i>
     </div>
     <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
-      <i class="bg hasCoupon"></i>
+      <!-- <i class="bg hasCoupon"></i> -->
+      <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
       <div class="left">
         <p class="money">￥
           <span class="money1">{{item.count}}</span>
@@ -66,7 +67,6 @@ export default {
       width: 213px
       height: 187px
       +bg-img('marketingMgt/kk.png')
-      border: 1px solid #999
       display: inline-block
       position: absolute
       top: 38%
@@ -80,9 +80,6 @@ export default {
       display: inline-block
       width: 689px
       height: 220px
-      background: #000
-    .hasCoupon
-      // +bg-img('marketingMgt/yhq.png')
   .left
     position: absolute
     top: 62px
@@ -114,7 +111,8 @@ export default {
     .time
       width: 500px
       position: absolute
-      top: 100px
+      top: 90px
+      color: #FECF8F
   .right
     position: absolute
     top: 70px
