@@ -65,9 +65,9 @@ export default {
         {id: 3, text: '原因三'},
         {id: 4, text: '原因四'}
       ],
-      img1: null,
-      img2: null,
-      img3: null,
+      img1: '',
+      img2: '',
+      img3: '',
       reason: '',
       wellShow: false,
       wellMsgShow: false,
@@ -153,7 +153,10 @@ export default {
       const data = await API.retreatGoods({
         orderId: this.orderId,
         refundType: this.type,
-        result: this.explain
+        result: this.explain,
+        img1: this.img1,
+        img2: this.img1,
+        img3: this.img1
       })
       console.log('退款', data)
       if (data.code === 1) {
