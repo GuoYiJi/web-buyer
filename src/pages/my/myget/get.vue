@@ -1,55 +1,57 @@
 <template>
-  <div class="home">
-    <div class="nav">
-      <div class="list">
-        <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">{{item.text}}</span>
-        <div class="line" :style="{left: (tag-1)*20 + '%'}"></div>
-      </div>
-    </div>
-    <div class="content">
-      <div v-if="tag == 1">
-        <fasiAll />
-      </div>
-      <div v-else-if="tag == 2">
-        <fasiPay />
-      </div>
-      <div v-else-if="tag == 3">
-        <fasiPin />
-      </div>
-      <div v-else-if="tag == 4">
-        <fasiPu />
-      </div>
-      <div v-else-if="tag == 5">
-        <fasiWaitcheck />
-      </div>
-      <div v-else-if="tag == 6">
-        <fasiOk />
-      </div>
+<!-- 我的拼团  首页 -->
+<div class="home">
+  <div class="nav">
+    <div class="list">
+      <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">{{item.text}}</span>
+      <div class="line" :style="{left: (tag-1)*16.6 + '%'}"></div>
     </div>
   </div>
+  <div class="content">
+    <div v-if="tag == 1">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+    <div v-else-if="tag == 2">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+    <div v-else-if="tag == 3">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+    <div v-else-if="tag == 4">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+    <div v-else-if="tag == 5">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+    <div v-else-if="tag == 6">
+      <fasiAll :ordersValueList="ordersValueList" />
+    </div>
+  </div>
+</div>
 </template>
 <script>
 import wx from "wx";
 import fasiAll from "@/components/p_fasiAll";
-import fasiPay from "@/components/p_fasiPay";
-import fasiPin from "@/components/p_fasiPin";
-import fasiPu from "@/components/p_fasiPu";
-import fasiWaitcheck from "@/components/p_fasiWaitcheck";
-import fasiOk from "@/components/p_fasiOk";
+// import fasiPay from "@/components/p_fasiPay";
+// import fasiPin from "@/components/p_fasiPin";
+// import fasiPu from "@/components/p_fasiPu";
+// import fasiWaitcheck from "@/components/p_fasiWaitcheck";
+// import fasiOk from "@/components/p_fasiOk";
+import api from '@/api/httpJchan'
+
 export default {
   components: {
     fasiAll,
-    fasiPay,
-    fasiPin,
-    fasiPu,
-    fasiWaitcheck,
-    fasiOk
+    // fasiPay,
+    // fasiPin,
+    // fasiPu,
+    // fasiWaitcheck,
+    // fasiOk
   },
   data() {
     return {
       tag: 1,
-      navData: [
-        {
+      navData: [{
           id: 1,
           text: "全部"
         },
@@ -73,18 +75,46 @@ export default {
           id: 6,
           text: "已完成"
         }
-      ]
+      ],
+      ordersValueList: []
     };
   },
   methods: {
     handleNav(tag) {
       this.tag = tag;
+      if (this.tag === 1) {
+        this.getOrderList(null);
+      } else if (this.tag === 2) {
+        this.getOrderList(1);
+      } else if (this.tag === 3) {
+        this.getOrderList(9);
+      } else if (this.tag === 4) {
+        this.getOrderList(5);
+      } else if (this.tag === 5) {
+        this.getOrderList(6);
+      } else if (this.tag === 6) {
+        this.getOrderList(7);
+      }
+    },
+    //获取相应拼单订单
+    async getOrderList(state) {
+      console.log("我直行了");
+      const response = await api.myorder({
+        pageNumber: 1,
+        pageSize: 20,
+        state,
+        isPing: 1
+      });
+      console.log(response);
+      this.ordersValueList = response.data.list
     }
     // toRoute(path) {
     //   this.$router.push('/pages/home/' + path)
     // }
   },
-  mounted() {}
+  mounted() {
+    this.getOrderList(null);
+  }
 };
 </script>
 <style lang="sass" scoped>
@@ -140,18 +170,18 @@ export default {
     display: flex
     width: 100%
     .item
-      flex: 0 0 20%
+      flex: 0 0 16.6%
       line-height: 70px
       box-sizing: border-box
 .line
   display: block
   height: 1px
-  width: 8%
+  width: 10%
   border-radius: 8px
   background-color: #F67C2F
   position: absolute
   bottom: 23px
-  margin: 0 6%
+  margin: 0 3.3%
   transition: left .3s ease-in
 
 </style>
