@@ -5,6 +5,7 @@
       <i class="t_img"></i>
     </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title <= 1)">
       <p class="bg hasCoupon"></p>
 =======
@@ -23,6 +24,11 @@
 >>>>>>> Jchan
 >>>>>>> local
 >>>>>>> 9ccf2817696a980a594d6ce7ae12ed58f8a68ecf
+=======
+    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
+      <!-- <i class="bg hasCoupon"></i> -->
+      <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
+>>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
       <div class="left">
         <p class="money">￥
           <span class="money1">{{item.count}}</span>
@@ -98,6 +104,7 @@ export default {
       display: inline-block
       width: 689px
       height: 220px
+<<<<<<< HEAD
 <<<<<<< Jchan1
 =======
 <<<<<<< HEAD
@@ -108,6 +115,8 @@ export default {
 >>>>>>> Jchan
 >>>>>>> local
 >>>>>>> 9ccf2817696a980a594d6ce7ae12ed58f8a68ecf
+=======
+>>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
   .left
     position: absolute
     top: 62px

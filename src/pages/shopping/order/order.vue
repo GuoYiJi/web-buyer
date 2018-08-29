@@ -274,12 +274,20 @@ export default {
       console.log('优惠券', data)
     },
     // 立即购买
+<<<<<<< HEAD
     buy () {
       let that = this
       const TEST_URL = config.url
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
       let appId = config.appId
+=======
+    buy() {
+      const TEST_URL = config.url;
+      const BASE_URL = config.url;
+      const URL = process.env.NODE_ENV === "development" ? TEST_URL : BASE_URL;
+      let appId = config.appId;
+>>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
       if (this.isGroup === true) {
         console.log('拼团商品')
         let obj = {
@@ -320,32 +328,45 @@ export default {
           url: URL + '/api/order/createOrder',
           data: JSON.stringify(obj),
           header: {
+<<<<<<< HEAD
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
             console.log(res.data)
+=======
+            "content-type": "application/json" // 默认值
+          },
+          success: function(res) {
+            console.log(res.data);
+>>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
             if (res.data.code === 1) {
-              that.wxSign(res.data.data.id)
+              that.wxSign(res.data.data.id);
             }
           }
-        })
+        });
       }
     },
     // 微信支付
-    async wxSign (orderId) {
-      const data = await API.wxSign({orderId: orderId})
-      console.log(data)
+    async wxSign(orderId) {
+      const data = await API.wxSign({ orderId: orderId });
+      console.log(data);
       if (data.code === 1) {
         wx.requestPayment({
-          'timeStamp': '',
-          'nonceStr': '',
-          'package': '',
-          'signType': 'MD5',
-          'paySign': '',
-          'success': function (res) {
-            console.log('调取支付返回结果', res)
+          timeStamp: "",
+          nonceStr: "",
+          package: "",
+          signType: "MD5",
+          paySign: "",
+          success: function(res) {
+            console.log("调取支付返回结果", res);
           },
+<<<<<<< HEAD
           'fail': function (res) {
+=======
+          fail: function(res) {},
+          success: function(res) {
+            console.log(res.data);
+>>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
           }
         })
       }
