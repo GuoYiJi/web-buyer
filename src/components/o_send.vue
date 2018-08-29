@@ -29,8 +29,8 @@
         </div>
       </div>
       <div class="btn">
-        <span v-if="item.isHasChildren == 0 && item.isPing == 0 "  class="b-sc" @click="toOpen('visible')">退款</span>
         <span class="b-xq" @click="bxq(item.id,2)">查看详情</span>
+        <span v-if="item.isHasChildren == 0 && item.isPing == 0 "  class="b-sc" @click="toOpen('visible')">退款</span>
       </div>
       <i-modal :visible="visible" @ok="retreat(item.id,0,item.paid,item.freight)" @cancel="toClose('visible')">
         <div class="m_tips">确定申请退款！</div>

@@ -113,28 +113,18 @@ export default {
     }
   },
   async mounted () {
-    const myorder = await API.myorder({isPing: 0})
-    this.myorderList = myorder.data.list
-    console.log('获取所有普通订单', myorder.data)
-    let order = myorder.data.list
-    for (var i = 0, prePayment = 0, delivery = 0, receive = 0; i < order.length; i++) {
-      if (order[i].state === 1) {
-        prePayment += 1
-      } else if (order[i].state === 5) {
-        delivery += 1
-      } else if (order[i].state === 6) {
-        receive += 1
-      }
-    }
-    this.prePayment = prePayment
-    this.delivery = delivery
-    this.receive = receive
+    const prePayment = await API.myorder({isPing: 0, state: 1})
+    const delivery = await API.myorder({isPing: 0, state: 5})
+    const receive = await API.myorder({isPing: 0, state: 6})
+    // 获取待收货，待发货，待付款订单的个数
+    this.prePayment = prePayment.data.totalRow
+    this.delivery = delivery.data.totalRow
+    this.receive = receive.data.totalRow
     wx.setStorage({
       key: 'qwe',
       data: 123
     })
-    // console.log(myorder.data.pageSize, 1231)
-    const afterList = await API.after({})
+    // const afterList = await API.after({})
     // console.log(afterList.data)
   }
 }

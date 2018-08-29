@@ -181,6 +181,7 @@ export default {
       line-height: 60px
       text-align: center
       margin-left: 20px
+      color: #fff
     .b-sc
       float: right
       display: inline-block
@@ -201,5 +202,4 @@ export default {
       line-height: 60px
       text-align: center
       margin-left: 20px
-      color: #fff
 </style>

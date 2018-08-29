@@ -119,11 +119,11 @@ export default {
   data () {
     return {
       visible: false,
+      isRetreat: false,
       wuliu: 0,
       youji: 0,
       zhuzi: 0,
-      details: {},
-      isRetreat: true
+      details: {}
     }
   },
   methods: {
@@ -145,10 +145,8 @@ export default {
       this.details = data.data
       console.log('待发货订单详情', this.details)
       // this.isRetreat = data.data.isHasChildren
-      if (data.data.isHasChildren === 1) {
-        this.isRetreat = false
-      } else if (data.data.isPing === 1) {
-        this.isRetreat = false
+      if (data.data.isHasChildren === 0 && data.data.isPing === 0) {
+        this.isRetreat = true
       }
     }
   },

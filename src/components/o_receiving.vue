@@ -46,7 +46,7 @@
         <span v-if="item.isHasChildren == 0 && item.isPing == 0 " class="b-sc" @click="toOpen('visible')">退货</span>
       </div>
       <i-modal :visible="visible" @ok="retreat(item.id,1,item.paid,item.freight)" @cancel="toClose('visible')">
-        <div class="m_tips">确定申请退款！</div>
+        <div class="m_tips">确定申请退货！</div>
       </i-modal>
     </div>
   </div>

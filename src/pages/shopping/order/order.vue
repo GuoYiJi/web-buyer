@@ -127,7 +127,6 @@ export default {
       this.expressWay = type
     },
     bindRegionChange (e) {
-      console.log(e)
       this.region = e.mp.detail.value
     },
     popt () {
