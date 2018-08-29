@@ -190,106 +190,96 @@
   </div>
 </template>
 <script>
-import wx from 'wx'
-import config from '@/config.js'
-import API from '@/api/httpShui'
+import wx from "wx";
+import config from "@/config.js";
+import API from "@/api/httpShui";
 export default {
   components: {},
-  data () {
+  data() {
     return {
       isDetails: null,
       isGroup: false,
       region: [],
-      customItem: '全部',
+      customItem: "全部",
       pop: 0,
       coupon: 0,
       xinz: 0,
       xxz: 0,
-      remark: '',
+      remark: "",
       goodsInfo: {},
       totalPack: 0,
       totalPrice: 0,
       totalNum: 0,
-      addressId: '483430653849763840',
-      skuObj: '',
-      skuCode: '',
-      couponId: '',
-      sessionId: '',
+      addressId: "483430653849763840",
+      skuObj: "",
+      skuCode: "",
+      couponId: "",
+      sessionId: "",
       expressWay: 0,
-      pingId: ''
-    }
+      pingId: ""
+    };
   },
   methods: {
-    Delivery (type) {
-      this.expressWay = type
+    Delivery(type) {
+      this.expressWay = type;
     },
-    bindRegionChange (e) {
-      console.log(e)
-      this.region = e.mp.detail.value
+    bindRegionChange(e) {
+      console.log(e);
+      this.region = e.mp.detail.value;
     },
     // 收货地址弹窗
-    popt () {
+    popt() {
       if (this.pop === 0) {
-        this.pop = 1
+        this.pop = 1;
       } else if (this.pop === 1) {
-        this.pop = 0
+        this.pop = 0;
       }
     },
     // 红包弹窗
-    yhq () {
+    yhq() {
       if (this.coupon === 0) {
-        this.coupon = 1
+        this.coupon = 1;
       } else if (this.coupon === 1) {
-        this.coupon = 0
+        this.coupon = 0;
       }
     },
     // 默认地址
-    mrdz () {
+    mrdz() {
       if (this.xxz === 0) {
-        this.xxz = 1
+        this.xxz = 1;
       } else if (this.xxz === 1) {
-        this.xxz = 0
+        this.xxz = 0;
       }
     },
     // 添加地址
-    tianJia () {
+    tianJia() {
       if (this.xinz === 0) {
-        this.xinz = 1
+        this.xinz = 1;
       } else if (this.xinz === 1) {
-        this.xinz = 0
+        this.xinz = 0;
       }
     },
     // 获取收货地址
-    async getAddress () {
-      const data = await API.address({ pageNumber: 1, pageSize: 5 })
-      console.log('收货地址', data)
+    async getAddress() {
+      const data = await API.address({ pageNumber: 1, pageSize: 5 });
+      console.log("收货地址", data);
     },
-    async getCoupon () {
+    async getCoupon() {
       const data = await API.coupon({
         isExchange: 0,
         state: 1,
         pageSize: 5,
         pageNumber: 1
-      })
-      console.log('优惠券', data)
+      });
+      console.log("优惠券", data);
     },
     // 立即购买
-<<<<<<< HEAD
-    buy () {
-      let that = this
-      const TEST_URL = config.url
-      const BASE_URL = config.url
-      const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
-      let appId = config.appId
-=======
     buy() {
       const TEST_URL = config.url;
       const BASE_URL = config.url;
       const URL = process.env.NODE_ENV === "development" ? TEST_URL : BASE_URL;
       let appId = config.appId;
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
       if (this.isGroup === true) {
-        console.log('拼团商品')
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
@@ -298,22 +288,21 @@ export default {
           skuList: this.skuObj,
           couponId: this.couponId,
           pingId: this.pingId,
-          pingOrderId: '',
+          pingOrderId: "",
           expressWay: this.expressWay
-        }
+        };
         wx.request({
-          method: 'POST',
-          url: URL + '/api/order/createPingOrder',
+          method: "POST",
+          url: URL + "/api/order/createPingOrder",
           data: JSON.stringify(obj),
           header: {
-            'content-type': 'application/json' // 默认值
+            "content-type": "application/json" // 默认值
           },
-          success: function (res) {
-            console.log(res.data)
+          success: function(res) {
+            console.log(res.data);
           }
-        })
+        });
       } else {
-        console.log('普通商品')
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
@@ -322,23 +311,16 @@ export default {
           skuList: this.skuObj,
           couponId: this.couponId,
           expressWay: this.expressWay
-        }
+        };
         wx.request({
-          method: 'POST',
-          url: URL + '/api/order/createOrder',
+          method: "POST",
+          url: URL + "/api/order/createOrder",
           data: JSON.stringify(obj),
           header: {
-<<<<<<< HEAD
-            'content-type': 'application/json' // 默认值
-          },
-          success: function (res) {
-            console.log(res.data)
-=======
             "content-type": "application/json" // 默认值
           },
           success: function(res) {
             console.log(res.data);
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
             if (res.data.code === 1) {
               that.wxSign(res.data.data.id);
             }
@@ -360,64 +342,60 @@ export default {
           success: function(res) {
             console.log("调取支付返回结果", res);
           },
-<<<<<<< HEAD
-          'fail': function (res) {
-=======
           fail: function(res) {},
           success: function(res) {
             console.log(res.data);
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
           }
-        })
+        });
       }
     }
   },
-  async mounted () {
+  async mounted() {
     // 获取sessionId
-    this.sessionId = await wx.getStorageSync('sessionId')
+    this.sessionId = await wx.getStorageSync("sessionId");
     // 详情过来
     if (this.$route.query.details) {
-      this.isDetails = true
-      let goods = JSON.parse(this.$route.query.details)
-      this.goodsInfo = goods.goods
-      this.skuObj = goods.skuObj
-      this.sKuCode = goods.sKuCode
-      this.totalPrice = goods.totalPrice
-      this.totalNum = goods.totalNum
-      this.totalPack = 1
-      console.log(this.goodsInfo)
+      this.isDetails = true;
+      let goods = JSON.parse(this.$route.query.details);
+      this.goodsInfo = goods.goods;
+      this.skuObj = goods.skuObj;
+      this.sKuCode = goods.sKuCode;
+      this.totalPrice = goods.totalPrice;
+      this.totalNum = goods.totalNum;
+      this.totalPack = 1;
+      console.log(this.goodsInfo);
     }
     // 购物车过来
     if (this.$route.query.cart) {
-      this.isDetails = false
-      let goods = JSON.parse(this.$route.query.cart)
-      this.goodsInfo = goods.goods
-      this.skuObj = goods.skuObj
-      this.totalPrice = goods.totalPrice
-      this.totalNum = goods.totalNum
-      this.totalPack = goods.goods.length
+      this.isDetails = false;
+      let goods = JSON.parse(this.$route.query.cart);
+      this.goodsInfo = goods.goods;
+      this.skuObj = goods.skuObj;
+      this.totalPrice = goods.totalPrice;
+      this.totalNum = goods.totalNum;
+      this.totalPack = goods.goods.length;
     }
     // 拼团过来
     if (this.$route.query.group) {
-      this.isGroup = true
-      let goods = JSON.parse(this.$route.query.group)
-      this.goodsInfo = goods.goods
-      this.pingId = goods.pingId
-      this.skuObj = goods.skuObj
-      this.skuCode = goods.skuCode
-      this.totalPrice = goods.totalPrice
-      this.totalNum = goods.totalNum
-      this.totalPack = 1
-      console.log(goods)
-      console.log(this.skuObj)
-      console.log(this.totalPrice)
-      console.log(this.totalNum)
-      console.log(this.totalPack)
+      this.isGroup = true;
+      let goods = JSON.parse(this.$route.query.group);
+      this.goodsInfo = goods.goods;
+      this.pingId = goods.pingId;
+      this.skuObj = goods.skuObj;
+      this.skuCode = goods.skuCode;
+      this.totalPrice = goods.totalPrice;
+      this.totalNum = goods.totalNum;
+      this.totalPack = 1;
+      console.log(goods);
+      console.log(this.skuObj);
+      console.log(this.totalPrice);
+      console.log(this.totalNum);
+      console.log(this.totalPack);
     }
-    this.getAddress()
-    this.getCoupon()
+    this.getAddress();
+    this.getCoupon();
   }
-}
+};
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'

@@ -4,31 +4,9 @@
       <p class="title">~空空如也~</p>
       <i class="t_img"></i>
     </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title <= 1)">
-      <p class="bg hasCoupon"></p>
-=======
-<<<<<<< Jchan1
     <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
       <!-- <i class="bg hasCoupon"></i> -->
       <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
-=======
-<<<<<<< HEAD
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title <= 1)">
-      <p class="bg hasCoupon"></p>
-=======
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
-      <!-- <i class="bg hasCoupon"></i> -->
-      <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
->>>>>>> Jchan
->>>>>>> local
->>>>>>> 9ccf2817696a980a594d6ce7ae12ed58f8a68ecf
-=======
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
-      <!-- <i class="bg hasCoupon"></i> -->
-      <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
       <div class="left">
         <p class="money">￥
           <span class="money1">{{item.count}}</span>
@@ -52,8 +30,8 @@ export default {
       title: 0,
       Invalid: 1,
       myCouponList: [],
-      startTime: "",
-      endTime: ""
+      startTime: [],
+      endTime: []
     };
   },
   methods: {},
@@ -61,17 +39,17 @@ export default {
     const myCoupon = await API.myCoupon({
       isExchange: 0,
       pageSize: 10,
-      pageNumber: 1
+      pageNumber: 1,
+      state: 1
     });
     this.myCouponList = myCoupon.data.list;
     this.title = myCoupon.data.list.length;
-    console.log(myCoupon.data.list);
     console.log(this.title);
     for (var i = 0; i < myCoupon.data.list.length; i++) {
       console.log(myCoupon.data.list[i].startTime.substring(0, 10));
       console.log(myCoupon.data.list[i].endTime.substring(0, 10));
-      this.startTime += myCoupon.data.list[i].startTime.substring(0, 10);
-      this.endTime += myCoupon.data.list[i].endTime.substring(0, 10);
+      this.startTime = myCoupon.data.list[i].startTime.split(" ")[0].toString();
+      this.endTime = myCoupon.data.list[i].endTime.split(" ")[0].toString();
     }
   }
 };
@@ -79,8 +57,6 @@ export default {
 
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'
-.hasCoupon
-  +bg-img('marketingMgt/yhq.png')
 .nav
   .head
     .title
@@ -104,19 +80,6 @@ export default {
       display: inline-block
       width: 689px
       height: 220px
-<<<<<<< HEAD
-<<<<<<< Jchan1
-=======
-<<<<<<< HEAD
-      background: #000
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Jchan
->>>>>>> local
->>>>>>> 9ccf2817696a980a594d6ce7ae12ed58f8a68ecf
-=======
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
   .left
     position: absolute
     top: 62px

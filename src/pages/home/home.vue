@@ -73,19 +73,6 @@
   </div>
 </template>
 <script>
-<<<<<<< HEAD
-// import wx from 'wx'
-import API from '@/api/httpShui'
-import mixin from '@/mixin'
-import colligate from '@/components/h_colligate'
-import Upnew from '@/components/h_Upnew'
-import selling from '@/components/h_selling'
-import collocation from '@/components/h_collocation'
-import Collage from '@/components/h_Collage'
-import discount from '@/components/h_discount'
-import screen from '@/components/h_screen'
-import footers from '@/commond/footer'
-=======
 import wx from "wx";
 // import API from '@/api/httpShui'
 import API from "@/api/httpJchan";
@@ -98,7 +85,6 @@ import Collage from "@/components/h_Collage";
 import discount from "@/components/h_discount";
 import screen from "@/components/h_screen";
 import footers from "@/commond/footer";
->>>>>>> 9e3cec12b7e8ef785d278b79eed0f4ae9fe1a355
 export default {
   mixins: [mixin],
   components: {
@@ -111,7 +97,7 @@ export default {
     screen,
     footers
   },
-  data () {
+  data() {
     return {
       nav: 1,
       indicatorDots: false,
@@ -122,39 +108,39 @@ export default {
       navData: [
         {
           id: 1,
-          text: '综合',
+          text: "综合",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         },
         {
           id: 2,
-          text: '新品上新',
+          text: "新品上新",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         },
         {
           id: 3,
-          text: '爆款精选',
+          text: "爆款精选",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         },
         {
           id: 4,
-          text: '搭配专区',
+          text: "搭配专区",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         },
         {
           id: 5,
-          text: '拼团优惠',
+          text: "拼团优惠",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         },
         {
           id: 6,
-          text: '特价折扣',
+          text: "特价折扣",
           img:
-            'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
+            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
         }
       ],
       state: 1,
@@ -166,33 +152,33 @@ export default {
       Pt: [],
       yhq: [],
       selectMGP: []
-    }
+    };
   },
   methods: {
-    toRoute () {
-      this.$router.push('/pages/home/details/detailsCg')
+    toRoute() {
+      this.$router.push("/pages/home/details/detailsCg");
     },
-    handleNav (tag) {
-      this.tag = tag
+    handleNav(tag) {
+      this.tag = tag;
     },
-    async btn (id) {
-      const getCoupon = await API.getCoupon({ couponId: id })
-      console.log(getCoupon)
+    async btn(id) {
+      const getCoupon = await API.getCoupon({ couponId: id });
+      console.log(getCoupon);
     }
   },
-  async mounted () {
-    const pageByCreate = await API.pageByCreate({ state: 2 })
-    this.yhq = pageByCreate.data.list
-    console.log(this.yhq)
-    const selectMGP = await API.selectMGP({})
-    console.log(selectMGP)
+  async mounted() {
+    const pageByCreate = await API.pageByCreate({ state: 2 });
+    this.yhq = pageByCreate.data.list;
+    console.log(this.yhq);
+    const selectMGP = await API.selectMGP({});
+    console.log(selectMGP);
     // this.selectMGP = selectMGP.data.list;
     // this.goodsList(1)
     // let bk = this.goodsList(2)
     // let zk = this.goodsList(3)
     // let pt = this.goodsList(4)
   }
-}
+};
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
