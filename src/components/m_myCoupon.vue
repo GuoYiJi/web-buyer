@@ -4,9 +4,20 @@
       <p class="title">~空空如也~</p>
       <i class="t_img"></i>
     </div>
+<<<<<<< Jchan1
     <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
       <!-- <i class="bg hasCoupon"></i> -->
       <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
+=======
+<<<<<<< HEAD
+    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title <= 1)">
+      <p class="bg hasCoupon"></p>
+=======
+    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
+      <!-- <i class="bg hasCoupon"></i> -->
+      <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
+>>>>>>> Jchan
+>>>>>>> local
       <div class="left">
         <p class="money">￥
           <span class="money1">{{item.count}}</span>
@@ -80,6 +91,13 @@ export default {
       display: inline-block
       width: 689px
       height: 220px
+<<<<<<< Jchan1
+=======
+<<<<<<< HEAD
+      background: #000
+=======
+>>>>>>> Jchan
+>>>>>>> local
   .left
     position: absolute
     top: 62px

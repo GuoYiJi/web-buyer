@@ -73,6 +73,22 @@
   </div>
 </template>
 <script>
+<<<<<<< Jchan1
+=======
+<<<<<<< HEAD
+import wx from 'wx'
+import API from '@/api/httpShui'
+import mixin from '@/mixin'
+import colligate from '@/components/h_colligate'
+import Upnew from '@/components/h_Upnew'
+import selling from '@/components/h_selling'
+import collocation from '@/components/h_collocation'
+import Collage from '@/components/h_Collage'
+import discount from '@/components/h_discount'
+import screen from '@/components/h_screen'
+import footers from '@/commond/footer'
+=======
+>>>>>>> local
 import wx from "wx";
 // import API from '@/api/httpShui'
 import API from "@/api/httpJchan";
@@ -85,6 +101,10 @@ import Collage from "@/components/h_Collage";
 import discount from "@/components/h_discount";
 import screen from "@/components/h_screen";
 import footers from "@/commond/footer";
+<<<<<<< Jchan1
+=======
+>>>>>>> Jchan
+>>>>>>> local
 export default {
   mixins: [mixin],
   components: {

@@ -274,11 +274,26 @@ export default {
       console.log("优惠券", data);
     },
     // 立即购买
+<<<<<<< Jchan1
+=======
+<<<<<<< HEAD
+    buy () {
+      let that = this
+      const TEST_URL = config.url
+      const BASE_URL = config.url
+      const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
+      let appId = config.appId
+=======
+>>>>>>> local
     buy() {
       const TEST_URL = config.url;
       const BASE_URL = config.url;
       const URL = process.env.NODE_ENV === "development" ? TEST_URL : BASE_URL;
       let appId = config.appId;
+<<<<<<< Jchan1
+=======
+>>>>>>> Jchan
+>>>>>>> local
       if (this.isGroup === true) {
         let obj = {
           sessionId: this.sessionId,
@@ -318,9 +333,42 @@ export default {
           data: JSON.stringify(obj),
           header: {
             "content-type": "application/json" // 默认值
+<<<<<<< Jchan1
           },
           success: function(res) {
             console.log(res.data);
+=======
+          },
+<<<<<<< HEAD
+          success: function (res) {
+            console.log(res.data)
+            if (res.data.code === 1) {
+              that.wxSign(res.data.data.id)
+            }
+          }
+        })
+      }
+    },
+    // 微信支付
+    async wxSign (orderId) {
+      const data = await API.wxSign({orderId: orderId})
+      console.log(data)
+      if (data.code === 1) {
+        wx.requestPayment({
+          'timeStamp': '',
+          'nonceStr': '',
+          'package': '',
+          'signType': 'MD5',
+          'paySign': '',
+          'success': function (res) {
+            console.log('调取支付返回结果', res)
+          },
+          'fail': function (res) {
+=======
+          success: function(res) {
+            console.log(res.data);
+>>>>>>> Jchan
+>>>>>>> local
           }
         });
       }
