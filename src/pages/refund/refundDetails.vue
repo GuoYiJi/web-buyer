@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <p class="refundState">请等待处理</p>
+    <!--<p class="refundState"> {{detailsInfo.state == 0 ? '等待商家处理' : detailsInfo.state == 1 ? '商家已同意' : detailsInfo.state == 2 ? '商家已拒绝' : detailsInfo.state == 3 ? '商家已同意' : detailsInfo.state == 4 ? '商家已发货' : detailsInfo.state == 5 ? '已撤销' : detailsInfo.state == 6 ? '确认收货' : ''}}</p>-->
     <div class="refundInfo">
       <p class="title">您已成功发起退款申请，请耐心等待处理</p>
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
@@ -40,25 +40,43 @@
   </div>
 </template>
 <script>
-  import wx from "wx"
-  export default {
-    data () {
-      return {
-        isFh: true
-      }
-    },
-    components: {
+import wx from 'wx'
+import API from '@/api/httpShui'
+export default {
+  detailsInfo () {
+    return {
+      isFh: true,
+      details: {},
+      goods: [],
+      refundType: '',
+      state: ''
 
+    }
+  },
+  components: {
+
+  },
+  methods: {
+    revise () {
+      this.$router.back()
     },
-    methods: {
-      revise () {
-        this.$router.back()
-      },
-      revokes () {
-        this.$router.back()
-      }
+    revokes () {
+      this.$router.back()
+    }
+  },
+  async mounted () {
+    console.log(this.$route.query.id)
+    const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
+    console.log(data)
+    if (data.code === 1) {
+      this.details = data.data
+      this.goods = data.data.goodsList
+      this.refundType = data.data.refundType
+      this.state = data.data.state
+      console.log(this.state)
     }
   }
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
   @import '~@/assets/css/mixin'
