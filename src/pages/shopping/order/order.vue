@@ -4,10 +4,11 @@
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
       <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
     </div>
-    <div class="address" @click="popt()">
+    <div class="address">
       <i class="dt"></i>
-      <span class="add_text">请填写收货地址</span>
-      <i class="sj"></i>
+      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货人：{{name + phone}}</p>
+      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货地址：{{addressDetails}}</p>
+      <p v-if="addressList.length == 0" class="add_text" @click="toOpen('addressBox','addAddress')">添加收货地址</p>
     </div>
     <div class="content">
       <p class="c_title">菲斯的小店</p>
@@ -52,9 +53,9 @@
         <span class="m_text">买家留言:</span>
         <input class="m_input" type="text" v-model="remark" placeholder="选填（填写内容已和卖家协商确认）">
       </div>
-      <div class="coupon" @click="yhq">
+      <div class="coupon" @click="toOpen('couponBox')">
         <span class="c_text">优惠券</span>
-        <i class="c_img"></i>
+        <span v-if="couponPrice" class="r_text">-￥{{couponPrice}}</span>
       </div>
     </div>
     <div class="foot">
@@ -64,13 +65,14 @@
       <span class="f_btn" @click="buy()">马上支付</span>
     </div>
     <!-- 收货地址弹窗 -->
-    <div class="tan" v-if="(pop == 1)">
+    <div class="tan" v-if="addressBox">
       <div class="t_nav">
-        <div class="t_head">
-          <span class="th_text">收货地址</span>
-          <i class="th_img" @click="popt()"></i>
+        <div class="head">
+          <span class="title">收货地址</span>
+          <i class="close" @click="toClose('addressBox')"></i>
         </div>
-        <div v-if="(xinz == 1)">
+        <!--添加地址-->
+        <div class="address-add" v-if="addAddress">
           <p class="tc_text">
             <span class="tc_name">收货人:</span>
             <input class="tc_namet" type="text">
@@ -91,194 +93,174 @@
             <span class="tc_detailed">详细地址:</span>
             <input class="tc_detailedt" type="text">
           </p>
-          <span class="t_btn" @click="popt()">完成</span>
+          <span class="btn" @click="popt()">添加</span>
         </div>
-        <div class="DZList" v-if="(xinz == 0)">
-          <div class="DZk">
-            <p class="DZ-head">
-              <span class="DZ-text">朱先森</span>
-              <span class="DZ-text">15632168160</span>
+
+        <!--选择地址-->
+        <scroll-view class="address-list" v-if="selectAddress">
+          <div class="item"  v-for="(item,index) in addressList" :key="index">
+            <p class="name">{{item.name+ '  ' + item.mobile}}</p>
+            <p class="details">
+              收货地址：{{item.value + item.address}}
             </p>
-            <p class="DZ-add">
-              <span>收货地址：广州市越秀区 西城都荟三层3012</span>
-            </p>
-            <span class="xian"></span>
-            <div class="DZ-diz">
-              <div @click="mrdz">
-                <i class="dz-img1" v-if="(xxz == 0)"></i>
-                <i class="dz-img3" v-if="(xxz == 1)"></i>
-                <span class="DZ-diz1">默认地址</span>
-              </div>
-              <i class="dz-img2"></i>
-              <span class="DZ-diz2">编辑</span>
+            <div class="select">
+              <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
+              <span class="edit">编辑</span>
             </div>
           </div>
-          <span class="t_btn" @click="tianJia()">添加地址</span>
-        </div>
-        <p></p>
+          <span class="btn" @click="confirm()">确认</span>
+        </scroll-view>
       </div>
     </div>
     <!-- 红包弹窗 -->
-    <div class="T-coupon" v-if="(coupon == 1)">
+    <div class="T-coupon" v-if="couponBox">
       <div class="c-head">
-        <p class="c-text" @click="yhq">取消</p>
+        <p class="c-text" @click="toClose('couponBox')">取消</p>
       </div>
-      <scroll-view scroll-y style="height: 100%;">
-        <div class="yhq">
+      <scroll-view scroll-y style="height: 100%">
+        <div class="yhq" v-for="(item,index) in couponList" :key="index" @click="selectCoupon(item.id,item.price)">
           <img class="y-img" src="../../../assets/img/marketingMgt/yhq.png">
           <div class="left">
             <p class="money">￥
-              <span class="money1">30</span>
+              <span class="money1">{{item.price}}</span>
             </p>
             <p class="discount">优惠券</p>
-            <p class="purchases">购满200可使用</p>
-            <p class="time">有效期2018-11-11-2018-11-11</p>
+            <p class="purchases">购满{{item.limitCount}}可使用</p>
+            <p class="time">有效期{{item.startTime}} - {{item.endTime}}</p>
           </div>
           <div class="right">未使用</div>
         </div>
-        <div class="yhq">
-          <img class="y-img" src="../../../assets/img/marketingMgt/yhq.png">
-          <div class="left">
-            <p class="money">￥
-              <span class="money1">30</span>
-            </p>
-            <p class="discount">优惠券</p>
-            <p class="purchases">购满200可使用</p>
-            <p class="time">有效期2018-11-11-2018-11-11</p>
-          </div>
-          <div class="right">未使用</div>
-        </div>
-        <div class="yhq">
-          <img class="y-img" src="../../../assets/img/marketingMgt/yhq.png">
-          <div class="left">
-            <p class="money">￥
-              <span class="money1">30</span>
-            </p>
-            <p class="discount">优惠券</p>
-            <p class="purchases">购满200可使用</p>
-            <p class="time">有效期2018-11-11-2018-11-11</p>
-          </div>
-          <div class="right">未使用</div>
-        </div>
-        <div class="yhq">
-          <img class="y-img" src="../../../assets/img/marketingMgt/yhq.png">
-          <div class="left">
-            <p class="money">￥
-              <span class="money1">30</span>
-            </p>
-            <p class="discount">优惠券</p>
-            <p class="purchases">购满200可使用</p>
-            <p class="time">有效期2018-11-11-2018-11-11</p>
-          </div>
-          <div class="right">未使用</div>
-        </div>
-        <div class="yhq">
-          <img class="y-img" src="../../../assets/img/marketingMgt/yhq.png">
-          <div class="left">
-            <p class="money">￥
-              <span class="money1">30</span>
-            </p>
-            <p class="discount">优惠券</p>
-            <p class="purchases">购满200可使用</p>
-            <p class="time">有效期2018-11-11-2018-11-11</p>
-          </div>
-          <div class="right">未使用</div>
-        </div>
-        <div style="height: 100px;"></div>
+        <div style="height: 100px"></div>
       </scroll-view>
     </div>
   </div>
 </template>
 <script>
-import wx from "wx";
-import config from "@/config.js";
-import API from "@/api/httpShui";
+import wx from 'wx'
+import config from '@/config.js'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
+  data () {
     return {
       isDetails: null,
       isGroup: false,
+      selectAddressId: '',
       region: [],
-      customItem: "全部",
-      pop: 0,
-      coupon: 0,
-      xinz: 0,
-      xxz: 0,
-      remark: "",
+      customItem: '全部',
+      couponBox: false,
+      selectAddress: false,
+      addAddress: false,
+      addressBox: false,
+      remark: '',
       goodsInfo: {},
+      name: '',
+      phone: '',
+      addressDetails: '',
       totalPack: 0,
       totalPrice: 0,
       totalNum: 0,
-      addressId: "483430653849763840",
-      skuObj: "",
-      skuCode: "",
-      couponId: "",
-      sessionId: "",
       expressWay: 0,
-      pingId: ""
-    };
+      addressId: '',
+      addressList: [],
+      skuObj: '',
+      skuCode: '',
+      couponId: '',
+      couponList: '',
+      couponPrice: '',
+      sessionId: '',
+      pingId: ''
+    }
   },
   methods: {
-    Delivery(type) {
-      this.expressWay = type;
+    toOpen (parent, child) {
+      this[parent] = true
+      this[child] = true
     },
-    bindRegionChange(e) {
-      console.log(e);
-      this.region = e.mp.detail.value;
+    toClose (name) {
+      this[name] = false
     },
-    // 收货地址弹窗
-    popt() {
-      if (this.pop === 0) {
-        this.pop = 1;
-      } else if (this.pop === 1) {
-        this.pop = 0;
+    // 选择地址
+    defaultAddress (id, index) {
+      let that = this
+      for (let i = 0; i < that.addressList.length; i++) {
+        if (i === index) {
+          that.addressList[i].isChoice = 1
+        } else {
+          that.addressList[i].isChoice = 0
+        }
       }
+      that.selectAddressId = id
     },
-    // 红包弹窗
-    yhq() {
-      if (this.coupon === 0) {
-        this.coupon = 1;
-      } else if (this.coupon === 1) {
-        this.coupon = 0;
+    // 确定选择地址
+    async confirm () {
+      const data = await API.editAddress({addressId: this.selectAddressId, isChoice: 1})
+      if (data.code === 1) {
+        this.getAddress()
       }
+      this.addressBox = false
+    },
+    // 配送方式
+    Delivery (type) {
+      this.expressWay = type
+    },
+    bindRegionChange (e) {
+      console.log(e)
+      this.region = e.mp.detail.value
     },
     // 默认地址
-    mrdz() {
-      if (this.xxz === 0) {
-        this.xxz = 1;
-      } else if (this.xxz === 1) {
-        this.xxz = 0;
-      }
-    },
     // 添加地址
-    tianJia() {
-      if (this.xinz === 0) {
-        this.xinz = 1;
-      } else if (this.xinz === 1) {
-        this.xinz = 0;
+    // 获取收货地址
+    async getAddress () {
+      const data = await API.address({ pageNumber: 1, pageSize: 5 })
+      console.log('收货地址', data)
+      let list = data.data.list
+      this.addressList = list
+      // 加载显示默认地址
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].isChoice === 1) {
+          this.addressId = list[i].id
+          this.name = list[i].name
+          this.phone = list[i].mobile
+          let val = list[i].value
+          this.addressDetails = val.split(',').join('') + list[i].address
+        } else {
+          this.addressId = list[0].id
+          this.name = list[0].name
+          this.phone = list[0].mobile
+          let val = list[0].value
+          this.addressDetails = val.split(',').join('') + list[0].address
+        }
       }
     },
-    // 获取收货地址
-    async getAddress() {
-      const data = await API.address({ pageNumber: 1, pageSize: 5 });
-      console.log("收货地址", data);
-    },
-    async getCoupon() {
-      const data = await API.coupon({
+    // 获取优惠券
+    async getCoupon () {
+      const myCoupon = await API.coupon({
         isExchange: 0,
         state: 1,
         pageSize: 5,
         pageNumber: 1
-      });
-      console.log("优惠券", data);
+      })
+      console.log('优惠券', myCoupon)
+      for (let i = 0; i < myCoupon.data.list.length; i++) {
+        myCoupon.data.list[i].startTime = myCoupon.data.list[i].startTime.split(' ')[0].toString()
+        myCoupon.data.list[i].endTime = myCoupon.data.list[i].endTime.split(' ')[0].toString()
+      }
+      this.couponList = myCoupon.data.list
+    },
+    // 选择优惠卷
+    selectCoupon (id, price) {
+      this.couponId = id
+      this.couponPrice = price
+      this.couponBox = false
     },
     // 立即购买
-    buy() {
-      const TEST_URL = config.url;
-      const BASE_URL = config.url;
-      const URL = process.env.NODE_ENV === "development" ? TEST_URL : BASE_URL;
-      let appId = config.appId;
+    buy () {
+      let that = this
+      const TEST_URL = config.url
+      const BASE_URL = config.url
+      const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
+      let appId = config.appId
       if (this.isGroup === true) {
         let obj = {
           sessionId: this.sessionId,
@@ -288,20 +270,20 @@ export default {
           skuList: this.skuObj,
           couponId: this.couponId,
           pingId: this.pingId,
-          pingOrderId: "",
+          pingOrderId: '',
           expressWay: this.expressWay
-        };
+        }
         wx.request({
-          method: "POST",
-          url: URL + "/api/order/createPingOrder",
+          method: 'POST',
+          url: URL + '/api/order/createPingOrder',
           data: JSON.stringify(obj),
           header: {
-            "content-type": "application/json" // 默认值
+            'content-type': 'application/json' // 默认值
           },
-          success: function(res) {
-            console.log(res.data);
+          success: function (res) {
+            that.wxSign(res.data.data.id)
           }
-        });
+        })
       } else {
         let obj = {
           sessionId: this.sessionId,
@@ -311,91 +293,92 @@ export default {
           skuList: this.skuObj,
           couponId: this.couponId,
           expressWay: this.expressWay
-        };
+        }
         wx.request({
-          method: "POST",
-          url: URL + "/api/order/createOrder",
+          method: 'POST',
+          url: URL + '/api/order/createOrder',
           data: JSON.stringify(obj),
           header: {
-            "content-type": "application/json" // 默认值
+            'content-type': 'application/json' // 默认值
           },
-          success: function(res) {
-            console.log(res.data);
+          success: function (res) {
             if (res.data.code === 1) {
-              that.wxSign(res.data.data.id);
+              that.wxSign(res.data.data.id)
             }
           }
-        });
+        })
       }
     },
     // 微信支付
-    async wxSign(orderId) {
-      const data = await API.wxSign({ orderId: orderId });
-      console.log(data);
+    async wxSign (orderId) {
+      let that = this
+      const data = await API.wxSign({ orderId: orderId })
+      console.log(data)
       if (data.code === 1) {
+        let obj = data.data
         wx.requestPayment({
-          timeStamp: "",
-          nonceStr: "",
-          package: "",
-          signType: "MD5",
-          paySign: "",
-          success: function(res) {
-            console.log("调取支付返回结果", res);
+          timeStamp: obj.timeStamp,
+          nonceStr: obj.nonceStr,
+          package: obj.package,
+          signType: obj.signType,
+          paySign: obj.paySign,
+          success: function (res) {
+            // console.log('调取支付返回结果', res)
+            that.$router.push({
+              path: '/pages/my/order/myorder',
+              query: { tag: 1 }
+            })
+            // if (res.errMsg === 'requestPayment:ok') {
+            // }
           },
-          fail: function(res) {},
-          success: function(res) {
-            console.log(res.data);
-          }
-        });
+          fail: function (res) {}
+        })
       }
     }
   },
-  async mounted() {
+  async mounted () {
     // 获取sessionId
-    this.sessionId = await wx.getStorageSync("sessionId");
+    this.sessionId = await wx.getStorageSync('sessionId')
     // 详情过来
     if (this.$route.query.details) {
-      this.isDetails = true;
-      let goods = JSON.parse(this.$route.query.details);
-      this.goodsInfo = goods.goods;
-      this.skuObj = goods.skuObj;
-      this.sKuCode = goods.sKuCode;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = 1;
-      console.log(this.goodsInfo);
+      this.isDetails = true
+      let goods = JSON.parse(this.$route.query.details)
+      this.goodsInfo = goods.goods
+      this.skuObj = goods.skuObj
+      this.sKuCode = goods.sKuCode
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = 1
+      console.log('详情过来', this.goodsInfo)
     }
     // 购物车过来
     if (this.$route.query.cart) {
-      this.isDetails = false;
-      let goods = JSON.parse(this.$route.query.cart);
-      this.goodsInfo = goods.goods;
-      this.skuObj = goods.skuObj;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = goods.goods.length;
+      this.isDetails = false
+      let goods = JSON.parse(this.$route.query.cart)
+      this.goodsInfo = goods.goods
+      this.skuObj = goods.skuObj
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = goods.goods.length
+      console.log('购物车过来', this.goodsInfo)
     }
     // 拼团过来
     if (this.$route.query.group) {
-      this.isGroup = true;
-      let goods = JSON.parse(this.$route.query.group);
-      this.goodsInfo = goods.goods;
-      this.pingId = goods.pingId;
-      this.skuObj = goods.skuObj;
-      this.skuCode = goods.skuCode;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = 1;
-      console.log(goods);
-      console.log(this.skuObj);
-      console.log(this.totalPrice);
-      console.log(this.totalNum);
-      console.log(this.totalPack);
+      this.isGroup = true
+      let goods = JSON.parse(this.$route.query.group)
+      this.goodsInfo = goods.goods
+      this.pingId = goods.pingId
+      this.skuObj = goods.skuObj
+      this.skuCode = goods.skuCode
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = 1
+      console.log('拼团过来', this.goodsInfo)
     }
-    this.getAddress();
-    this.getCoupon();
+    this.getAddress()
+    this.getCoupon()
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
@@ -424,29 +407,25 @@ export default {
       border: 1px solid #EE7527
       color: #fff
   .address
-    height: 82px
-    background: #F9F9F9
-    line-height: 82px
+    /*height: 120px*/
+    padding: 28px 33px 28px 83px
+    background: #F9F9F9 url('../../../assets/img/shopping/shanJiao.png') no-repeat 95% center
+    background-size: 14px 25px
+    position: relative
     .dt
+      position: absolute
+      top: 40px
+      left: 33px
       width: 26px
       height: 32px
       +bg-img('shopping/s3.png')
       vertical-align: middle
       display: inline-block
-      margin-left: 33px
     .add_text
       font-size: 28px
       color: #000
       vertical-align: middle
       display: inline-block
-      margin-left: 25px
-    .sj
-      width: 14px
-      height: 25px
-      +bg-img('shopping/shanJiao.png')
-      vertical-align: middle
-      display: inline-block
-      margin-left: 426px
   .content
     .c_title
       height: 82px
@@ -486,7 +465,7 @@ export default {
       height: 82px
       background: #fff
       line-height: 82px
-      padding-left: 30px
+      padding: 0 30px
       font-size: 24px
       color: #000
       border-bottom: 1px solid #E5E5E5
@@ -504,9 +483,9 @@ export default {
           color: #F67C2F
           font-size: 28px
       .s_text3
+        float: right
         display: inline-block
         vertical-align: middle
-        padding-left: 295px
         .st3
           font-size: 32px
           color: #FF0000
@@ -517,38 +496,38 @@ export default {
       height: 82px
       background: #fff
       line-height: 82px
-      padding-left: 30px
+      padding: 0 30px
       font-size: 24px
       color: #000
       border-bottom: 1px solid #E5E5E5
       .m_text
+        width: 120px
         display: inline-block
         vertical-align: middle
       .m_input
+        width: 440px
         display: inline-block
         vertical-align: middle
         font-size: 28px
-        width: 500px
-        margin-left: 20px
     .coupon
       height: 82px
-      background: #fff
       line-height: 82px
-      padding-left: 30px
+      padding: 0 50px 0 30px
       font-size: 24px
       color: #000
+      background: #fff url('../../../assets/img/shopping/shanJiao.png') no-repeat 96% center
+      background-size: 14px 25px
       .c_text
         font-size: 28px
         color: #000
         display: inline-block
         vertical-align: middle
-      .c_img
-        +bg-img('shopping/shanJiao.png')
-        width: 14px
-        height: 25px
+      .r_text
+        float: right
+        font-size: 28px
+        color: #EE7527
         display: inline-block
         vertical-align: middle
-        margin-left: 589px
   .foot
     height: 99px
     background: #fff
@@ -556,7 +535,7 @@ export default {
     display: flex
     width: 100%
     position: fixed
-    bottom: 0rpx
+    bottom: 0
     .f_text
       flex: 3
       padding-left: 32px
@@ -571,170 +550,183 @@ export default {
     width: 100%
     height: 100%
     position: fixed
-    top: 0px
-    left: 0px
+    top: 0
+    left: 0
     background: rgba(0,0,0,.3)
     z-index: 99
     .t_nav
       width: 650px
-      height: 580px
+      height: 680px
       background: #fff
+      border-radius: 10px
       position: absolute
-      top: 15%
-      left: 7%
-      .t_head
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
+      margin: auto
+      .head
+        box-sizing: border-box
+        width: 650px
         height: 58px
         line-height: 58px
         border-bottom: 1px solid #E5E5E5
-        .th_text
-          display: inline-block
-          vertical-align: middle
+        display: inline-block
+        vertical-align: middle
+        font-size: 28px
+        color: #000
+        padding: 0 33px
+        .title
           font-size: 28px
           color: #000
-          padding-left: 34px
-        .th_img
+        .close
+          float: right
           display: inline-block
           vertical-align: middle
           +bg-img('shopping/gb.png')
           width: 23px
           height: 23px
-          margin-left: 452px
-      .tc_text
-        height: 48px
-        line-height: 48px
-        margin-top: 32px
-        margin-left: 58px
-        .tc_name
-          display: inline-block
-          vertical-align: middle
-          font-size: 28px
-          color: #000
-        .tc_namet
-          display: inline-block
-          vertical-align: middle
-          width: 384px
+          margin-top: 18px
+      .address-add
+        background: #ffffff
+        height: 622px
+        .tc_text
           height: 48px
-          border: 1px solid #999
-          margin-left: 61px
-        .tc_phone
-          display: inline-block
-          vertical-align: middle
-          font-size: 28px
-          color: #000
-        .tc_phonet
-          display: inline-block
-          vertical-align: middle
-          width: 384px
-          height: 48px
-          border: 1px solid #999
-          margin-left: 36px
-        .tc_region
-          display: inline-block
-          vertical-align: middle
-          font-size: 28px
-          color: #000
-        .region
-          display: inline-block
-          display: inline-block
-          vertical-align: middle
-          width: 384px
-          height: 48px
-          border: 1px solid #999
-          margin-left: 36px
-          overflow: hidden
-          .picker
+          line-height: 48px
+          margin-top: 32px
+          margin-left: 58px
+          .tc_name
             display: inline-block
+            vertical-align: middle
+            font-size: 28px
+            color: #000
+          .tc_namet
             display: inline-block
             vertical-align: middle
             width: 384px
             height: 48px
-            padding-left: 10px
-        .tc_detailed
-          display: inline-block
-          vertical-align: middle
-          font-size: 28px
-          color: #000
-        .tc_detailedt
-          display: inline-block
-          vertical-align: middle
-          width: 384px
-          height: 48px
-          border: 1px solid #999
-          margin-left: 36px
-      .t_btn
-        display: inline-block
-        width: 538px
-        height: 64px
-        background: #EE7527
-        color: #fff
-        font-size: 28px
-        text-align: center
-        line-height: 64px
-        border-radius: 8px
-        position: absolute
-        bottom: 20px
-        left: 56px
-      .DZList
-        background: #F9F9F9
-        height: 208px
-        margin-top: 20px
-        .DZk
-          position: relative
-          .DZ-head
-            position: absolute
-            top: 31px
-            left: 33px
+            border: 1px solid #999
+            margin-left: 61px
+          .tc_phone
+            display: inline-block
+            vertical-align: middle
             font-size: 28px
             color: #000
-            .DZ-text
-              padding-right: 40px
-          .DZ-add
-            position: absolute
-            top: 73px
-            left: 33px
+          .tc_phonet
+            display: inline-block
+            vertical-align: middle
+            width: 384px
+            height: 48px
+            border: 1px solid #999
+            margin-left: 36px
+          .tc_region
+            display: inline-block
+            vertical-align: middle
+            font-size: 28px
+            color: #000
+          .region
+            display: inline-block
+            vertical-align: middle
+            width: 384px
+            height: 48px
+            border: 1px solid #999
+            margin-left: 36px
+            overflow: hidden
+            .picker
+              display: inline-block
+              vertical-align: middle
+              width: 384px
+              height: 48px
+              padding-left: 10px
+          .tc_detailed
+            display: inline-block
+            vertical-align: middle
+            font-size: 28px
+            color: #000
+          .tc_detailedt
+            display: inline-block
+            vertical-align: middle
+            width: 384px
+            height: 48px
+            border: 1px solid #999
+            margin-left: 36px
+        .btn
+          display: inline-block
+          width: 538px
+          height: 64px
+          background: #EE7527
+          color: #fff
+          font-size: 28px
+          text-align: center
+          line-height: 64px
+          border-radius: 8px
+          position: absolute
+          bottom: 20px
+          left: 56px
+      .address-list
+        height: 622px
+        background: #f1f1f1
+        overflow-y: auto
+        .item
+          box-sizing: border-box
+          padding: 10px 32px 0 32px
+          /*height: 208px*/
+          background: #ffffff
+          margin-top: 24px
+          .name,.details
+            width: 100%
+            overflow-x: hidden
+          .name
+            line-height: 50px
+            font-size: 28px
+            color: #000
+          .details
+            line-height: 45px
             font-size: 24px
             color: #999
-          .xian
-            height: 1px
-            width: 94.5%
-            margin-left: 33px
-            border: 1px solid #E5E5E5
-            position: absolute
-            top: 128px
-          .DZ-diz
-            position: relative
-            top: 155px
-            .DZ-diz1
-              position: absolute
-              left: 80px
-              bottom: -31px
-            .dz-img1
-              position: absolute
-              left: 33px
-              width: 28px
-              height: 28px
-              +bg-img('shopping/xxz.png')
-            .dz-img3
-              position: absolute
-              left: 33px
-              width: 25px
-              height: 28px
-              +bg-img('shopping/xwxz.png')
-            .DZ-diz2
-              position: absolute
-              right: 35px
-              bottom: -33px
-            .dz-img2
-              position: absolute
-              right: 107px
-              width: 28px
-              height: 28px
-              +bg-img('shopping/bj.png')
+          .select
+            height: 79px
+            line-height: 80px
+            border-top: 1px solid #ccc
+            .check
+              float: left
+              display: inline-block
+              height: 80px
+              font-size: 24px
+              color: #666
+              padding-left: 53px
+              background: url('../../../assets/img/my/check.png') no-repeat left center
+              background-size: 28px 28px
+            .check.active
+              background: url('../../../assets/img/my/checked.png') no-repeat left center
+              background-size: 28px 28px
+            .edit
+              float: right
+              display: inline-block
+              height: 80px
+              font-size: 24px
+              color: #666
+              padding-left: 40px
+              background: url('../../../assets/img/my/del-adr.png') no-repeat left center
+              background-size: 28px 28px
+        .btn
+          display: inline-block
+          width: 538px
+          height: 64px
+          background: #EE7527
+          color: #fff
+          font-size: 28px
+          text-align: center
+          line-height: 64px
+          border-radius: 8px
+          position: absolute
+          bottom: 20px
+          left: 56px
   .T-coupon
     display: inline-block
     position: fixed
-    bottom: 0px
-    left: 0px
+    bottom: 0
+    left: 0
     background: #F9F9F9
     height: 800px
     width: 100%
@@ -775,14 +767,14 @@ export default {
         .discount
           width: 200px
           position: absolute
-          discount: inline-block
+          display: inline-block
           top: -30px
           left: 220px
           font-size: 35px
         .purchases
           width: 200px
           position: absolute
-          discount: inline-block
+          display: inline-block
           color: #FECF8F
           top: 20px
           left: 220px

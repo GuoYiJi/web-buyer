@@ -17,7 +17,7 @@
       <li class="sortItem menu"></li>
     </ul>
     <div class="goodsList clearfix">
-      <div class="item" v-for="(item,index) in goodsList" :key="index" @click="clickItem(item)">
+      <div class="item" v-for="(item,index) in goodsList" :key="index">
         <div class="img">
           <img v-if="item.image" :src="item.image" alt="">
           <img v-else src="../../assets/img/classify/goods.png" alt="">
@@ -30,7 +30,7 @@
           </p>
           <p class="price-btn">
             <span class="price">批货价:￥{{item.sellPrice}}</span>
-            <span class="btn">立即采购</span>
+            <span class="btn" @click="clickItem(item)">立即采购</span>
           </p>
         </div>
       </div>

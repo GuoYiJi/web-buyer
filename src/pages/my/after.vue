@@ -1,10 +1,13 @@
 <template>
   <!-- 售后 -->
   <div class="home">
-    <div class="kuang">
+    <div class="kuang" v-for="(item, index) in list" :key="index">
       <div class="head">
         <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货，等待处理</span>
+        <span class="h-text">
+          {{item.refundType == 0 ? '退款' : item.refundType == 1 ? '退货' : item.refundType == 2 ? '换货' : ''}},
+          {{item.state == 0 ? '等待商家处理' : item.state == 1 ? '商家已同意' : item.state == 2 ? '商家已拒绝' : item.state == 3 ? '商家已同意' : item.state == 4 ? '商家已发货' : item.state == 5 ? '已撤销' : item.state == 6 ? '确认收货' : ''}}
+        </span>
       </div>
       <div class="nav">
         <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
@@ -15,181 +18,46 @@
       <div class="below">
         <div class="total">
           <p class="t-left">共
-            <span class="piece">3</span>个款</p>
+            <span class="piece">{{item.goodsList.length}}</span>个款</p>
           <p class="t-left">
             <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
+          <!--<p class="t-freight">（含运费￥10.00）</p>-->
+          <p v-if="item.refundType != 2" class="t-right">合计:
+            <span class="money">￥{{item.price}}</span>
           </p>
         </div>
         <div class="btn">
-          <span class="b-xq">查看详情</span>
+          <span class="b-xq" @click="refundDetails(item.id,item.refundType)">查看详情</span>
         </div>
       </div>
     </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货，已拒绝换货</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货,卖家已同意，请寄回商品</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货，等待商家收货</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货，换货成功</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货，退货失败</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
-    <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">换货关闭</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span>个款</p>
-          <p class="t-left">
-            <span class="piece">86</span>件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="btn">
-          <span class="b-xq">查看详情</span>
-        </div>
-      </div>
-    </div>
+    <!--<div class="kuang">-->
+      <!--<div class="head">-->
+        <!--<span class="h-title">菲斯的小店</span>-->
+        <!--<span class="h-text">换货，已拒绝换货</span>-->
+      <!--</div>-->
+      <!--<div class="nav">-->
+        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
+        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
+        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
+        <!--<i class="n-icon"></i>-->
+      <!--</div>-->
+      <!--<div class="below">-->
+        <!--<div class="total">-->
+          <!--<p class="t-left">共-->
+            <!--<span class="piece">3</span>个款</p>-->
+          <!--<p class="t-left">-->
+            <!--<span class="piece">86</span>件商品</p>-->
+          <!--<p class="t-freight">（含运费￥10.00）</p>-->
+          <!--<p class="t-right">合计:-->
+            <!--<span class="money">￥154.00</span>-->
+          <!--</p>-->
+        <!--</div>-->
+        <!--<div class="btn">-->
+          <!--<span class="b-xq">查看详情</span>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
   </div>
 </template>
 <script>
@@ -198,12 +66,32 @@ import API from '@/api/httpShui'
 export default {
   components: {},
   data () {
-    return {}
+    return {
+      list: []
+    }
   },
-  methods: {},
+  methods: {
+    refundDetails (id, type) {
+      console.log(id)
+      if (type === 2) { // 换货详情
+        this.$router.push({
+          path: '/pages/refund/barterDetails',
+          query: {id: id}
+        })
+      } else { // 退款，退货详情
+        this.$router.push({
+          path: '/pages/refund/refundDetails',
+          query: {id: id}
+        })
+      }
+    }
+  },
   async mounted () {
-    const tabsList = await API.afterService()
-    console.log(tabsList)
+    const data = await API.afterService()
+    console.log('售后列表', data)
+    if (data.code === 1) {
+      this.list = data.data.list
+    }
   }
 }
 </script>
@@ -247,7 +135,7 @@ export default {
   background: #fff
   .total
     height: 82px
-    margin-left: 32px
+    padding: 0 34px
     overflow: hidden
     border-bottom: 1px solid #E5E5E5
     p
@@ -283,6 +171,6 @@ export default {
       vertical-align: middle
       line-height: 60px
       text-align: center
-      margin-right: 20px
+      margin-right: 34px
       color: #fff
 </style>

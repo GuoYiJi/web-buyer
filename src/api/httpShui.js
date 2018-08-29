@@ -21,6 +21,7 @@ class API {
   deleteCollect = params => http.post('api/like/goods/deleteMyLike', params)
   // 获取地址
   address = params => http.post('api/address/page', params)
+  editAddress = params => http.post('api/address/edit', params)
   // 获取优惠券
   coupon = params => http.post('api/coupon/page', params)
   // 获取购物车
@@ -41,6 +42,8 @@ class API {
   retreatGoods = params => http.post('api/order/doubleBack', params)
   // 售后列表
   afterService = params => http.post('api/order/refund/selectOrderRefund', params)
+  // 售后详情
+  getRefundDetails = params => http.post('api/order/refund/selectOrderRefundDetail', params)
 }
 
 export default new API()

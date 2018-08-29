@@ -250,7 +250,10 @@ export default {
           totalPrice: 60,
           totalNum: 1
         }
-        this.$router.push({path: '/pages/shopping/order/order', query: {details: JSON.stringify(obj)}})
+        this.$router.push({
+          path: '/pages/shopping/order/order',
+          query: {details: JSON.stringify(obj)}
+        })
       }
     },
     // 选择规格
