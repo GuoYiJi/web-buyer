@@ -4,7 +4,7 @@
       <input v-model.lazy="name" class="name" type="text" placeholder="收货人">
     </div>
     <div class="item">
-      <input v-model.lazy="phone" class="phone" type="text" placeholder="手机号码">
+      <input v-model.lazy="phone" class="phone" maxlength="11" type="text" placeholder="手机号码">
     </div>
     <div class="item">
       <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
