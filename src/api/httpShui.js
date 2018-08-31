@@ -7,6 +7,8 @@ import http from './Shui'
 class API {
   // 登录
   authLogin = params => http.post('api/account/authLogin', params)
+  // 获取店铺信息
+  getShopInfo = params => http.post('api/warehouse/selectWarehouse', params)
   // 一级分类
   getTabs = params => http.post('api/label/data/selectLabelList', params)
   // 二级分类

@@ -146,18 +146,18 @@ export default {
       this.$router.push("/pages/my/pinDetails/pinDetails")
     },
   },
-  mounted() {
-    // this.ordersValueList.forEach((Pitem, Pindex) => {
-    //   this.skuCodeList[Pindex] = [];
-    //   Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
-    //     console.log(Citem, Pindex, Cindex);
-    //     let color = Citem.skuCode.split(',')[0];
-    //     let size = Citem.skuCode.split(',')[1];
-    //     console.log(color, size);
-    //     this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
-    //   })
-    // });
-    // console.log(this.skuCodeList);
+  created() {
+    this.ordersValueList.forEach((Pitem, Pindex) => {
+      this.skuCodeList[Pindex] = [];
+      Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
+        console.log(Citem, Pindex, Cindex);
+        let color = Citem.skuCode.split(',')[0];
+        let size = Citem.skuCode.split(',')[1];
+        console.log(color, size);
+        this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
+      })
+    });
+    console.log(this.skuCodeList);
   }
 };
 </script>

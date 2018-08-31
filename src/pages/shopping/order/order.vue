@@ -12,30 +12,33 @@
     </div>
     <div class="content">
       <p class="c_title">菲斯的小店</p>
-      <div v-if="isDetails === false" class="c_nav" v-for="(item,index) in goodsInfo" :key="index">
+      <!--购物车-->
+      <div v-if="buyType === 2" class="c_nav" v-for="(item,index) in goodsInfo" :key="index">
         <img v-if="item.image" :src="item.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{item.name}}</p>
-          <p class="cn_t2">{{item.skuCode}} : {{item.num}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
-      <div v-if="isDetails === true" class="c_nav">
+      <!--详情-->
+      <div v-if="buyType === 1" class="c_nav">
         <img v-if="goodsInfo.image" :src="goodsInfo.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{goodsInfo.name}}</p>
-          <p class="cn_t2">{{skuCode}} : {{totalNum}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
-      <div v-if="isGroup === true" class="c_nav">
+      <!--拼团-->
+      <div v-if="buyType === 3" class="c_nav">
         <img v-if="goodsInfo.image" :src="goodsInfo.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{goodsInfo.name}}</p>
-          <p class="cn_t2">{{skuCode}} : {{totalNum}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
@@ -143,8 +146,7 @@ export default {
   components: {},
   data () {
     return {
-      isDetails: null,
-      isGroup: false,
+      buyType: null,
       selectAddressId: '',
       region: [],
       customItem: '全部',
@@ -169,7 +171,8 @@ export default {
       couponList: '',
       couponPrice: '',
       sessionId: '',
-      pingId: ''
+      pingId: null,
+      pingOrderId: null
     }
   },
   methods: {
@@ -261,17 +264,22 @@ export default {
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
       let appId = config.appId
-      if (this.isGroup === true) {
-        let obj = {
-          sessionId: this.sessionId,
-          appId: appId,
-          addressId: this.addressId,
-          remark: this.remark,
-          skuList: this.skuObj,
-          couponId: this.couponId,
-          pingId: this.pingId,
-          pingOrderId: '',
-          expressWay: this.expressWay
+      let obj = {
+        sessionId: this.sessionId,
+        appId: appId,
+        addressId: this.addressId,
+        remark: this.remark,
+        skuList: this.skuObj,
+        couponId: this.couponId,
+        expressWay: this.expressWay
+      }
+      // 拼团购买
+      if (this.buyType === 3) {
+        if (this.pingId != null) {
+          obj.pingId = this.pingId
+        }
+        if (this.pingOrderId != null) {
+          obj.pingOrderId = this.pingOrderId
         }
         wx.request({
           method: 'POST',
@@ -281,19 +289,13 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
-            that.wxSign(res.data.data.id)
+            console.log(res)
+            that.wxSign(res.data.data.id, 2)
           }
         })
-      } else {
-        let obj = {
-          sessionId: this.sessionId,
-          appId: appId,
-          addressId: this.addressId,
-          remark: this.remark,
-          skuList: this.skuObj,
-          couponId: this.couponId,
-          expressWay: this.expressWay
-        }
+      }
+      // 普通购买
+      if (this.buyType === 1 || this.buyType === 2) {
         wx.request({
           method: 'POST',
           url: URL + '/api/order/createOrder',
@@ -302,15 +304,16 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
+            console.log(res)
             if (res.data.code === 1) {
-              that.wxSign(res.data.data.id)
+              that.wxSign(res.data.data.id, 1)
             }
           }
         })
       }
     },
     // 微信支付
-    async wxSign (orderId) {
+    async wxSign (orderId, type) {
       let that = this
       const data = await API.wxSign({ orderId: orderId })
       console.log(data)
@@ -323,15 +326,37 @@ export default {
           signType: obj.signType,
           paySign: obj.paySign,
           success: function (res) {
-            // console.log('调取支付返回结果', res)
-            that.$router.push({
-              path: '/pages/my/order/myorder',
-              query: { tag: 1 }
-            })
-            // if (res.errMsg === 'requestPayment:ok') {
-            // }
+            console.log('支付成功返回结果', res)
+            if (res.errMsg === 'requestPayment:ok') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
           },
-          fail: function (res) {}
+          fail: function (res) {
+            console.log('支付失败返回结果', res)
+            if (res.errMsg === 'requestPayment:fail cancel' || res.errMsg === 'requestPayment:fail (detail message)') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
+          }
         })
       }
     }
@@ -341,11 +366,12 @@ export default {
     this.sessionId = await wx.getStorageSync('sessionId')
     // 详情过来
     if (this.$route.query.details) {
-      this.isDetails = true
+      this.buyType = 1
       let goods = JSON.parse(this.$route.query.details)
+      console.log(goods)
       this.goodsInfo = goods.goods
       this.skuObj = goods.skuObj
-      this.sKuCode = goods.sKuCode
+      this.skuCode = goods.skuCode
       this.totalPrice = goods.totalPrice
       this.totalNum = goods.totalNum
       this.totalPack = 1
@@ -353,7 +379,7 @@ export default {
     }
     // 购物车过来
     if (this.$route.query.cart) {
-      this.isDetails = false
+      this.buyType = 2
       let goods = JSON.parse(this.$route.query.cart)
       this.goodsInfo = goods.goods
       this.skuObj = goods.skuObj
@@ -364,10 +390,18 @@ export default {
     }
     // 拼团过来
     if (this.$route.query.group) {
-      this.isGroup = true
       let goods = JSON.parse(this.$route.query.group)
+      console.log(goods.goods)
+      if (goods.pingId !== undefined) {
+        this.buyType = 3
+        this.pingId = goods.pingId
+        if (goods.pingOrderId !== undefined) {
+          this.pingOrderId = goods.pingOrderId
+        }
+      } else {
+        this.buyType = 1
+      }
       this.goodsInfo = goods.goods
-      this.pingId = goods.pingId
       this.skuObj = goods.skuObj
       this.skuCode = goods.skuCode
       this.totalPrice = goods.totalPrice
@@ -501,11 +535,11 @@ export default {
       color: #000
       border-bottom: 1px solid #E5E5E5
       .m_text
-        width: 120px
+        /*width: 120px*/
         display: inline-block
         vertical-align: middle
       .m_input
-        width: 440px
+        width: 420px
         display: inline-block
         vertical-align: middle
         font-size: 28px

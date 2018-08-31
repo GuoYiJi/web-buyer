@@ -5,6 +5,8 @@ import http from './Jchan'
 // 和路由命名一样，加模块的h后缀
 // h_getIndex = params => http.post()
 class API {
+  // 获取店铺信息
+  getShopInfo = params => http.post('api/warehouse/selectWarehouse', params)
   // 售后列表
   after = params => http.post('api/order/refund/selectOrderRefund', params)
   // 运费规则

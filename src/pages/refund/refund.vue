@@ -1,6 +1,7 @@
 <template>
   <div class="wrapper">
-    <p class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
+    <p v-if="isType" class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
+    <p v-if="!isType" class="refundReason" @click="wellShow = true">退货原因<span class="reason">{{reason}}</span></p>
     <p class="refundPrice">
       退款金额：<span class="price">￥{{price}}</span>
       <span v-if="isType" class="freight">含邮费 ￥{{freight}}</span>
@@ -46,7 +47,8 @@
     <div class="submit" @click="submit">提交</div>
     <div class="well" v-show="wellShow">
       <div class="box">
-        <p class="head">请选择退款原因</p>
+        <p v-if="isType" class="head">请选择退款原因</p>
+        <p v-if="!isType" class="head">请选择退货原因</p>
         <p class="select" @click="check(item.id,item.text)" v-for="(item,index) in reasonList" :key="index">
           <span class="check" :class="{checked : isCheck == item.id}"></span>
           <span>{{item.text}}</span>
@@ -111,13 +113,13 @@ export default {
           // self.img = file.tempFilePaths[0]
           self.uploadImg (file.tempFilePaths[0], function (url) {
             self.img = url
-            if (num == 1) {
+            if (num === 1) {
               self.img1 = url
             }
-            if (num == 2) {
+            if (num === 2) {
               self.img2 = url
             }
-            if (num == 3) {
+            if (num === 3) {
               self.img3 = url
             }
           })
@@ -180,7 +182,7 @@ export default {
         img2: this.img2,
         img3: this.img3
       })
-      console.log('退款', data)
+      console.log('退款/货', data)
       if (data.code === 1) {
         this.$router.push('/pages/my/after')
       }

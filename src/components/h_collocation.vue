@@ -1,11 +1,5 @@
 <template>
   <div class="nav">
-    <!--<div class="title">-->
-    <!--<span class="title_1">NEW SHOW</span>-->
-    <!--<span class="title_2">火爆热卖，源于一派</span>-->
-    <!--<span class="xian"></span>-->
-    <!--<span class="xian_1"></span>-->
-    <!--</div>-->
     <div class="content">
       <scroll-view scroll-y>
         <div class="item_b">
@@ -82,7 +76,7 @@ export default {
   async mounted() {
     const selectMGP = await API.selectMGP({});
     this.selectMGP = selectMGP.data.list;
-    console.log(selectMGP);
+    // console.log(selectMGP);
   }
 };
 </script>
