@@ -75,17 +75,17 @@
         <div class="address-add" v-if="addAddress">
           <p class="tc_text">
             <span class="tc_name">收货人:</span>
-            <input class="tc_namet" type="text">
+            <input class="tc_namet" type="text" v-model="tc_namet">
           </p>
           <p class="tc_text">
             <span class="tc_phone">联系电话:</span>
-            <input class="tc_phonet" type="text">
+            <input class="tc_phonet" type="text" v-model="tc_phonet">
           </p>
           <p class="tc_text">
             <span class="tc_region">所在地址:</span>
             <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
               <view class="picker">
-                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '所在地址:' }}
+                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '' }}
               </view>
             </picker>
           </p>
@@ -95,21 +95,23 @@
           </p>
           <span class="btn" @click="popt()">添加</span>
         </div>
-
         <!--选择地址-->
-        <scroll-view class="address-list" v-if="selectAddress">
-          <div class="item" v-for="(item,index) in addressList" :key="index">
-            <p class="name">{{item.name+ ' ' + item.mobile}}</p>
-            <p class="details">
-              收货地址：{{item.value + item.address}}
-            </p>
-            <div class="select">
-              <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
-              <span class="edit">编辑</span>
+        <div class="address-list" v-if="selectAddress">
+          <scroll-view scroll-y style="height: 100%">
+            <div class="item" v-for="(item,index) in addressList" :key="index">
+              <p class="name">{{item.name+ ' ' + item.mobile}}</p>
+              <p class="details">
+                收货地址：{{item.value + item.address}}
+              </p>
+              <div class="select">
+                <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
+                <span class="edit" @click="addAdd()">编辑</span>
+              </div>
             </div>
-          </div>
-          <span class="btn" @click="confirm()">确认</span>
-        </scroll-view>
+            <div style="height: 20px"></div>
+            <span class="btn" @click="confirm()">确认</span>
+          </scroll-view>
+        </div>
       </div>
     </div>
     <!-- 红包弹窗 -->
@@ -139,6 +141,7 @@
 import wx from "wx";
 import config from "@/config.js";
 import API from "@/api/httpShui";
+import APIJ from "@/api/httpJchan";
 export default {
   components: {},
   data() {
@@ -169,6 +172,9 @@ export default {
       couponList: "",
       couponPrice: "",
       sessionId: "",
+      postcode: "",
+      recode: "",
+      editddres: "",
       pingId: ""
     };
   },
@@ -192,6 +198,43 @@ export default {
       }
       that.selectAddressId = id;
     },
+    async popt() {
+      console.log(this);
+    },
+    // 地址编辑
+    addAdd() {
+      console.log(this.addAddress);
+      console.log(this.selectAddress);
+      if (this.addAddress == false) {
+        this.addAddress = true;
+        this.selectAddress = false;
+      } else if (this.addAddress == true) {
+        this.addAddress = false;
+      }
+      if (this.recode.length == 1) {
+        this.recode = this.recode[0];
+      } else if (this.recode.length == 2) {
+        this.recode = this.recode[1];
+      } else if (this.recode.length == 3) {
+        this.recode = this.recode[2];
+      }
+      console.log(this.recode);
+      this.editddres();
+    },
+    // async editddres() {
+    //   const editddres = await APIJ.editddres({
+    //     name: this.name,
+    //     mobile: this.phone,
+    //     address: this.address,
+    //     value: this.region.join(","),
+    //     isChoice: this.isChoice,
+    //     areaId: this.recode,
+    //     addressId: this.tid
+    //   });
+    //   this.editddres = editddres.data.list;
+    //   console.log(addres.data);
+    //   console.log(this.address);
+    // },
     // 确定选择地址
     async confirm() {
       const data = await API.editAddress({
@@ -203,13 +246,16 @@ export default {
       }
       this.addressBox = false;
     },
-    // 配送方式
-    Delivery(type) {
-      this.expressWay = type;
-    },
+    // 选择地址组件
     bindRegionChange(e) {
       console.log(e);
       this.region = e.mp.detail.value;
+      this.postcode = e.mp.detail.postcode;
+      this.recode = e.mp.detail.code;
+    },
+    // 配送方式
+    Delivery(type) {
+      this.expressWay = type;
     },
     // 默认地址
     // 添加地址
@@ -726,9 +772,9 @@ export default {
           text-align: center
           line-height: 64px
           border-radius: 8px
-          position: absolute
+          position: relative
           bottom: 20px
-          left: 56px
+          left: 54px
   .T-coupon
     display: inline-block
     position: fixed
