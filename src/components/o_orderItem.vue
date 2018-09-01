@@ -6,36 +6,48 @@
         <span class="h-text">{{stateName[item.state]}}</span>
       </div>
       <div v-if="item.state != 5">
+          <!-- 其他 -->
           <div class="nav" >
             <div  v-for="(goods,j) in item.goodsList" :key="j">
               <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image">
               <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
             </div>
           </div>
+          <div class="below">
+            <div class="total">
+              <p class="t-left">共
+                <span class="piece">{{item.goodsListSize}}</span>个款，合计<span class="piece">{{item.num}}</span>件</p>
+              <p class="t-freight">（含运费￥{{item.freight}}）</p>
+              <p class="t-right">合计:
+                <span class="money">￥{{item.count}}</span>
+              </p>
+            </div>
+          </div>
       </div>
       <div v-else>
-        <div class="nav" v-for="(goods,j) in item.goodsList" :key="j">
-          <img v-if="goods.image" class="n-img" :src="goods.image">
-          <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-          <div class="n-right">
-            <p class="n-title">{{goods.name}}</p>
-            <block v-for="(sku, s) in goods.skuList" :key="s">
-              <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
-            </block>
+        <!-- 待发货 -->
+        <div v-for="(goods,j) in item.goodsList" :key="j">
+          <div class="nav">
+            <img v-if="goods.image" class="n-img" :src="goods.image">
+            <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+            <div class="n-right">
+              <p class="n-title">{{goods.name}}</p>
+              <block v-for="(sku, s) in goods.skuList" :key="s">
+                <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
+              </block>
+            </div>
+        </div>
+        <div class="below">
+          <div class="total">
+            <p class="t-right">
+              共<span class="piece">{{item.goodsListSize}}</span>件商品, 合计:<span class="money">￥{{item.count}}</span>
+            </p>
           </div>
         </div>
-
       </div>
-      
+        
+      </div>
       <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">{{item.goodsListSize}}</span>个款，合计<span class="piece">{{item.num}}</span>件</p>
-          <p class="t-freight">（含运费￥{{item.freight}}）</p>
-          <p class="t-right">合计:
-            <span class="money">￥{{item.count}}</span>
-          </p>
-        </div>
         <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
           <tr>
             <th></th>
@@ -261,7 +273,8 @@ table.skuCode
   background: #fff
   .total
     height: 82px
-    margin-left: 32px
+    line-height: 82px
+    padding: 0 32px
     overflow: hidden
     border-bottom: 1px solid #E5E5E5
     p
@@ -272,11 +285,11 @@ table.skuCode
       color: #000
     .t-left
       float: left
-      padding-top: 20px
+      // padding-top: 20px
     .t-right
       float: right
-      padding-top: 15px
-      padding-right: 10px
+      // padding-top: 15px
+      // padding-right: 10px
     .t-freight
       float: right
       padding-top: 20px
