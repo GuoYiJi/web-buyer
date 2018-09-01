@@ -17,7 +17,7 @@
           <p class="Goods">期货:{{item.delivery}}</p>
           <p class="volume">销量:{{item.sellCount}}</p>
           <p class="money">￥{{item.sellPrice}}</p>
-          <span class="btn">立即采购</span>
+          <span class="btn" @click="clickItem(item)">立即采购</span>
         </div>
       </div>
     </div>
@@ -75,6 +75,10 @@ export default {
       if (this.page <= this.totalPage) {
         this.goodsList(this.page)
       }
+    },
+    clickItem (obj) {
+      let objStr = JSON.stringify(obj)
+      this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
     }
   },
   mounted () {

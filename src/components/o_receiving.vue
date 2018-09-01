@@ -26,27 +26,31 @@
             <span class="money">￥{{item.count}}</span>
           </p>
         </div>
-        <block v-if="item.isHasChildren != 0">
-          <div class="orders">
-            <li class="o-item">
-              <span>子订单编号（已完成）：{{item.children[index+1]}}</span>
-              <i class="o-img"></i>
-            </li>
-          </div>
-          <!-- <div class="orders">
-            <li class="o-item">
-              <span>子订单编号（已完成）：12345678</span>
-              <i class="o-img"></i>
-            </li>
-          </div> -->
-        </block>
+        <!--<block v-if="item.isHasChildren != 0">-->
+          <!--<div class="orders">-->
+            <!--<li class="o-item">-->
+              <!--<span>子订单编号（已完成）：{{item.children[index+1]}}</span>-->
+              <!--<i class="o-img"></i>-->
+            <!--</li>-->
+          <!--</div>-->
+          <!--<div class="orders">-->
+            <!--<li class="o-item">-->
+              <!--<span>子订单编号（已完成）：12345678</span>-->
+              <!--<i class="o-img"></i>-->
+            <!--</li>-->
+          <!--</div>-->
+        <!--</block>-->
       </div>
       <div class="btn">
         <span class="b-xq" @click="bxq(item.id,3)">查看详情</span>
-        <span v-if="item.isHasChildren == 0 && item.isPing == 0 " class="b-sc" @click="toOpen('visible')">退货</span>
+        <span v-if="item.isHasChildren == 0 && item.isPing == 0 " class="b-sc" @click="toOpen('visible1')">退货</span>
+        <span v-if="item.isHasChildren == 0 && item.isPing == 0 " class="b-sc" @click="toOpen('visible2')">换货</span>
       </div>
-      <i-modal :visible="visible" @ok="retreat(item.id,1,item.paid,item.freight)" @cancel="toClose('visible')">
+      <i-modal :visible="visible1" @ok="retreat(item.id,1,item.paid,item.freight)" @cancel="toClose('visible1')">
         <div class="m_tips">确定申请退货！</div>
+      </i-modal>
+      <i-modal :visible="visible2" @ok="exchange(item.id,2)" @cancel="toClose('visible2')">
+        <div class="m_tips">确定申请换货！</div>
       </i-modal>
     </div>
   </div>
@@ -58,7 +62,8 @@ export default {
   components: {},
   data () {
     return {
-      visible: false,
+      visible1: false,
+      visible2: false,
       myorderList: []
     }
   },
@@ -77,11 +82,18 @@ export default {
     toClose (name) {
       this[name] = false
     },
-    // 申请退款
+    // 申请退货
     retreat (id, type, price, freight) {
       this.$router.push({
         path: '/pages/refund/refund',
         query: {orderId: id, type: type, price: price, freight: freight}
+      })
+    },
+    // 申请换货
+    exchange (id, type) {
+      this.$router.push({
+        path: '/pages/refund/barter',
+        query: {orderId: id, type: type}
       })
     },
     // 获取订单

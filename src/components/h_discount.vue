@@ -16,7 +16,7 @@
           <span class="money_1">￥{{item.sellPrice}}</span>
           <!--<s class="money_2">￥{{item.money_1}}</s>-->
         </p>
-        <i class="gwc"></i>
+        <i class="gwc" @click="clickItem(item)"></i>
       </div>
     </div>
     <div class="More">
@@ -74,6 +74,10 @@ export default {
       if (this.page <= this.totalPage) {
         this.goodsList(this.page)
       }
+    },
+    clickItem (obj) {
+      let objStr = JSON.stringify(obj)
+      this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
     }
   },
   mounted () {

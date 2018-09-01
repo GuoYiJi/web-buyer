@@ -72,7 +72,6 @@ export default {
   },
   methods: {
     refundDetails (id, type) {
-      console.log(id)
       if (type === 2) { // 换货详情
         this.$router.push({
           path: '/pages/refund/barterDetails',
@@ -88,7 +87,7 @@ export default {
   },
   async mounted () {
     const data = await API.afterService()
-    console.log('售后列表', data)
+    // console.log('售后列表', data)
     if (data.code === 1) {
       this.list = data.data.list
     }

@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper">
-    <!--<p class="refundState"> {{detailsInfo.state == 0 ? '等待商家处理' : detailsInfo.state == 1 ? '商家已同意' : detailsInfo.state == 2 ? '商家已拒绝' : detailsInfo.state == 3 ? '商家已同意' : detailsInfo.state == 4 ? '商家已发货' : detailsInfo.state == 5 ? '已撤销' : detailsInfo.state == 6 ? '确认收货' : ''}}</p>-->
+    <!--<p class="refundState"> </p>-->
     <div class="refundInfo">
-      <p class="title">您已成功发起退款申请，请耐心等待处理</p>
+      <p class="title">{{state == 0 ? '等待商家处理' : state == 1 ? '商家已同意' : state == 2 ? '商家已拒绝' : state == 3 ? '商家已同意' : state == 4 ? '商家已发货' : state == 5 ? '已撤销' : state == 6 ? '确认收货' : ''}}</p>
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
       <div v-if="isFh" class="addressBox">
         <p class="name">收货人：朱先森 15632168160</p>
@@ -13,23 +13,23 @@
         <p class="number">12454676891245467689</p>
       </div>
       <p class="title">退款信息</p>
-      <div class="refundGoods">
+      <div class="refundGoods" v-for="(item,index) in goods" :key="index">
         <div class="img">
-          <img src="../../assets/img/classify/goods.png" alt="">
+          <img v-if="item.image" src="../../assets/img/classify/goods.png" alt="">
+          <img v-else src="../../assets/img/classify/goods.png" alt="">
         </div>
         <div class="text">
-          <p class="name">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-          <p class="spec">白色：均码/1件</p>
-          <p class="spec">黑色：均码/1件</p>
+          <p class="name">{{item.name}}</p>
+          <p class="spec">{{item.skuCode}} / {{item.num}}件</p>
+          <!--<p class="spec">黑色：均码/1件</p>-->
         </div>
       </div>
       <div class="businessInfo">
-        <p>买家：香海的小店</p>
-        <p>姓名：罗小海</p>
-        <p>退款原因：原因1原因1</p>
-        <p>退款金额：39.9</p>
-        <p>申请时间：2018-12-12  23:12</p>
-        <p>退款编号：236854545465789</p>
+        <p>买家：{{shopName}}</p>
+        <p>退款原因：{{details.result}}</p>
+        <p>退款金额：{{details.price}}</p>
+        <p>申请时间：{{details.createTime}}</p>
+        <p>退款编号：{{details.orderRefundNo}}</p>
       </div>
     </div>
     <div class="btnGroup clearfix">
@@ -43,14 +43,14 @@
 import wx from 'wx'
 import API from '@/api/httpShui'
 export default {
-  detailsInfo () {
+  data () {
     return {
-      isFh: true,
+      isFh: false,
+      shopName: '',
       details: {},
       goods: [],
       refundType: '',
       state: ''
-
     }
   },
   components: {
@@ -65,15 +65,34 @@ export default {
     }
   },
   async mounted () {
-    console.log(this.$route.query.id)
+    let that = this
+    wx.getStorage({
+      key: 'shopName',
+      success: function (res) {
+        that.shopName = res.data
+      }
+    })
     const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
-    console.log(data)
     if (data.code === 1) {
       this.details = data.data
       this.goods = data.data.goodsList
-      this.refundType = data.data.refundType
-      this.state = data.data.state
-      console.log(this.state)
+      // this.refundType = data.data.refundType
+      // this.state = data.data.state
+      // 订单状态
+      let refundType = data.data.refundType
+      // 商家回复状态
+      let state = data.data.state
+      if (refundType === 0) {
+        this.isFh = false
+      }
+      if (refundType === 1 || refundType === 2) {
+        if (state === 0 || state === 2 || state === 5) {
+          this.isFh = false
+        }
+        if (state === 1 || state === 3 || state === 4 || state === 6) {
+          this.isFh = true
+        }
+      }
     }
   }
 }
@@ -163,7 +182,7 @@ export default {
           font-size: 24px
           color: #999999
     .businessInfo
-      height: 360px
+      /*height: 360px*/
       padding: 32px 24px
       background: #ffffff
       p

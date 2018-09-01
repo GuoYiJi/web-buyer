@@ -12,30 +12,33 @@
     </div>
     <div class="content">
       <p class="c_title">菲斯的小店</p>
-      <div v-if="isDetails === false" class="c_nav" v-for="(item,index) in goodsInfo" :key="index">
+      <!--购物车-->
+      <div v-if="buyType === 2" class="c_nav" v-for="(item,index) in goodsInfo" :key="index">
         <img v-if="item.image" :src="item.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{item.name}}</p>
-          <p class="cn_t2">{{item.skuCode}} : {{item.num}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
-      <div v-if="isDetails === true" class="c_nav">
+      <!--详情-->
+      <div v-if="buyType === 1" class="c_nav">
         <img v-if="goodsInfo.image" :src="goodsInfo.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{goodsInfo.name}}</p>
-          <p class="cn_t2">{{skuCode}} : {{totalNum}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
-      <div v-if="isGroup === true" class="c_nav">
+      <!--拼团-->
+      <div v-if="buyType === 3" class="c_nav">
         <img v-if="goodsInfo.image" :src="goodsInfo.image" class="cn_img">
         <img v-else src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg" class="cn_img">
         <div class="cn_text">
           <p class="cn_t1">{{goodsInfo.name}}</p>
-          <p class="cn_t2">{{skuCode}} : {{totalNum}} 件</p>
+          <p class="cn_t2" v-for="(item,i) in skuCode" :key="i">{{item}}</p>
           <i class="cn_sj"></i>
         </div>
       </div>
@@ -98,8 +101,8 @@
 
         <!--选择地址-->
         <scroll-view class="address-list" v-if="selectAddress">
-          <div class="item" v-for="(item,index) in addressList" :key="index">
-            <p class="name">{{item.name+ ' ' + item.mobile}}</p>
+          <div class="item"  v-for="(item,index) in addressList" :key="index">
+            <p class="name">{{item.name+ '  ' + item.mobile}}</p>
             <p class="details">
               收货地址：{{item.value + item.address}}
             </p>
@@ -136,256 +139,280 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import config from "@/config.js";
-import API from "@/api/httpShui";
+import wx from 'wx'
+import config from '@/config.js'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
+  data () {
     return {
-      isDetails: null,
-      isGroup: false,
-      selectAddressId: "",
+      buyType: null,
+      selectAddressId: '',
       region: [],
-      customItem: "全部",
+      customItem: '全部',
       couponBox: false,
       selectAddress: false,
       addAddress: false,
       addressBox: false,
-      remark: "",
+      remark: '',
       goodsInfo: {},
-      name: "",
-      phone: "",
-      addressDetails: "",
+      name: '',
+      phone: '',
+      addressDetails: '',
       totalPack: 0,
       totalPrice: 0,
       totalNum: 0,
       expressWay: 0,
-      addressId: "",
+      addressId: '',
       addressList: [],
-      skuObj: "",
-      skuCode: "",
-      couponId: "",
-      couponList: "",
-      couponPrice: "",
-      sessionId: "",
-      pingId: ""
-    };
+      skuObj: '',
+      skuCode: '',
+      couponId: '',
+      couponList: '',
+      couponPrice: '',
+      sessionId: '',
+      pingId: null,
+      pingOrderId: null
+    }
   },
   methods: {
-    toOpen(parent, child) {
-      this[parent] = true;
-      this[child] = true;
+    toOpen (parent, child) {
+      this[parent] = true
+      this[child] = true
     },
-    toClose(name) {
-      this[name] = false;
+    toClose (name) {
+      this[name] = false
     },
     // 选择地址
-    defaultAddress(id, index) {
-      let that = this;
+    defaultAddress (id, index) {
+      let that = this
       for (let i = 0; i < that.addressList.length; i++) {
         if (i === index) {
-          that.addressList[i].isChoice = 1;
+          that.addressList[i].isChoice = 1
         } else {
-          that.addressList[i].isChoice = 0;
+          that.addressList[i].isChoice = 0
         }
       }
-      that.selectAddressId = id;
+      that.selectAddressId = id
     },
     // 确定选择地址
-    async confirm() {
-      const data = await API.editAddress({
-        addressId: this.selectAddressId,
-        isChoice: 1
-      });
+    async confirm () {
+      const data = await API.editAddress({addressId: this.selectAddressId, isChoice: 1})
       if (data.code === 1) {
-        this.getAddress();
+        this.getAddress()
       }
-      this.addressBox = false;
+      this.addressBox = false
     },
     // 配送方式
-    Delivery(type) {
-      this.expressWay = type;
+    Delivery (type) {
+      this.expressWay = type
     },
-    bindRegionChange(e) {
-      console.log(e);
-      this.region = e.mp.detail.value;
+    bindRegionChange (e) {
+      console.log(e)
+      this.region = e.mp.detail.value
     },
     // 默认地址
     // 添加地址
     // 获取收货地址
-    async getAddress() {
-      const data = await API.address({ pageNumber: 1, pageSize: 5 });
-      console.log("收货地址", data);
-      let list = data.data.list;
-      this.addressList = list;
+    async getAddress () {
+      const data = await API.address({ pageNumber: 1, pageSize: 5 })
+      console.log('收货地址', data)
+      let list = data.data.list
+      this.addressList = list
       // 加载显示默认地址
       for (var i = 0; i < list.length; i++) {
         if (list[i].isChoice === 1) {
-          this.addressId = list[i].id;
-          this.name = list[i].name;
-          this.phone = list[i].mobile;
-          let val = list[i].value;
-          this.addressDetails = val.split(",").join("") + list[i].address;
+          this.addressId = list[i].id
+          this.name = list[i].name
+          this.phone = list[i].mobile
+          let val = list[i].value
+          this.addressDetails = val.split(',').join('') + list[i].address
         } else {
-          this.addressId = list[0].id;
-          this.name = list[0].name;
-          this.phone = list[0].mobile;
-          let val = list[0].value;
-          this.addressDetails = val.split(",").join("") + list[0].address;
+          this.addressId = list[0].id
+          this.name = list[0].name
+          this.phone = list[0].mobile
+          let val = list[0].value
+          this.addressDetails = val.split(',').join('') + list[0].address
         }
       }
     },
     // 获取优惠券
-    async getCoupon() {
+    async getCoupon () {
       const myCoupon = await API.coupon({
         isExchange: 0,
         state: 1,
         pageSize: 5,
         pageNumber: 1
-      });
-      console.log("优惠券", myCoupon);
+      })
+      console.log('优惠券', myCoupon)
       for (let i = 0; i < myCoupon.data.list.length; i++) {
-        myCoupon.data.list[i].startTime = myCoupon.data.list[i].startTime
-          .split(" ")[0]
-          .toString();
-        myCoupon.data.list[i].endTime = myCoupon.data.list[i].endTime
-          .split(" ")[0]
-          .toString();
+        myCoupon.data.list[i].startTime = myCoupon.data.list[i].startTime.split(' ')[0].toString()
+        myCoupon.data.list[i].endTime = myCoupon.data.list[i].endTime.split(' ')[0].toString()
       }
-      this.couponList = myCoupon.data.list;
+      this.couponList = myCoupon.data.list
     },
     // 选择优惠卷
-    selectCoupon(id, price) {
-      this.couponId = id;
-      this.couponPrice = price;
-      this.couponBox = false;
+    selectCoupon (id, price) {
+      this.couponId = id
+      this.couponPrice = price
+      this.couponBox = false
     },
     // 立即购买
-    buy() {
-      let that = this;
-      const TEST_URL = config.url;
-      const BASE_URL = config.url;
-      const URL = process.env.NODE_ENV === "development" ? TEST_URL : BASE_URL;
-      let appId = config.appId;
-      if (this.isGroup === true) {
-        let obj = {
-          sessionId: this.sessionId,
-          appId: appId,
-          addressId: this.addressId,
-          remark: this.remark,
-          skuList: this.skuObj,
-          couponId: this.couponId,
-          pingId: this.pingId,
-          pingOrderId: "",
-          expressWay: this.expressWay
-        };
+    buy () {
+      let that = this
+      const TEST_URL = config.url
+      const BASE_URL = config.url
+      const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
+      let appId = config.appId
+      let obj = {
+        sessionId: this.sessionId,
+        appId: appId,
+        addressId: this.addressId,
+        remark: this.remark,
+        skuList: this.skuObj,
+        couponId: this.couponId,
+        expressWay: this.expressWay
+      }
+      // 拼团购买
+      if (this.buyType === 3) {
+        if (this.pingId != null) {
+          obj.pingId = this.pingId
+        }
+        if (this.pingOrderId != null) {
+          obj.pingOrderId = this.pingOrderId
+        }
         wx.request({
-          method: "POST",
-          url: URL + "/api/order/createPingOrder",
+          method: 'POST',
+          url: URL + '/api/order/createPingOrder',
           data: JSON.stringify(obj),
           header: {
-            "content-type": "application/json" // 默认值
+            'content-type': 'application/json' // 默认值
           },
-          success: function(res) {
-            that.wxSign(res.data.data.id);
+          success: function (res) {
+            console.log(res)
+            that.wxSign(res.data.data.id, 2)
           }
-        });
-      } else {
-        let obj = {
-          sessionId: this.sessionId,
-          appId: appId,
-          addressId: this.addressId,
-          remark: this.remark,
-          skuList: this.skuObj,
-          couponId: this.couponId,
-          expressWay: this.expressWay
-        };
+        })
+      }
+      // 普通购买
+      if (this.buyType === 1 || this.buyType === 2) {
         wx.request({
-          method: "POST",
-          url: URL + "/api/order/createOrder",
+          method: 'POST',
+          url: URL + '/api/order/createOrder',
           data: JSON.stringify(obj),
           header: {
-            "content-type": "application/json" // 默认值
+            'content-type': 'application/json' // 默认值
           },
-          success: function(res) {
+          success: function (res) {
+            console.log(res)
             if (res.data.code === 1) {
-              that.wxSign(res.data.data.id);
+              that.wxSign(res.data.data.id, 1)
             }
           }
-        });
+        })
       }
     },
     // 微信支付
-    async wxSign(orderId) {
-      let that = this;
-      const data = await API.wxSign({ orderId: orderId });
-      console.log(data);
+    async wxSign (orderId, type) {
+      let that = this
+      const data = await API.wxSign({ orderId: orderId })
+      console.log(data)
       if (data.code === 1) {
-        let obj = data.data;
+        let obj = data.data
         wx.requestPayment({
           timeStamp: obj.timeStamp,
           nonceStr: obj.nonceStr,
           package: obj.package,
           signType: obj.signType,
           paySign: obj.paySign,
-          success: function(res) {
-            // console.log('调取支付返回结果', res)
-            that.$router.push({
-              path: "/pages/my/order/myorder",
-              query: { tag: 1 }
-            });
-            // if (res.errMsg === 'requestPayment:ok') {
-            // }
+          success: function (res) {
+            console.log('支付成功返回结果', res)
+            if (res.errMsg === 'requestPayment:ok') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
           },
-          fail: function(res) {}
-        });
+          fail: function (res) {
+            console.log('支付失败返回结果', res)
+            if (res.errMsg === 'requestPayment:fail cancel' || res.errMsg === 'requestPayment:fail (detail message)') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
+          }
+        })
       }
     }
   },
-  async mounted() {
+  async mounted () {
     // 获取sessionId
-    this.sessionId = await wx.getStorageSync("sessionId");
+    this.sessionId = await wx.getStorageSync('sessionId')
     // 详情过来
     if (this.$route.query.details) {
-      this.isDetails = true;
-      let goods = JSON.parse(this.$route.query.details);
-      this.goodsInfo = goods.goods;
-      this.skuObj = goods.skuObj;
-      this.sKuCode = goods.sKuCode;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = 1;
-      console.log("详情过来", this.goodsInfo);
+      this.buyType = 1
+      let goods = JSON.parse(this.$route.query.details)
+      console.log(goods)
+      this.goodsInfo = goods.goods
+      this.skuObj = goods.skuObj
+      this.skuCode = goods.skuCode
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = 1
+      console.log('详情过来', this.goodsInfo)
     }
     // 购物车过来
     if (this.$route.query.cart) {
-      this.isDetails = false;
-      let goods = JSON.parse(this.$route.query.cart);
-      this.goodsInfo = goods.goods;
-      this.skuObj = goods.skuObj;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = goods.goods.length;
-      console.log("购物车过来", this.goodsInfo);
+      this.buyType = 2
+      let goods = JSON.parse(this.$route.query.cart)
+      this.goodsInfo = goods.goods
+      this.skuObj = goods.skuObj
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = goods.goods.length
+      console.log('购物车过来', this.goodsInfo)
     }
     // 拼团过来
     if (this.$route.query.group) {
-      this.isGroup = true;
-      let goods = JSON.parse(this.$route.query.group);
-      this.goodsInfo = goods.goods;
-      this.pingId = goods.pingId;
-      this.skuObj = goods.skuObj;
-      this.skuCode = goods.skuCode;
-      this.totalPrice = goods.totalPrice;
-      this.totalNum = goods.totalNum;
-      this.totalPack = 1;
-      console.log("拼团过来", this.goodsInfo);
+      let goods = JSON.parse(this.$route.query.group)
+      console.log(goods.goods)
+      if (goods.pingId !== undefined) {
+        this.buyType = 3
+        this.pingId = goods.pingId
+        if (goods.pingOrderId !== undefined) {
+          this.pingOrderId = goods.pingOrderId
+        }
+      } else {
+        this.buyType = 1
+      }
+      this.goodsInfo = goods.goods
+      this.skuObj = goods.skuObj
+      this.skuCode = goods.skuCode
+      this.totalPrice = goods.totalPrice
+      this.totalNum = goods.totalNum
+      this.totalPack = 1
+      console.log('拼团过来', this.goodsInfo)
     }
-    this.getAddress();
-    this.getCoupon();
+    this.getAddress()
+    this.getCoupon()
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
@@ -508,11 +535,11 @@ export default {
       color: #000
       border-bottom: 1px solid #E5E5E5
       .m_text
-        width: 120px
+        /*width: 120px*/
         display: inline-block
         vertical-align: middle
       .m_input
-        width: 440px
+        width: 420px
         display: inline-block
         vertical-align: middle
         font-size: 28px
