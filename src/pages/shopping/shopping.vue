@@ -31,7 +31,7 @@
             <p class="uniform" v-for="(ite,i) in item.skuCode" :key="i">{{ite}}</p>
             <p class="money">¥{{item.sellPrice}}</p>
             <span class="quantity">x{{item.totalNum}}</span>
-            <span class="btn" @click="popup1(index)">编辑</span>
+            <span class="btn" @click="editOrder(index)">编辑</span>
           </div>
         </div>
       </div>
@@ -44,8 +44,9 @@
       </i-modal>
     </div>
     <!-- 弹窗 -->
-    <div class="popup" v-if="(popup == 1)">
+    <div class="popup" v-if="popup">
       <div class="kuang_1">
+        <img class="pop_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
         <img class="pop_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
         <p class="pop_money">￥{{editSpec.sellPrice}}</p>
         <p class="pop_title">{{editSpec.name}}</p>
@@ -55,12 +56,7 @@
         <p class="k2_title">选择颜色和尺码</p>
         <div class="k2_btnk">
           <span class="k2_btn" v-for="(item,index) in editSpec.skuAttr" :key="index" @click="selectColorSpec(index,item.colorVal)">{{item.colorVal}}
-            <span class="k2_dian">5</span>
           </span>
-          <!-- <span class="k2_btn">绿色
-            <span class="k2_dian">99</span>
-          </span>
-          <span class="k2_btn">绿色</span> -->
         </div>
       </div>
       <div class="kuang_3">
@@ -68,25 +64,18 @@
           <li class="s_item">尺码</li>
           <li class="s_item">购买数量</li>
         </ul>
-        <ul class="s_item_box" v-for="(item, index) in skuAttr[colorIndex].sizeArray" :key="index">
+        <ul class="s_item_box" v-for="(item, index) in editSpec.skuAttr[colorIndex].sizeArray" :key="index">
           <li class="s_item">{{item.sizeVal}}</li>
           <li class="s_item">
-            <i-input-number :value="value1" min="0" max="100" @change="handleChange1" />
-          </li>
-        </ul>
-        <ul class="s_item_box">
-          <li class="s_item">M</li>
-          <li class="s_item">
             <span class="minus" @click="minus(colorIndex, index)"></span>
-            <span class="count">{{item.sizeNum}}</span>
+            <span class="count">{{item.newNum}}</span>
             <span class="add" @click="add(colorIndex, index)"></span>
           </li>
         </ul>
       </div>
       <div class="kuang_4">
         <p class="k4_title">已选</p>
-        <p class="k4_text">绿色：S/1件；M/1件</p>
-        <p class="k4_text">红色：S/1件；M/1件</p>
+        <p class="k4_text" v-for="(item,index) in editSpec.skuAttr" :key="index">{{item.colorVal}}：<span v-for="(item,i) in item.sizeArray" :key="i">{{item.sizeVal}}/{{item.sizeNum}}件;</span></p>
       </div>
       <span class="btn">确定</span>
     </div>
@@ -115,9 +104,9 @@ export default {
       xz: 0,
       del: 1,
       visible2: false,
-      cardList: [],
       checkAll: false,
       check: false,
+      cardList: [],
       selectArr: [],
       skuAttr: [],
       colorIndex: 0,
@@ -125,17 +114,39 @@ export default {
     }
   },
   methods: {
-    popup1 (index) {
-      this.popup = true
-      // let obj = {}
-      // obj.name = this.cardList[index].name
-      // obj.sellPrice = this.cardList[index].sellPrice
-      // obj.skuAttr = this.cardList[index].skuAttr
-      // this.editSpec = obj
+    editOrder (index) {
+      let that = this
+      that.popup = true
+      let obj = {}
+      obj.name = that.cardList[index].name
+      obj.image = that.cardList[index].image
+      obj.sellPrice = that.cardList[index].sellPrice
+      obj.skuAttr = that.cardList[index].skuAttr
+      that.editSpec = obj
     },
     // 选择规格
     selectColorSpec (index) {
       this.colorIndex = index
+    },
+    // 减
+    minus (colorIndex, sizeIndex) {
+      // console.log(colorIndex, sizeIndex)
+      let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
+      if (num === 0) {
+        return false
+      } else {
+        this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum--
+      }
+    },
+    // 加
+    add (colorIndex, sizeIndex) {
+      // console.log(colorIndex, sizeIndex)
+      let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
+      if (num === 100) {
+        return false
+      } else {
+        this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum++
+      }
     },
     // 删除
     delBtn () {
@@ -148,28 +159,22 @@ export default {
     },
     // 单选
     clickCheck (id, skuId, num, index) {
-      let obj = {}
-      obj.skuAttr = this.cardList[index].skuAttr
-      obj.name = this.cardList[index].name
-      obj.image = this.cardList[index].image
-      obj.price = this.cardList[index].sellPrice
-      this.editSpec = obj
       let that = this
-      if (that.cardList[index].check) {
-        that.count--
-        that.cardList[index].check = false
-        for (let i = 0; i < that.selectArr.length; i++) {
-          if (that.selectArr[i].id === id) {
-            that.selectArr.splice(i, 1)
-          }
-        }
-        // console.log('0', that.cardList[index])
-      } else {
-        that.count++
-        that.cardList[index].check = true
-        that.selectArr.push({id: id, skuId: skuId, num: num})
-        // console.log('1', this.cardList[index])
-      }
+      // if (that.cardList[index].check) {
+      //   that.count--
+      //   that.cardList[index].check = false
+      //   for (let i = 0; i < that.selectArr.length; i++) {
+      //     if (that.selectArr[i].id === id) {
+      //       that.selectArr.splice(i, 1)
+      //     }
+      //   }
+      //   // console.log('0', that.cardList[index])
+      // } else {
+      //   that.count++
+      //   that.cardList[index].check = true
+      //   that.selectArr.push({id: id, skuId: skuId, num: num})
+      //   // console.log('1', this.cardList[index])
+      // }
     },
     // 全选
     clickCheckAll () {
@@ -237,55 +242,6 @@ export default {
         this.$router.push({path: '/pages/shopping/order/order', query: {cart: JSON.stringify(dataObj)}})
       }
     },
-    // 处理规格数据
-    setSkuCode (list) {
-      console.log('设置规格文字', list)
-      // 处理规格数据
-      let skuAttr = []
-      let skuCode = []
-      console.log(list.length)
-      for (let i = 0; i < list.length; i++) {
-        console.log('list')
-        for (let j = 0; j < list[i].sizeArray.length; j++) {
-          console.log(sizeArray)
-          let obj = {}
-          if (list[i].sizeArray[j].sizeNum === 0) {
-            continue
-          }
-          let colorVal = list[i].colorVal
-          let sizeVal = list[i].sizeArray[j].sizeVal
-          let colorId = list[i].color
-          let sizeId = list[i].sizeArray[j].sizeId
-          let num = list[i].sizeArray[j].sizeNum
-          let attrIds = colorId + ',' + sizeId
-          totalNum += Number(num)
-          // 处理规格文字
-          let ishas = false
-          let skuVal = ''
-          for (let g = 0; g < skuCode.length; g++) {
-            let str = skuCode[g].substring(0, 1)
-            if (str === colorVal) {
-              skuCode[g] += sizeVal + '/' + num + '件;'
-              ishas = true
-              break
-            }
-          }
-          if (!ishas) {
-            skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
-            skuCode.push(skuVal)
-          }
-          // for (let k = 0; k < that.skuList.length; k++) {
-          //   if (that.skuList[k].attrIds === attrIds) {
-          //     obj.skuId = that.skuList[k].id
-          //   }
-          // }
-          // obj.num = num
-          // skuAttr.push(obj)
-        }
-      }
-      console.log('设置规格文字后', skuCode)
-      return skuCode
-    },
     async getCard () {
       let that = this
       const data = await API.getCardList()
@@ -305,7 +261,6 @@ export default {
     }
   },
   async mounted () {
-    // this.getCard()
     let that = this
     const data = await API.getCardList()
     if (data.code === 1) {
@@ -332,6 +287,7 @@ export default {
             sizeObj.sizeId = attrIds[1]
             sizeObj.sizeVal = attrVal[1]
             sizeObj.sizeNum = sku.num
+            sizeObj.newNum = sku.num
             sizeArray.push(sizeObj)
             obj.sizeArray = sizeArray
             let isHas = false
@@ -351,26 +307,26 @@ export default {
           // 处理规格数据
           let skuCode = []
           let totalNum = 0
-          for (let i = 0; i < skuAttr.length; i++) {
-            for (let j = 0; j < skuAttr[i].sizeArray.length; j++) {
+          for (let a = 0; a < skuAttr.length; a++) {
+            for (let b = 0; b < skuAttr[a].sizeArray.length; b++) {
               let obj = {}
-              if (skuAttr[i].sizeArray[j].sizeNum === 0) {
+              if (skuAttr[a].sizeArray[b].sizeNum === 0) {
                 continue
               }
-              let colorVal = skuAttr[i].colorVal
-              let sizeVal = skuAttr[i].sizeArray[j].sizeVal
-              // let colorId = skuAttr[i].color
-              // let sizeId = skuAttr[i].sizeArray[j].sizeId
-              let num = skuAttr[i].sizeArray[j].sizeNum
+              let colorVal = skuAttr[a].colorVal
+              let sizeVal = skuAttr[a].sizeArray[b].sizeVal
+              // let colorId = skuAttr[a].color
+              // let sizeId = skuAttr[a].sizeArray[b].sizeId
+              let num = skuAttr[a].sizeArray[b].sizeNum
               // let attrIds = colorId + ',' + sizeId
               totalNum += Number(num)
               // 处理规格文字
               let ishas = false
               let skuVal = ''
-              for (let g = 0; g < skuCode.length; g++) {
-                let str = skuCode[g].substring(0, 1)
+              for (let c = 0; c < skuCode.length; c++) {
+                let str = skuCode[c].substring(0, 1)
                 if (str === colorVal) {
-                  skuCode[g] += sizeVal + '/' + num + '件;'
+                  skuCode[c] += sizeVal + '/' + num + '件;'
                   ishas = true
                   break
                 }
@@ -676,6 +632,8 @@ export default {
           text-align: center
           line-height: 60px
           position: relative
+        .k2_btn.active
+        border: 1px solid #F67C2F
           .k2_dian
             display: inline-block
             width: 34px
