@@ -5,11 +5,11 @@
       <i class="h-img"></i>
       <span>交易成功</span>
     </div>
-    <div class="diz">
+    <div class="diz" v-if="details.orderAddress">
       <i class="dz-img"></i>
-      <span class="dz-name">收货人：朱先森</span>
-      <span class="dz-phone">15632168160</span>
-      <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
+      <span class="dz-name">收货人：{{details.orderAddress.name}}</span>
+      <span class="dz-phone">{{details.orderAddress.mobile}}</span>
+      <p class="dz-dz">收货地址：{{details.orderAddress.value+details.orderAddress.address}}</p>
     </div>
     <p class="title">菲斯的小店</p>
     <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
@@ -75,7 +75,7 @@
     <div style="height: 100px"></div>
     <!-- !=主订单 -->
     <div v-if="(zhu == 0)" class="foot">
-      <span class="pay">删除订单</span>
+      <span class="pay" @click="delOrder(details.id)">删除订单</span>
     </div>
   </div>
 </template>
@@ -90,7 +90,7 @@ export default {
       zi: 0,
       wuliu: 0,
       zhu: 0,
-      details: {}
+      details:{orderAddress:{}}
     }
   },
   methods: {
@@ -98,7 +98,15 @@ export default {
       const data = await API.getOrderDetails({orderId: id})
       this.details = data.data
       console.log('交易成功订单详情', this.details)
-    }
+    },
+    async delOrder(id){
+      const data = await API.delOrderShow({orderId: id})
+      if (data.code === 1) {
+        // this.visible3 = false;
+        this.$router.back();
+        // this.$emit('refreshOrder');
+      }
+    },
   },
   mounted () {
     this.getOrderDetails(this.id)

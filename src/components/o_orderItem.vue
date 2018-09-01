@@ -2,7 +2,7 @@
   <!-- 全部订单-待付款 -->
   <div class="home">
     <div class="head">
-        <span class="h-title">菲斯的小店</span>
+        <span class="h-title">{{shopName}}</span>
         <span class="h-text">{{stateName[item.state]}}</span>
       </div>
       <div v-if="item.state != 5">
@@ -11,12 +11,6 @@
               <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image">
               <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
             </div>
-            <!-- <div class="n-right">
-              <p class="n-title">{{goods.name}}</p>
-              <block v-for="(sku, s) in goods.skuList" :key="s">
-                <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
-              </block>
-            </div> -->
           </div>
       </div>
       <div v-else>
@@ -42,6 +36,26 @@
             <span class="money">￥{{item.count}}</span>
           </p>
         </div>
+        <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
+          <tr>
+            <th></th>
+            <th>颜色</th>
+            <th>码数</th>
+            <th>总件数</th>
+            <th>已发</th>
+            <th>未发</th>
+            <th></th>
+          </tr>
+          <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
+            <td></td>
+            <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
+            <td></td>
+          </tr>
+        </table>
+        <div class="total" v-for="(cOder,idx) in item.children" :key="idx" >
+          <span class="t-left" @click="bxq(cOder.id, cOder.state)">子订单编号({{stateName[cOder.state]}}): {{cOder.orderNo}}</span>
+          <span class="t-right">></span>
+        </div>
         <div class="btn" >
           <span class="b-xq" v-if="item.state==1" @click="toOpen('visible1')">确认付款</span>
           <span class="b-xq" v-if="item.state==2" @click="toOpen('visible3')">删除订单</span>
@@ -64,12 +78,6 @@
         <i-modal :visible="visible4" @ok="retreat(item.id,0,item.paid,item.freight)" @cancel="toClose('visible4')">
           <div class="m_tips">确定申请退款！</div>
         </i-modal>
-        <!-- <i-modal :visible="visible5" @ok="retreat(item.id,1,item.paid,item.freight)" @cancel="toClose('visible5')">
-          <div class="m_tips">确定申请退货！</div>
-        </i-modal>
-        <i-modal :visible="visible6" @ok="exchange(item.id,2)" @cancel="toClose('visible6')">
-          <div class="m_tips">确定申请换货！</div>
-        </i-modal> -->
         <i-modal :visible="visible5" @ok="sureOrder(item.id)" @cancel="toClose('visible5')">
           <div class="m_tips">请确认已经收到宝贝！</div>
         </i-modal>
@@ -82,7 +90,8 @@ import API from '@/api/httpShui'
 export default {
   components: {},
   props:{
-    item :{}
+    item :{},
+    shopName:''
   },
   data () {
     return {
@@ -91,11 +100,10 @@ export default {
       visible3: false,
       visible4: false,
       visible5: false,
-      visible6: false,
-      visible7: false,
       // myorderList: [],
-      stateName : ['','待付款','交易取消','已支付','支付失败','待发货','待收货','交易完成','交易关闭','拼单中'],
-      id: ''
+      stateName : ['','待付款','交易取消','已支付','支付失败','待发货','待收货','已完成','交易关闭','拼单中'],
+      id: '',
+      skuCodeList : []
     }
   },
   methods: {
@@ -112,9 +120,6 @@ export default {
     buyPay(orderId){
       // 跳去支付页面
     },
-    delOrder(id){
-      this.visible3 = false
-    },
     // 申请退款
     retreat (id, type, price, freight) {
       this.visible4 = false;
@@ -124,17 +129,12 @@ export default {
         query: {orderId: id, type: type, price: price, freight: freight}
       })
     },
-    // 申请换货
-    exchange (id, type) {
-      this.visible6 = false;
-      this.$router.push({
-        path: '/pages/refund/barter',
-        query: {orderId: id, type: type}
-      })
-    },
     // 查看物流
     logistics (orderId){
-
+      this.$router.push({
+        path: '/pages/my/logistics',
+        query: {orderId: orderId}
+      })
     },
     //申请售后
     afterSale(orderId){
@@ -156,6 +156,15 @@ export default {
         this.$emit('refreshOrder');
       }
     },
+    //删除订单
+    async delOrder(id){
+      const data = await API.delOrderShow({orderId: id})
+      if (data.code === 1) {
+        this.visible3 = false;
+        // this.$router.back();
+        this.$emit('refreshOrder');
+      }
+    },
     // 确认收货
     async sureOrder (orderId) {
       const data = await API.sureOrder({orderId: orderId})
@@ -169,11 +178,48 @@ export default {
   async mounted () {
     // console.log(this.item);
     // this.getOrder()
+  },
+  created(){
+    // console.log(this.item);
+    if(this.item && this.item.goodsList && this.item.goodsList.length > 0){
+      let gArr = this.item.goodsList;
+      gArr.forEach((good,idx)=>{
+        this.skuCodeList[idx] = [];
+        good.skuList.forEach((Citem, Cindex) => {
+          let color = Citem.skuCode.split(':')[0];
+          let size = Citem.skuCode.split(':')[1];
+          // console.log(color, Citem);
+          this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
+          console.log(this.skuCodeList);
+        })
+      })
+      
+    }
+    
   }
 }
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
+
+table.skuCode
+  width: 100%
+  border: none
+  text-align: center
+  tr
+    width: 100%
+    display: flex
+    &:nth-of-type(2n)
+      background-color: #EEEEEE
+    th, td
+      flex: 1
+      padding: 10px 0
+      font-size: 28px
+    th
+      background-color: #FAFAFA
+      color: #999999
+    td
+      color: #666666
 .head
   display: flex
   font-size: 28px
@@ -221,6 +267,9 @@ export default {
     p
       font-size: 24px
       color: #000
+    span 
+      font-size: 24px
+      color: #000
     .t-left
       float: left
       padding-top: 20px
@@ -250,6 +299,7 @@ export default {
       width: 160px
       height: 60px
       background: #F67C2F
+      font-size: 24px
       vertical-align: middle
       line-height: 60px
       text-align: center
@@ -260,7 +310,8 @@ export default {
       display: inline-block
       width: 140px
       height: 58px
-      border: 1px solid #BFBFBF
+      background: #EEEEEE
+      font-size: 24px
       vertical-align: middle
       line-height: 60px
       text-align: center

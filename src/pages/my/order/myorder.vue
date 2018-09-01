@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="content">
-        <orderItem v-for="(item,idx) in orderList" :key="idx" :item="item" @refreshOrder="refreshOrder"></orderItem>
+        <orderItem v-for="(item,idx) in orderList" :key="idx" :item="item" @refreshOrder="refreshOrder" :shopName="shopName"></orderItem>
       <!-- <div v-if="tag == '1'">
         <obligation />
         <send />
@@ -54,6 +54,7 @@ export default {
     return {
       tag: null,
       orderList : [],
+      shopName:'',
       navData: [
         {
           id: 1,
@@ -128,6 +129,13 @@ export default {
     let type = this.$route.query.tag
     // this.tag = type;
     this.refreshOrder(type);
+    let that = this
+    wx.getStorage({
+      key: 'shopName',
+      success: function (res) {
+        that.shopName = res.data
+      }
+    })
   }
 }
 </script>
