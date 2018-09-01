@@ -37,12 +37,16 @@
         <span class="h-title">菲斯的小店</span>
         <span class="h-text">交易完成</span>
       </div>
-      <div class="nav">
-        <!-- <img class="n-img" :src="item.goodslist[index].image"> -->
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <i class="n-icon"></i>
+      <div class="nav" v-for="(goods,j) in item.goodsList" :key="j">
+        <img v-if="goods.image" class="n-img" :src="goods.image">
+        <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+        <div class="n-right">
+          <p class="n-title">{{goods.name}}</p>
+          <block v-for="(sku, s) in goods.skuList" :key="s">
+            <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
+          </block>
+          <!-- <p class="yardage">{{skuCode}}/{{item.goodsList[0].skuList[0].num}}件</p> -->
+        </div>
       </div>
       <div class="below">
         <div class="total">
@@ -69,14 +73,14 @@
         </block>
       </div>
       <div class="btn">
-        <span class="b-xq2" @click="bxq(4)">查看详情</span>
+        <span class="b-xq" @click="bxq(item.id,4)">查看详情</span>
       </div>
     </div>
   </div>
 </template>
 <script>
 // import wx from 'wx'
-import API from '@/api/httpJchan'
+import API from '@/api/httpShui'
 export default {
   components: {},
   data () {
@@ -93,19 +97,33 @@ export default {
     toClose (name) {
       this[name] = false
     },
-    bxq (xq) {
+    bxq (id, xq) {
+      // console.log(id)
+      // console.log(xq)
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
-        query: { xq: xq }
+        query: { id: id, xq: xq }
       })
     },
-    myord () {}
+    // 获取订单
+    async getOrder () {
+      const Myorder = await API.myOrder({state: 7, isPing: 0})
+      console.log('交易完成', Myorder)
+      this.myorderList = Myorder.data.list
+      // 更改规格显示
+      for (let i = 0; i < this.myorderList.length; i++) {
+        for (let j = 0; j < this.myorderList[i].goodsList.length; j++) {
+          for (let g = 0; g < this.myorderList[i].goodsList[j].skuList.length; g++) {
+            let skuCode = this.myorderList[i].goodsList[j].skuList[g].skuCode
+            this.myorderList[i].goodsList[j].skuList[g].skuCode = skuCode.replace(/,/g, ':')
+          }
+        }
+      }
+    }
   },
   // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 7 })
-    this.myorderList = myorder.data.list
-    this.myord()
+    this.getOrder()
   }
 }
 </script>
@@ -128,23 +146,26 @@ export default {
 .nav
   height: 202px
   padding: 0 32px
-  line-height: 202px
   position: relative
+  display: flex
   .n-img
     width: 160px
     height: 160px
     margin-right: 20px
-    vertical-align: middle
+    margin-top: 20px
     display: inline-block
-  .n-icon
-    width: 14px
-    height: 25px
-    +bg-img("home/shanJiao.png")
-    vertical-align: middle
+  .n-right
     display: inline-block
-    position: absolute
-    right: 34px
-    top: 45%
+    padding-top: 13px
+    flex: 1
+    .n-title
+      font-size: 28px
+      color: #000
+      +moreLine(2)
+      height: 96px
+    .yardage
+      font-size: 24px
+      color: #999
 .below
   background: #fff
   .total
@@ -192,10 +213,11 @@ export default {
     margin-top: 30px
     margin-right: 33px
 .btn
-  line-height: 108px
   height: 108px
-  padding-left: 30px
+  line-height: 108px
+  padding: 24px 33px
   background: #fff
+  box-sizing: border-box
   .b-xq
     float: right
     display: inline-block
@@ -205,9 +227,8 @@ export default {
     vertical-align: middle
     line-height: 60px
     text-align: center
-    margin-right: 20px
+    margin-left: 20px
     color: #fff
-    margin-top: 25px
   .b-sc
     float: right
     display: inline-block

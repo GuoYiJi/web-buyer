@@ -2,20 +2,18 @@
   <!-- 全部订单-待发货 -->
   <div class="home">
     <!-- 1 -->
-    <div class="kuang" v-for="(item,index) in myorderList" :key="index">
+    <div class="kuang" v-for="(item,i) in myorderList" :key="i">
       <div class="head">
         <span class="h-title">菲斯的小店</span>
         <span class="h-text">待发货</span>
       </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <div class="nav" v-for="(goods,j) in item.goodsList" :key="j">
+        <img v-if="goods.image" class="n-img" :src="goods.image">
+        <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
         <div class="n-right">
-          <p class="n-title">{{item.goodsList[0].skuList[0].name}}</p>
-          <!-- <block v-for="(ite, inde) in skuCode" :key="inde">
-            <p class="yardage">{{ite}}/{{item.goodsList[0].skuList[0].num}}件</p>
-          </block> -->
-          <block v-for="(ite, inde) in skuZong[index]" :key="inde">
-            <p class="yardage">{{ite}}/{{item.goodsList[0].skuList[0].num}}件</p>
+          <p class="n-title">{{goods.name}}</p>
+          <block v-for="(sku, s) in goods.skuList" :key="s">
+            <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
           </block>
           <!-- <p class="yardage">{{skuCode}}/{{item.goodsList[0].skuList[0].num}}件</p> -->
         </div>
@@ -31,138 +29,14 @@
         </div>
       </div>
       <div class="btn">
-        <span class="b-sc" @click="torefund()">退款</span>
-        <span class="b-xq" @click="bxq(2)">查看详情</span>
+        <span class="b-xq" @click="bxq(item.id,2)">查看详情</span>
+        <span v-if="item.isHasChildren == 0 && item.isPing == 0 "  class="b-sc" @click="toOpen('visible')">退款</span>
       </div>
-      <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
-        <div class="m_tips">确定取消订单</div>
+      <i-modal :visible="visible" @ok="retreat(item.id,0,item.paid,item.freight)" @cancel="toClose('visible')">
+        <div class="m_tips">确定申请退款！</div>
       </i-modal>
 
     </div>
-    <!-- 2 -->
-    <!-- <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">待发货</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <div class="n-right">
-          <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-          <p class="yardage">白色：均码/2件</p>
-          <p class="yardage">黑色：均码/1件</p>
-        </div>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span> 件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-        <div class="b-box">
-          <li class="b-item b-title">
-            <span class="b-text">颜色</span>
-            <span class="b-text">码数</span>
-            <span class="b-text">总件数</span>
-            <span class="b-text">已发</span>
-            <span class="b-text">未发</span>
-          </li>
-          <li class="b-item b-color">
-            <span class="b-text">红</span>
-            <span class="b-text">S</span>
-            <span class="b-text">12</span>
-            <span class="b-text">6</span>
-            <span class="b-text">6</span>
-          </li>
-          <li class="b-item">
-            <span class="b-text">黄</span>
-            <span class="b-text">M</span>
-            <span class="b-text">12</span>
-            <span class="b-text">10</span>
-            <span class="b-text">2</span>
-          </li>
-          <li class="b-item b-color">
-            <span class="b-text">红</span>
-            <span class="b-text">M</span>
-            <span class="b-text">10</span>
-            <span class="b-text">8</span>
-            <span class="b-text">2</span>
-          </li>
-        </div>
-        <div class="orders">
-          <li class="o-item">
-            <span>子订单编号（已完成）：12345678</span>
-            <i class="o-img"></i>
-          </li>
-        </div>
-        <div class="orders">
-          <li class="o-item">
-            <span>子订单编号（已完成）：12345678</span>
-            <i class="o-img"></i>
-          </li>
-        </div>
-      </div>
-      <div class="btn">
-        <span class="b-sc" @click="torefund()">退款</span>
-        <span class="b-xq" @click="bxq(3)">查看详情</span>
-      </div>
-      <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
-        <div class="m_tips">确定取消订单</div>
-      </i-modal>
-    </div> -->
-    <!-- 3 -->
-    <!-- <div class="kuang">
-      <div class="head">
-        <span class="h-title">菲斯的小店</span>
-        <span class="h-text">待发货</span>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <div class="n-right">
-          <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-          <p class="yardage">白色：均码/2件</p>
-          <p class="yardage">黑色：均码/1件</p>
-        </div>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span> 件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-      </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <div class="n-right">
-          <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-          <p class="yardage">白色：均码/2件</p>
-          <p class="yardage">黑色：均码/1件</p>
-        </div>
-      </div>
-      <div class="below">
-        <div class="total">
-          <p class="t-left">共
-            <span class="piece">3</span> 件商品</p>
-          <p class="t-freight">（含运费￥10.00）</p>
-          <p class="t-right">合计:
-            <span class="money">￥154.00</span>
-          </p>
-        </div>
-      </div>
-      <div class="btn">
-        <span class="b-sc" @click="torefund()">退款</span>
-        <span class="b-xq" @click="bxq(4)">查看详情</span>
-      </div>
-      <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
-        <div class="m_tips">确定取消订单</div>
-      </i-modal>
-    </div> -->
     <!-- 4 -->
     <!-- <div class="kuang">
       <div class="head">
@@ -276,13 +150,13 @@
   </div>
 </template>
 <script>
-import wx from 'wx'
-import API from '@/api/httpJchan'
+// import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
   data () {
     return {
-      visible2: false,
+      visible: false,
       myorderList: [],
       goodsList: [],
       skuList: [],
@@ -291,17 +165,27 @@ export default {
     }
   },
   methods: {
-    bxq (xq) {
-      this.$router.push({
-        path: '/pages/my/orderDetails/obligation',
-        query: { xq: xq }
-      })
-    },
-    torefund () {
-      this.$router.push({ path: '/pages/refund/refund' })
+    toOpen (name) {
+      this[name] = true
     },
     toClose (name) {
       this[name] = false
+    },
+    // 去详情
+    bxq (id, xq) {
+      // console.log(id)
+      // console.log(xq)
+      this.$router.push({
+        path: '/pages/my/orderDetails/obligation',
+        query: { id: id, xq: xq }
+      })
+    },
+    // 申请退款
+    retreat (id, type, price, freight) {
+      this.$router.push({
+        path: '/pages/refund/refund',
+        query: {orderId: id, type: type, price: price, freight: freight}
+      })
     },
     myord () {
       const myorderList = this.myorderList
@@ -324,12 +208,25 @@ export default {
       }
       this.skuCode = skuArr
       this.skuZong = skuZong // 新加
+    },
+    // 获取订单
+    async getOrder () {
+      const Myorder = await API.myOrder({state: 5, isPing: 0})
+      console.log('待发货', Myorder)
+      this.myorderList = Myorder.data.list
+      // 更改规格显示
+      for (let i = 0; i < this.myorderList.length; i++) {
+        for (let j = 0; j < this.myorderList[i].goodsList.length; j++) {
+          for (let g = 0; g < this.myorderList[i].goodsList[j].skuList.length; g++) {
+            let skuCode = this.myorderList[i].goodsList[j].skuList[g].skuCode
+            this.myorderList[i].goodsList[j].skuList[g].skuCode = skuCode.replace(/,/g, ':')
+          }
+        }
+      }
     }
   },
-  // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 5 })
-    this.myorderList = myorder.data.list
+    this.getOrder()
     this.myord()
   }
 }
@@ -433,10 +330,11 @@ export default {
       margin-right: 33px
 .btn
   height: 108px
-  line-height: 108px
-  padding-left: 370px
+  padding: 24px 33px
   background: #fff
+  box-sizing: border-box
   .b-xq
+    float: right
     display: inline-block
     width: 160px
     height: 60px
@@ -444,9 +342,10 @@ export default {
     vertical-align: middle
     line-height: 60px
     text-align: center
-    margin-right: 20px
+    margin-left: 20px
     color: #fff
   .b-sc
+    float: right
     display: inline-block
     width: 158px
     height: 58px
@@ -454,5 +353,5 @@ export default {
     vertical-align: middle
     line-height: 60px
     text-align: center
-    margin-right: 20px
+    margin-left: 20px
 </style>

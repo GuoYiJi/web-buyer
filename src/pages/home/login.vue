@@ -2,12 +2,14 @@
   <div class="home">
     <div class="login">
       <p v-if="userInfo.userInfo"><img :src="userInfo.userInfo.avatarUrl" class="icon_wx" /></p>
-      <p v-else><i  class="icon_wx"></i></p>
+      <p v-else>
+        <i class="icon_wx"></i>
+      </p>
       <!-- <img :src="userInfo" class="icon_wx"></img> -->
       <p>{{userInfo.userInfo ? userInfo.userInfo.nickName : '微信登陆'}}</p>
     </div>
     <i-message id="message" />
-    <button v-if="!userInfoBool" class="user_btn wx_btn" open-type="getUserInfo" @getuserinfo="getUserInfo">授权登陆</button> 
+    <button v-if="!userInfoBool" class="user_btn wx_btn" open-type="getUserInfo" @getuserinfo="getUserInfo">授权登陆</button>
     <!-- <button v-if="userInfoBool" class="wx_btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权登陆</button>  -->
   </div>
 </template>
@@ -15,7 +17,7 @@
 import wx from "wx";
 import mixin from "@/mixin";
 import config from "@/config";
-import API from '@/api/httpJsong'
+import API from "@/api/httpJsong";
 export default {
   mixins: [mixin],
   components: {},
@@ -60,7 +62,7 @@ export default {
         code: this.code,
         avatar: this.userInfo.userInfo.avatarUrl,
         nick: this.userInfo.userInfo.nickName,
-        // phone: "",
+        // phone: '',
         // appId: config.appId,
         // encryptedDataPhone: encryptedData.encryptedData,
         // ivPhone: encryptedData.iv,
@@ -68,6 +70,10 @@ export default {
         iv: this.userInfo.iv
       });
       console.log(data.data);
+      wx.setStorage({
+        key: "no",
+        data: data.data.no
+      });
       await wx.setStorageSync("sessionId", data.data.sessionId);
       this.toRoute("home/home");
     }
@@ -99,7 +105,7 @@ export default {
   }
 };
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .wx_btn
   position: absolute

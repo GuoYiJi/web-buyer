@@ -166,12 +166,19 @@ export default {
       console.log(getCoupon);
     }
   },
-  async mounted() {
+  async mounted () {
+    const shopInfo = await API.getShopInfo()
+    if (shopInfo.code === 1) {
+      wx.setStorage({
+        key: 'shopName',
+        data: shopInfo.data.name
+      })
+    }
     const pageByCreate = await API.pageByCreate({ state: 2 });
     this.yhq = pageByCreate.data.list;
-    console.log(this.yhq);
+    // console.log(this.yhq);
     const selectMGP = await API.selectMGP({});
-    console.log(selectMGP);
+    // console.log(selectMGP);
     // this.selectMGP = selectMGP.data.list;
     // this.goodsList(1)
     // let bk = this.goodsList(2)

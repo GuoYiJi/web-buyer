@@ -21,7 +21,7 @@
           <p class="title">{{item.name}}</p>
           <p class="volume">货期:{{item.delivery}}丨销量:{{item.sellCount}}</p>
           <p class="money">批发价:{{item.sellPrice}}</p>
-          <span class="btn">立即采购</span>
+          <span class="btn" @click="clickItem(item)">立即采购</span>
         </div>
         <!--<div class="right">-->
           <!--<img :src="img" class="img">-->
@@ -87,6 +87,10 @@ export default {
       if (this.page <= this.totalPage) {
         this.goodsList(this.page)
       }
+    },
+    clickItem (obj) {
+      let objStr = JSON.stringify(obj)
+      this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
     }
   },
   mounted () {

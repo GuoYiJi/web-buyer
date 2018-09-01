@@ -16,41 +16,46 @@ import API from "@/api/httpJchan";
 export default {
   components: {},
   data() {
-    return {};
+    return {
+      name: "",
+      phone: "",
+      identity: "",
+      referrer: ""
+    };
   },
   methods: {
     async prosave() {
       console.log(this);
-      setTimeout(() => {
-        const arr = [
-          {
-            name: this.name,
-            plan: "name"
-          },
-          {
-            name: this.phone,
-            plan: "phone"
-          },
-          {
-            name: this.identity,
-            plan: "identity"
-          },
-          {
-            name: this.referrer,
-            plan: "referrer"
-          }
-        ];
-        const msg = this.$check.all(arr);
-        if (msg) {
-          this.handleError(msg);
-        }
-      }, 200);
-      const prosave = await API.prosave({
-        name: this.name,
-        mobile: this.phone,
-        formMetaId: this.identity,
-        tmobile: this.referrer
-      });
+      if (
+        this.name != "" &&
+        this.phone != "" &&
+        this.identity != "" &&
+        this.referrer != ""
+      ) {
+        var prosave = await this.$API.prosave({
+          name: this.name,
+          mobile: this.phone,
+          formMetaId: this.identity,
+          tmobile: this.referrer
+        });
+        wx.showToast({
+          title: "申请成功",
+          icon: "success",
+          duration: 2000
+        });
+      } else if (
+        this.name == "" &&
+        this.phone == "" &&
+        this.identity == "" &&
+        this.referrer == ""
+      ) {
+        wx.showToast({
+          title: "请填写内容",
+          icon: "loading",
+          duration: 2000
+        });
+      }
+      console.log(prosave);
       // this.prosaveList = prosave.data.list;
     }
   },

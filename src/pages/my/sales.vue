@@ -2,20 +2,19 @@
   <!-- 申请售后  -->
   <div class="home">
     <div class="nav" v-if="(qq == 1)">
-      <div class="head" @click="tuiKuan()">
+      <div class="head">
         <i class="t-img"></i>
         <span class="t-text">退货退款(已收到货，需要退换已收到的货物)</span>
         <i class="t-sj"></i>
       </div>
-      <div class="head" @click="huanHuo()">
+      <div class="head">
         <i class="h-img"></i>
         <span class="h-text">换货(商品存在质量等问题，需要协商换货)</span>
         <i class="t-sj"></i>
       </div>
     </div>
-    <!-- 待发货状态下 -->
     <div class="nav" v-if="(qq == 0)">
-      <div class="head" @click="tuiKuan()">
+      <div class="head">
         <i class="t-img"></i>
         <span class="tt-text">仅退款(无需退货)</span>
         <i class="t-sj"></i>
@@ -28,16 +27,9 @@ import wx from "wx";
 export default {
   components: {},
   data() {
-    return { qq: 1 };
+    return { qq: 0 };
   },
-  methods: {
-    tuiKuan() {
-      this.$router.push("/pages/refund/refund");
-    },
-    huanHuo() {
-      this.$router.push("/pages/refund/barter");
-    }
-  },
+  methods: {},
   mounted() {}
 };
 </script>

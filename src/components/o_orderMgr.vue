@@ -51,10 +51,10 @@ export default {
     console.log(1231231)
   }, // 获取后台数据
   async mounted () {
-    const myorder = await API.myorder({ state: 2 })
-    this.myorderList = myorder.data.list
+    const Myorder = await API.myorder({state: 2, isPing: 0})
+    this.myorderList = Myorder.data.list
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'

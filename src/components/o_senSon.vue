@@ -12,22 +12,24 @@
       <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
     </div>
     <p class="title">菲斯的小店</p>
-    <div class="nav">
-      <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+    <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
+      <img v-if="item.image" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <div class="n-right">
-        <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-        <p class="yardage">白色：均码/2件</p>
-        <p class="yardage">黑色：均码/1件</p>
+        <p class="n-title">{{item.name}}</p>
+        <p class="yardage">{{item.skuCode}}</p>
+        <!--<p class="yardage">黑色：均码/1件</p>-->
       </div>
     </div>
     <div class="below">
       <div class="total">
         <p class="t-left">共
-          <span class="piece">3</span> 件商品</p>
+          <span class="piece">{{details.num}}</span> 件商品
+        </p>
         <!-- 邮寄 -->
-        <p v-if="(youji == 1)" class="t-freight">（含运费￥10.00）</p>
+        <p v-if="(youji == 1)" class="t-freight">（含运费￥{{details.freight}}）</p>
         <p class="t-right">合计:
-          <span class="money">￥154.00</span>
+          <span class="money">￥{{details.count}}</span>
         </p>
       </div>
       <!-- 邮寄，主子订单 -->
@@ -76,46 +78,84 @@
           </li>
         </div>
       </div>
-      <p class="message">买家留言：包装好一点</p>
+
+      <p class="message">买家留言：{{details.remark ? details.remark : '没有留言信息！'}}</p>
     </div>
     <div class="prices">
       <p>
         <span class="left">商品总价</span>
-        <span class="right">￥154.00</span>
+        <span class="right">￥{{details.count - details.freight}}</span>
       </p>
       <p>
         <span class="left">优惠劵折扣</span>
-        <span class="right">- ￥10.00</span>
+        <span class="right">-￥{{details.couponMoney ? details.couponMoney : 0}}</span>
       </p>
       <!-- 物流到付 -->
       <p v-if="(wuliu == 1)">
         <span class="left">运费</span>
-        <span class="right">+ ￥10.00</span>
+        <span class="right">+￥{{details.freight}}</span>
       </p>
       <div class="serial">
-        <p class="s-text">订单编号：2018062712345678904</p>
-        <p class="s-text">下单时间：2018-06-16 12:27:12</p>
-        <p class="s-text">支付时间：2018-06-16 14:27:12</p>
+        <p class="s-text">订单编号：{{details.orderNo}}</p>
+        <p class="s-text">下单时间：{{details.createTime}}</p>
+        <p v-if="details.payTime" class="s-text">支付时间：{{details.payTime}}</p>
       </div>
     </div>
-    <div style="height: 100px"></div>
-    <div class="foot">
-      <span class="pay">退款</span>
+    <!--<div style="height: 100px"></div>-->
+    <div v-if="isRetreat" class="foot">
+      <span class="pay" @click="toOpen('visible')">退款</span>
     </div>
+    <i-modal :visible="visible" @ok="retreat(details.id, 0, details.paid, details.freight)" @cancel="toClose('visible')">
+      <div class="m_tips">确定申请退款！</div>
+    </i-modal>
   </div>
 </template>
 <script>
-import wx from "wx";
+// import wx from 'wx'
+import API from '@/api/httpShui'
 export default {
   components: {},
-  data() {
-    return { wuliu: 0, youji: 0, zhuzi: 0 };
+  props: ['id'],
+  data () {
+    return {
+      visible: false,
+      isRetreat: false,
+      wuliu: 0,
+      youji: 0,
+      zhuzi: 0,
+      details: {}
+    }
   },
-  methods: {},
-  mounted() {}
-};
+  methods: {
+    toOpen (name) {
+      this[name] = true
+    },
+    toClose (name) {
+      this[name] = false
+    },
+    // 申请退款
+    retreat (id, type, price, freight) {
+      this.$router.push({
+        path: '/pages/refund/refund',
+        query: {orderId: id, type: type, price: price, freight: freight}
+      })
+    },
+    async getOrderDetails (id) {
+      const data = await API.getOrderDetails({orderId: id})
+      this.details = data.data
+      console.log('待发货订单详情', this.details)
+      // this.isRetreat = data.data.isHasChildren
+      if (data.data.isHasChildren === 0 && data.data.isPing === 0) {
+        this.isRetreat = true
+      }
+    }
+  },
+  mounted () {
+    this.getOrderDetails(this.id)
+  }
+}
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .head
   color: #F67C2F
@@ -263,7 +303,7 @@ export default {
 .prices
   margin-top: 20px
   background: #fff
-  padding: 10px 33px
+  padding: 33px 33px
   p
    font-size: 28px
    display: inline-block

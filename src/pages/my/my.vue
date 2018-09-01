@@ -4,9 +4,10 @@
       <div class="h-bg">
         <open-data class="h-img" type="userAvatarUrl"></open-data>
       </div>
-      <span class="h-name">来年陌生的某某</span>
-      <span class="h-id">ID：612148</span>
-      <span class="h-integral">657积分</span>
+      <!-- <span class="h-name">来年陌生的某某</span> -->
+      <open-data class="h-name" type="userNickName"></open-data>
+      <span class="h-id">ID：{{no}}</span>
+      <!-- <span class="h-integral">657积分</span> -->
     </div>
     <div class="nav">
       <p class="title" @click="order(1)">我的订单</p>
@@ -61,9 +62,11 @@
         <span class="yhq">我的优惠券</span>
         <i class="m-icon"></i>
       </li>
-      <li class="m-item" @click="tuig()">
+      <li class="m-item">
+        <!-- <li class="m-item" @click="tuig()"> -->
         <i class="m-sz"></i>
-        <span class="msz">邀请推广</span>
+        <!-- <span class="msz">邀请推广</span> -->
+        <button class="msz" open-type="share">邀请推广</button>
         <i class="m-icon"></i>
       </li>
     </div>
@@ -86,7 +89,8 @@ export default {
       delivery: 0,
       receive: 0,
       commented: 0,
-      refund: 0
+      refund: 0,
+      no: ""
     };
   },
   methods: {
@@ -107,37 +111,50 @@ export default {
     },
     like() {
       this.$router.push("/pages/my/like");
-    },
-    tuig() {
-      this.$router.push("/pages/my/procedures");
-      // this.$router.push("/pages/my/sales");
     }
+    // tuig() {
+    //   this.$router.push("/pages/my/procedures");
+    // }
+  },
+  onShareAppMessage: function(res) {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res.target);
+    }
+    return {
+      title: "申请小程序",
+      path: "/pages/my/procedures",
+      imageUrl:
+        "http://img0.ph.126.net/AE8LWDjxdZzUWfgWnuqJmQ==/141300438409203738.jpg"
+      // path: "/pages/my/invate/invateDetail/user?id=123"
+    };
   },
   async mounted() {
-    const myorder = await API.myorder({});
-    this.myorderList = myorder.data.list;
-    console.log(myorder.data);
-    var order = myorder.data.list;
-    for (var i = 0; i < order.length; i++) {
-      if (order[i].state == 1) {
-        this.prePayment += 1;
-      } else if (order[i].state == 5) {
-        this.delivery += 1;
-      } else if (order[i].state == 6) {
-        this.receive += 1;
-      }
-    }
+    var that = this;
+    const prePayment = await API.myorder({ isPing: 0, state: 1 });
+    const delivery = await API.myorder({ isPing: 0, state: 5 });
+    const receive = await API.myorder({ isPing: 0, state: 6 });
+    // 获取待收货，待发货，待付款订单的个数
+    this.prePayment = prePayment.data.totalRow;
+    this.delivery = delivery.data.totalRow;
+    this.receive = receive.data.totalRow;
     wx.setStorage({
       key: "qwe",
       data: 123
     });
-    console.log(myorder.data.pageSize, 1231);
-    const afterList = await API.after({});
-    console.log(afterList.data);
+    wx.getStorage({
+      key: "no",
+      success: function(res) {
+        console.log(res.data);
+        that.no = res.data;
+      }
+    });
+    // const afterList = await API.after({})
+    // console.log(afterList.data)
   }
 };
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .menu-2
   margin-top: 20px
@@ -297,6 +314,9 @@ export default {
         padding-right: 500px
         font-size: 28px
         color: #000
+        background: #fff
+      button::after
+        border: none
       .m-icon
         vertical-align: middle
         display: inline-block

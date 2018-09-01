@@ -2,10 +2,10 @@
   <div class="nav">
     <block v-for="(item, index) in pageaddresList" :key="index" v-if="(item.id == tid)">
       <div class="item">
-        <input v-model.lazy="name" class="name" :value=item.name type="text" placeholder="收货人">
+        <input v-model="name" class="name" type="text" :placeholder="item.name">
       </div>
       <div class="item">
-        <input v-model.lazy="mobile" class="phone" :value="item.mobile" type="text" placeholder="手机号码">
+        <input v-model="phone" class="phone" maxlength="11" type="text" :placeholder="item.mobile">
       </div>
       <div class="item">
         <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
@@ -15,7 +15,7 @@
         </picker>
       </div>
       <div class="item">
-        <input class="address" v-model="address" :value="item.address" type="text" placeholder="详细地址">
+        <input class="address" v-model="address" type="text" :placeholder="item.address">
         <i class="img"></i>
       </div>
       <div class="tacitly">
@@ -69,35 +69,23 @@ export default {
       } else if (this.recode.length == 3) {
         this.recode = this.recode[2];
       }
-      // setTimeout(() => {
-      //   const arr = [
-      //     {
-      //       name: this.name,
-      //       plan: "name"
-      //     },
-      //     {
-      //       name: this.phone,
-      //       plan: "phone"
-      //     }
-      //   ];
-      //   const msg = this.$check.all(arr);
-      //   if (msg) {
-      //     this.handleError(msg);
-      //   }
-      // }, 200);
+      console.log(this.recode);
       this.editddres();
       setTimeout(() => {
         wx.navigateBack({ data: 1 });
       }, 200);
     },
     async editddres() {
+      // console.log(this);
+      // return;
       const editddres = await API.editddres({
         name: this.name,
         mobile: this.phone,
         address: this.address,
         value: this.region.join(","),
         isChoice: this.isChoice,
-        areaId: this.recode
+        areaId: this.recode,
+        addressId: this.tid
       });
       this.editddres = editddres.data.list;
       console.log(addres.data);
