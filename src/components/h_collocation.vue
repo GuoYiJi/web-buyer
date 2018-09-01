@@ -1,10 +1,10 @@
 <template>
   <div class="nav">
     <!--<div class="title">-->
-      <!--<span class="title_1">NEW SHOW</span>-->
-      <!--<span class="title_2">火爆热卖，源于一派</span>-->
-      <!--<span class="xian"></span>-->
-      <!--<span class="xian_1"></span>-->
+    <!--<span class="title_1">NEW SHOW</span>-->
+    <!--<span class="title_2">火爆热卖，源于一派</span>-->
+    <!--<span class="xian"></span>-->
+    <!--<span class="xian_1"></span>-->
     <!--</div>-->
     <div class="content">
       <scroll-view scroll-y>
@@ -12,21 +12,21 @@
           <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
             <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
               <div class="g_left">
-                <div class="left_box">
+                <div class="left_box" v-for="(item, index) in selectMGP" :key="index">
                   <div class="title">
                     <p>
-                      <i class="i_new"></i>清新系列</p>
+                      <i class="i_new"></i>{{item.title}}系列</p>
                   </div>
-                  <div class="card_box shop-card">
+                  <div class="card_box shop-card" v-for="(ite, inde) in item.matchGoods" :key="inde" v-if="inde == 0">
                     <div class="img_box">
-                      <p class="img_1"><img src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"></p>
+                      <p class="img_1"><img v-if="inde == 0" :src="ite.image"></p>
                     </div>
-                    <div class="desc">
-                      <p class="d_text">就爱上的回访记录卡山东客服了解奥斯卡代理费圣诞快乐房间卡萨老地方拉水电费可垃圾上单士大夫看见爱上的看法</p>
-                      <p class="d_time"> 货期:现货丨销量:123</p>
+                    <div class="desc" v-if="inde == 0">
+                      <p class="d_text">{{ite.name}}</p>
+                      <p class="d_time">货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</p>
                     </div>
                     <p class="price">
-                      <span>售价:￥23</span>
+                      <span>售价:￥{{ite.sellPrice}}</span>
                       <i class="sell"></i>
                     </p>
                   </div>
@@ -34,235 +34,26 @@
               </div>
               <div class="g_right">
                 <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                </div>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <div class="item_b">
-          <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-            <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
-              <div class="g_left">
-                <div class="left_box">
-                  <div class="title_1">
-                    <p>
-                      <i class="i_new_1"></i>职场系列</p>
-                  </div>
-                  <div class="card_box shop-card">
-                    <div class="img_box">
-                      <p class="img_1"><img src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"></p>
+                  <div class="scard_box" v-for="(item, i) in selectMGP" :key="i">
+                    <div class="p_card" v-for="(ite, j) in item.matchGoods" :key="j">
+                      <div class="g_boxs">
+                        <div class="card_boxs shop-cards">
+                          <div class="img_box">
+                            <p class="img_1"><img :src="ite.images"></p>
+                          </div>
+                          <div class="descs">
+                            <p class="d_texts">{{ite.name}}</p>
+                            <p class="d_times">货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</p>
+                          </div>
+                          <p class="price">
+                            <span>售价:￥{{ite.sellPrice}}</span>
+                            <span class="sell"></span>
+                          </p>
+                          <i class="cancel_shop" v-if="cancel"></i>
+                        </div>
+                      </div>
                     </div>
-                    <div class="desc">
-                      <p class="d_text">就爱上的回访记录卡山东客服了解奥斯卡代理费圣诞快乐房间卡萨老地方拉水电费可垃圾上单士大夫看见爱上的看法</p>
-                      <p class="d_time"> 货期:现货丨销量:123</p>
-                    </div>
-                    <p class="price">
-                      <span>售价:￥23</span>
-                      <i class="sell"></i>
-                    </p>
                   </div>
-                </div>
-              </div>
-              <div class="g_right">
-                <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                </div>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <div class="item_b">
-          <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-            <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
-              <div class="g_left">
-                <div class="left_box">
-                  <div class="title_2">
-                    <p>
-                      <i class="i_new_2"></i>生活系列</p>
-                  </div>
-                  <div class="card_box shop-card">
-                    <div class="img_box">
-                      <p class="img_1"><img src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"></p>
-                    </div>
-                    <div class="desc">
-                      <p class="d_text">就爱上的回访记录卡山东客服了解奥斯卡代理费圣诞快乐房间卡萨老地方拉水电费可垃圾上单士大夫看见爱上的看法</p>
-                      <p class="d_time"> 货期:现货丨销量:123</p>
-                    </div>
-                    <p class="price">
-                      <span>售价:￥23</span>
-                      <i class="sell"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="g_right">
-                <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                </div>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <div class="item_b">
-          <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-            <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
-              <div class="g_left">
-                <div class="left_box">
-                  <div class="title_3">
-                    <p>
-                      <i class="i_new_3"></i>森木系列</p>
-                  </div>
-                  <div class="card_box shop-card">
-                    <div class="img_box">
-                      <p class="img_1"><img src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"></p>
-                    </div>
-                    <div class="desc">
-                      <p class="d_text">就爱上的回访记录卡山东客服了解奥斯卡代理费圣诞快乐房间卡萨老地方拉水电费可垃圾上单士大夫看见爱上的看法</p>
-                      <p class="d_time"> 货期:现货丨销量:123</p>
-                    </div>
-                    <p class="price">
-                      <span>售价:￥23</span>
-                      <i class="sell"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="g_right">
-                <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                </div>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <div class="item_b">
-          <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-            <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
-              <div class="g_left">
-                <div class="left_box">
-                  <div class="title_4">
-                    <p>
-                      <i class="i_new_4"></i>酷炫系列</p>
-                  </div>
-                  <div class="card_box shop-card">
-                    <div class="img_box">
-                      <p class="img_1"><img src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"></p>
-                    </div>
-                    <div class="desc">
-                      <p class="d_text">就爱上的回访记录卡山东客服了解奥斯卡代理费圣诞快乐房间卡萨老地方拉水电费可垃圾上单士大夫看见爱上的看法</p>
-                      <p class="d_time"> 货期:现货丨销量:123</p>
-                    </div>
-                    <p class="price">
-                      <span>售价:￥23</span>
-                      <i class="sell"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="g_right">
-                <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
-                  <p class="p_card">
-                    <scard />
-                  </p>
                 </div>
               </div>
             </div>
@@ -279,19 +70,25 @@
 <script>
 import wx from "wx";
 import scard from "@/components/group_card";
+import API from "@/api/httpJchan";
 export default {
   components: { scard },
-  data () {
-    return {}
+  data() {
+    return {
+      selectMGP: []
+    };
   },
   methods: {},
-  mounted () {}
-}
+  async mounted() {
+    const selectMGP = await API.selectMGP({});
+    this.selectMGP = selectMGP.data.list;
+    console.log(selectMGP);
+  }
+};
 </script>
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .nav
-  /*padding-top: 50px*/
   padding-bottom: 25px
   border-bottom: 1px solid #999
   background: #fff
@@ -345,6 +142,50 @@ export default {
         padding-right: 26px
         padding-bottom: 20px
         width: 216px
+        .g_boxs
+          height: 422px
+          width: 216px
+        .card_boxs
+          padding-bottom: 4px
+          .img_box
+            +border(2px,all, #ccc)
+            padding: 16px 0px
+            .img_1
+              height: 300px
+              width: 212px
+        .d_name
+          color: #e3e3e3
+          font-size: 14px
+        .shop-cards
+          position: relative
+          img
+            width: 100%
+            border-radius: 4px
+        .descs
+          margin: 5px 0
+          font-size: 20px
+        .d_texts
+          color: #000
+          font-size: 24px
+          +singleFile
+        // .price
+        //   color: #FF0000
+        //   font-weight: bold
+        //   font-size: 24px
+        //   padding-top: 10px
+        //   height: 24px
+        //   line-height: 24px
+        //   +singleFile
+        //   text-align: left
+          // .sell
+          //   color: #333
+          //   font-size: 22px
+          //   font-weight: 500
+        .d_times
+          font-size: 20px
+          color: #999
+          +singleFile
+          text-align: left
     .g_box
       padding-top: 60px
       background: #fff
@@ -441,7 +282,7 @@ export default {
         height: 42px
         position: absolute
         right: 20px
-        top: -11px
+        top: 0px
     .d_time
       font-size: 24px
       color: #999
