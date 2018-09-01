@@ -15,13 +15,10 @@
           <i class="b_img"></i>
           <span class="b_text" @click="bj(item.id)">编辑</span>
         </p>
-        <p @click="toOpen('visible2')">
+        <p @click="toOpen(item.id)">
           <i class="s_img"></i>
           <span class="s_text">删除</span>
         </p>
-        <i-modal :visible="visible2" @ok="toCloseok('visible2',item.id)" @cancel="toClose('visible2')">
-          <div class="m_tips">是否删除？</div>
-        </i-modal>
       </div>
     </div>
     <div class="kongt"></div>
@@ -60,16 +57,25 @@ export default {
         this.onShow();
       }
     },
-    toOpen(name) {
-      this[name] = true;
+    async toOpen(id) {
+      var that = this;
+      wx.showModal({
+        title: "提示",
+        content: "是否删除？",
+        success: function(res) {
+          if (res.confirm) {
+            console.log("用户点击确定");
+            console.log(id);
+            that.del(id);
+          } else if (res.cancel) {
+            console.log("用户点击取消");
+          }
+        }
+      });
     },
-    toClose(name) {
-      this[name] = false;
-    },
-    async toCloseok(name, id) {
+    async del(id) {
       console.log(id);
       const deleteddres = await API.deleteddres({ addressId: id });
-      this[name] = false;
       this.addrd();
     },
     async bj(id) {
@@ -89,9 +95,6 @@ export default {
       this.pageaddresList = pageaddres.data.list;
     }
   },
-  // onPageScroll(e) {
-  //   console.log(e);
-  // },
   async onPullDownRefresh() {
     const pnumber = 1;
     const pageaddres = await API.pageaddres({

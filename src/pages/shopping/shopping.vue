@@ -633,7 +633,11 @@ export default {
           line-height: 60px
           position: relative
         .k2_btn.active
+<<<<<<< HEAD
         border: 1px solid #F67C2F
+=======
+          border: 1px solid #F67C2F
+>>>>>>> 67208e48ed0779d37e63449f219172ec1f079be6
           .k2_dian
             display: inline-block
             width: 34px

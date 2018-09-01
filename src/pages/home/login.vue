@@ -2,7 +2,9 @@
   <div class="home">
     <div class="login">
       <p v-if="userInfo.userInfo"><img :src="userInfo.userInfo.avatarUrl" class="icon_wx" /></p>
-      <p v-else><i  class="icon_wx"></i></p>
+      <p v-else>
+        <i class="icon_wx"></i>
+      </p>
       <!-- <img :src="userInfo" class="icon_wx"></img> -->
       <p>{{userInfo.userInfo ? userInfo.userInfo.nickName : '微信登陆'}}</p>
     </div>
@@ -12,10 +14,10 @@
   </div>
 </template>
 <script>
-import wx from 'wx'
-import mixin from '@/mixin'
-import config from '@/config'
-import API from '@/api/httpJsong'
+import wx from "wx";
+import mixin from "@/mixin";
+import config from "@/config";
+import API from "@/api/httpJsong";
 export default {
   mixins: [mixin],
   components: {},
@@ -66,10 +68,14 @@ export default {
         // ivPhone: encryptedData.iv,
         encryptedData: this.userInfo.encryptedData,
         iv: this.userInfo.iv
-      })
-      console.log(data.data)
-      await wx.setStorageSync('sessionId', data.data.sessionId)
-      this.toRoute('home/home')
+      });
+      console.log(data.data);
+      wx.setStorage({
+        key: "no",
+        data: data.data.no
+      });
+      await wx.setStorageSync("sessionId", data.data.sessionId);
+      this.toRoute("home/home");
     }
   },
   async mounted () {
