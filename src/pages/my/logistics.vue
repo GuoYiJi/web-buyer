@@ -7,7 +7,7 @@
         <span class="h-text">物流公司：中通快递</span>
       </div>
       <div class="head">
-        <span class="ht-text">快递单号：{{order.logistics.logisticsNo}}}</span>
+        <span class="ht-text">快递单号：{{order.logistics.logisticsNo}}</span>
       </div>
       <div class="img-box">
         <img class="img" v-if="order.logistics.image" :src="order.logistics.image">
