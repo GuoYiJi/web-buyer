@@ -26,8 +26,8 @@
       <div class="below">
         <div class="total">
           <span class="t-left">共
-            <p class="size">{{item.goodsList.skuList}}</p>个款式&emsp;
-            <p class="piece">{{item.goodsList}}</p>件商品</span>
+            <p class="size">{{item.goodsList[0].skuList.length}}</p>个款式&emsp;
+            <p class="piece">{{item.goodsList.length}}</p>件商品</span>
           <span class="t-right">
             <span class="money">合计:
               <strong>￥{{item.paid}}</strong>&emsp;

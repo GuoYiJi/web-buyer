@@ -293,7 +293,7 @@ table.skuCode
       // padding-right: 10px
     .t-freight
       float: right
-      padding-top: 20px
+      // padding-top: 20px
       font-size: 24px
       color: #666
     .piece

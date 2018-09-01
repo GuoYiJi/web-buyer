@@ -124,7 +124,7 @@ export default {
     .item_b:first-child
       border: none
     .left_box
-      position: absolute
+      position: relative
       top: 0
       left: 20px
       width: 344px
