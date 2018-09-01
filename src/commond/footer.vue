@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="container">
+  <div id="container1">
     <div class="bar" :class="[tag == 1 && 'active' ]" @click="push('/pages/home/home')">
       <i class="icon icon1"></i>
       <p>首页</p>
@@ -52,7 +52,7 @@ export default {
     //高亮字体颜色
   @mixin color  
     color: $main-color
-  #container
+  #container1
     height: 98px
     padding: 2px 0
     position: fixed
