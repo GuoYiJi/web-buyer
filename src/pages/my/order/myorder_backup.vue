@@ -2,18 +2,17 @@
   <div class="home">
     <div class="nav">
       <div class="list">
-        <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="refreshOrder(item.id)">{{item.text}}</span>
+        <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">{{item.text}}</span>
         <div class="line" :style="{left: (tag-1)*20 + '%'}"></div>
       </div>
     </div>
     <div class="content">
-        <orderItem v-for="(item,idx) in orderList" :key="idx" :item="item" @refreshOrder="refreshOrder"></orderItem>
-      <!-- <div v-if="tag == '1'">
+      <div v-if="tag == '1'">
         <obligation />
         <send />
         <receiving />
         <stocks />
-        <orderMgr />
+        <!--<orderMgr />-->
       </div>
       <div v-if="tag == '2'">
         <obligation />
@@ -26,8 +25,7 @@
       </div>
       <div v-if="tag == '5'">
         <stocks />
-      </div> -->
-    
+      </div>
     </div>
   </div>
 </template>
@@ -38,57 +36,44 @@ import obligation from '@/components/o_obligation'
 import send from '@/components/o_send'
 import receiving from '@/components/o_receiving'
 import stocks from '@/components/o_stocks'
-import orderItem from '@/components/o_orderItem'
-import API from '@/api/httpShui'
-
 export default {
   components: {
     // orderMgr,
     obligation,
     send,
     receiving,
-    stocks,
-    orderItem
+    stocks
   },
   data () {
     return {
       tag: null,
-      orderList : [],
       navData: [
         {
           id: 1,
-          state : 0,
           text: '全部'
         },
         {
           id: 2,
-          state : 1,
           text: '待付款'
         },
         {
           id: 3,
-          state : 5,
           text: '待发货'
         },
         {
           id: 4,
-          state : 6,
           text: '待收货'
         },
         {
           id: 5,
-          state : 7,
           text: '已完成'
         }
       ]
     }
   },
   methods: {
-    refreshOrder (tag) {
-      if(tag){
-        this.tag = tag;
-      }
-      this.getOrder(this.navData[this.tag-1].state);
+    handleNav (tag) {
+      this.tag = tag
     },
     // toRoute(path) {
     //   this.$router.push('/pages/home/' + path)
@@ -99,35 +84,11 @@ export default {
     myTag () {
       let type = this.$route.query.tag
       this.tag = type
-    },
-    // 获取订单
-    async getOrder (state) {
-      // debugger
-      let param = {
-        isPing: 0,
-        pageSize : 10
-      }
-      if(state){
-        param.state = state;
-      }
-      const Myorder = await API.myOrder(param)
-      console.log( Myorder)
-      this.orderList = Myorder.data.list
-      // 更改规格显示
-      for (let i = 0; i < this.orderList.length; i++) {
-        for (let j = 0; j < this.orderList[i].goodsList.length; j++) {
-          for (let g = 0; g < this.orderList[i].goodsList[j].skuList.length; g++) {
-            let skuCode = this.orderList[i].goodsList[j].skuList[g].skuCode
-            this.orderList[i].goodsList[j].skuList[g].skuCode = skuCode.replace(/,/g, ':')
-          }
-        }
-      }
     }
   },
   mounted () {
     let type = this.$route.query.tag
-    // this.tag = type;
-    this.refreshOrder(type);
+    this.tag = type
   }
 }
 </script>

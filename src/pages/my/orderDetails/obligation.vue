@@ -3,13 +3,13 @@
     <!-- 订单详情-买家待付款 -->
     <obliGat v-if="xq==1" :id="id"/>
     <!-- 订单详情-待发货状态 -->
-    <senSon  v-if="xq==2" :id="id"/>
+    <senSon  v-if="xq==5" :id="id"/>
     <!-- 订单详情-待收货状态-->
-    <sendMailTEdT v-if="xq==3" :id="id"/>
+    <sendMailTEdT v-if="xq==6" :id="id"/>
     <!-- 订单详情-交易成功状态 -->
-    <succOrder v-if="xq==4" :id="id" />
+    <succOrder v-if="xq==7" :id="id" />
     <!-- 订单详情-交易取消状态-->
-    <!--<cancelledMail  :id="id"/>-->
+    <cancelledMail v-if="xq==2"  :id="id"/>
   </div>
 </template>
 <script>

@@ -55,7 +55,7 @@
       <span class="f-title">合计：
         <span class="f-text">￥{{details.paid}}</span>
       </span>
-      <span class="pay" @click="toOpen('visible1')">马上支付</span>
+      <span class="pay" @click="pay(details.id)">马上支付</span>
       <span class="btn" @click="toOpen('visible2')">取消订单</span>
     </div>
     <i-modal :visible="visible1" @ok="toClose('visible1')" @cancel="toClose('visible1')">
@@ -90,6 +90,64 @@ export default {
       const data = await API.getOrderDetails({orderId: id})
       this.details = data.data
       console.log('待付款订单详情', this.details)
+    },
+    pay(orderId){
+      // 如果是个人直接调起微信支付
+      let isPersonal = true;
+      if(isPersonal){
+        this.wxSign(orderId,1);
+      }else{
+        this.visible1 = true;
+      }
+
+    },
+    // 微信支付
+    async wxSign (orderId, type) {
+      let that = this
+      const data = await API.wxSign({ orderId: orderId })
+      console.log(data)
+      if (data.code === 1) {
+        let obj = data.data
+        wx.requestPayment({
+          timeStamp: obj.timeStamp,
+          nonceStr: obj.nonceStr,
+          package: obj.package,
+          signType: obj.signType,
+          paySign: obj.paySign,
+          success: function (res) {
+            console.log('支付成功返回结果', res)
+            if (res.errMsg === 'requestPayment:ok') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
+          },
+          fail: function (res) {
+            console.log('支付失败返回结果', res)
+            if (res.errMsg === 'requestPayment:fail cancel' || res.errMsg === 'requestPayment:fail (detail message)') {
+              if (type === 1) {
+                that.$router.push({
+                  path: '/pages/my/order/myorder',
+                  query: { tag: 1 }
+                })
+              }
+              if (type === 2) {
+                that.$router.push({
+                  path: '/pages/my/myget/get'
+                })
+              }
+            }
+          }
+        })
+      }
     },
     // 取消订单
     async cancelOrder () {
