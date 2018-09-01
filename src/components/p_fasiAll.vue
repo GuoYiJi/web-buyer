@@ -15,9 +15,9 @@
       <img class="n-img" v-for="(list, num) in item.goodsList" :key="list.goodsId" :src="list.image" v-if="num < 1">
       <div class="goodsDetail">
         <span class="title">{{item.goodsList[0].name}}</span>
-        <span class="skuCode" v-for="(good, goodnum) in item.goodsList">
+        <!-- <span class="skuCode" v-for="(good, goodnum) in item.goodsList">
           <p v-for="(skuItem, skuNum) in good.skuList">{{skuItem.skuCode}}</p>
-        </span>
+        </span> -->
       </div>
     </div>
 
@@ -42,13 +42,13 @@
         </tr>
       <!-- </thead>
       <tbody> -->
-        <tr v-for="(numb, ccnum) in 5">
+        <!-- <tr v-for="(numb, ccnum) in 5">
           <td>{{ccnum}}</td>
           <td>{{ccnum}}</td>
           <td>{{ccnum}}</td>
           <td>{{ccnum}}</td>
           <td>{{ccnum}}</td>
-        </tr>
+        </tr> -->
       <!-- </tbody> -->
     </table>
 
