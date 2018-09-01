@@ -40,7 +40,7 @@
           <div class="below">
             <div class="total">
               <p class="t-right">
-                共<span class="piece">{{item.goodsListSize}}</span>件商品, 合计:<span class="money">￥{{item.count}}</span>
+                共<span class="piece">{{goods.countNum}}</span>件商品, 合计:<span class="money">￥{{goods.countPrice}}</span>
               </p>
             </div>
           </div>
