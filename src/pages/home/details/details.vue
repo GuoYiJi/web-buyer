@@ -292,6 +292,7 @@ export default {
     },
     // 减
     minus (colorIndex, sizeIndex) {
+      console.log('减515')
       // console.log(colorIndex, sizeIndex)
       let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
       if (num === 0) {

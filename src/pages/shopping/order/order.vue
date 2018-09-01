@@ -4,11 +4,11 @@
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
       <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
     </div>
-    <div class="address">
+    <div class="address"  @click="toOpen('addressBox','selectAddress')">
       <i class="dt"></i>
-      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货人：{{name + phone}}</p>
-      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货地址：{{addressDetails}}</p>
-      <p v-if="addressList.length == 0" class="add_text" @click="toOpen('addressBox','addAddress')">添加收货地址</p>
+      <p class="add_text">收货人：{{name + phone}}</p>
+      <p class="add_text">收货地址：{{addressDetails}}</p>
+      <p v-if="addressList.length == 0" class="add_text">添加收货地址</p>
     </div>
     <div class="content">
       <p class="c_title">菲斯的小店</p>
@@ -178,8 +178,15 @@ export default {
   },
   methods: {
     toOpen (parent, child) {
-      this[parent] = true
-      this[child] = true
+      if(this.addressList.length>0){
+        this[parent] = false;
+        this[child]=true;
+      }else{
+        this[parent] = true
+        this[child]=false;
+      }
+      
+      
     },
     toClose (name) {
       this[name] = false
@@ -235,6 +242,12 @@ export default {
           let val = list[0].value
           this.addressDetails = val.split(',').join('') + list[0].address
         }
+      }
+      if(list.length==0){
+          this.addressId = ""
+          this.name =""
+          this.phone =""
+          this.addressDetails =""
       }
     },
     // 获取优惠券
@@ -405,7 +418,8 @@ export default {
     }
     this.getAddress()
     this.getCoupon()
-  }
+  },
+
 }
 </script>
 <style type="text/sass" lang="sass" scoped>
