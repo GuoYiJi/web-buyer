@@ -78,17 +78,17 @@
         <div class="address-add" v-if="addAddress">
           <p class="tc_text">
             <span class="tc_name">收货人:</span>
-            <input class="tc_namet" type="text">
+            <input class="tc_namet" type="text" v-model="tc_namet">
           </p>
           <p class="tc_text">
             <span class="tc_phone">联系电话:</span>
-            <input class="tc_phonet" type="text">
+            <input class="tc_phonet" type="text" v-model="tc_phonet">
           </p>
           <p class="tc_text">
             <span class="tc_region">所在地址:</span>
             <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
               <view class="picker">
-                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '所在地址:' }}
+                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '' }}
               </view>
             </picker>
           </p>
@@ -146,7 +146,8 @@ export default {
   components: {},
   data () {
     return {
-      buyType: null,
+      isDetails: null,
+      isGroup: false,
       selectAddressId: '',
       region: [],
       customItem: '全部',
@@ -264,22 +265,17 @@ export default {
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
       let appId = config.appId
-      let obj = {
-        sessionId: this.sessionId,
-        appId: appId,
-        addressId: this.addressId,
-        remark: this.remark,
-        skuList: this.skuObj,
-        couponId: this.couponId,
-        expressWay: this.expressWay
-      }
-      // 拼团购买
-      if (this.buyType === 3) {
-        if (this.pingId != null) {
-          obj.pingId = this.pingId
-        }
-        if (this.pingOrderId != null) {
-          obj.pingOrderId = this.pingOrderId
+      if (this.isGroup === true) {
+        let obj = {
+          sessionId: this.sessionId,
+          appId: appId,
+          addressId: this.addressId,
+          remark: this.remark,
+          skuList: this.skuObj,
+          couponId: this.couponId,
+          pingId: this.pingId,
+          pingOrderId: '',
+          expressWay: this.expressWay
         }
         wx.request({
           method: 'POST',
@@ -289,8 +285,7 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
-            console.log(res)
-            that.wxSign(res.data.data.id, 2)
+            that.wxSign(res.data.data.id)
           }
         })
       }
@@ -304,7 +299,6 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
-            console.log(res)
             if (res.data.code === 1) {
               that.wxSign(res.data.data.id, 1)
             }
@@ -313,7 +307,7 @@ export default {
       }
     },
     // 微信支付
-    async wxSign (orderId, type) {
+    async wxSign (orderId) {
       let that = this
       const data = await API.wxSign({ orderId: orderId })
       console.log(data)
@@ -366,7 +360,7 @@ export default {
     this.sessionId = await wx.getStorageSync('sessionId')
     // 详情过来
     if (this.$route.query.details) {
-      this.buyType = 1
+      this.isDetails = true
       let goods = JSON.parse(this.$route.query.details)
       console.log(goods)
       this.goodsInfo = goods.goods
