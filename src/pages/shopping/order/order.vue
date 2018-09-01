@@ -4,11 +4,11 @@
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
       <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
     </div>
-    <div class="address">
+    <div class="address"  @click="toOpen('addressBox')">
       <i class="dt"></i>
-      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货人：{{name + phone}}</p>
-      <p class="add_text" @click="toOpen('addressBox','selectAddress')">收货地址：{{addressDetails}}</p>
-      <p v-if="addressList.length == 0" class="add_text" @click="toOpen('addressBox','addAddress')">添加收货地址</p>
+      <p class="add_text">收货人：{{name}}&nbsp;&nbsp;{{phone}}</p>
+      <p class="add_text">收货地址：{{addressDetails}}</p>
+      <p v-if="addressList.length == 0" class="add_text">添加收货地址</p>
     </div>
     <div class="content">
       <p class="c_title">菲斯的小店</p>
@@ -78,11 +78,11 @@
         <div class="address-add" v-if="addAddress">
           <p class="tc_text">
             <span class="tc_name">收货人:</span>
-            <input class="tc_namet" type="text">
+            <input class="tc_namet" v-model="addObj.tc_name" type="text">
           </p>
           <p class="tc_text">
             <span class="tc_phone">联系电话:</span>
-            <input class="tc_phonet" type="text">
+            <input class="tc_phonet" v-model="addObj.tc_phone" type="text">
           </p>
           <p class="tc_text">
             <span class="tc_region">所在地址:</span>
@@ -94,24 +94,30 @@
           </p>
           <p class="tc_text">
             <span class="tc_detailed">详细地址:</span>
-            <input class="tc_detailedt" type="text">
+            <input class="tc_detailedt" v-model="addObj.tc_detailedt" type="text">
           </p>
           <span class="btn" @click="popt()">添加</span>
         </div>
 
         <!--选择地址-->
+        
         <scroll-view class="address-list" v-if="selectAddress">
-          <div class="item"  v-for="(item,index) in addressList" :key="index">
-            <p class="name">{{item.name+ '  ' + item.mobile}}</p>
-            <p class="details">
-              收货地址：{{item.value + item.address}}
-            </p>
-            <div class="select">
-              <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
-              <span class="edit">编辑</span>
+          <div class="select-cont" style="height: 100%;overflow: auto">
+            <div  style="margin-bottom:64px">
+              <div class="item"  v-for="(item,index) in addressList" :key="index">
+                <p class="name">{{item.name+ '  ' + item.mobile}}</p>
+                <p class="details">
+                  收货地址：{{item.value + item.address}}
+                </p>
+                <div class="select">
+                  <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
+                  <span class="edit" @click="editAddress(item)">编辑</span>
+                </div>
+              </div>
             </div>
+            <span class="btn" @click="confirm()">确认</span>
           </div>
-          <span class="btn" @click="confirm()">确认</span>
+          
         </scroll-view>
       </div>
     </div>
@@ -142,6 +148,7 @@
 import wx from 'wx'
 import config from '@/config.js'
 import API from '@/api/httpShui'
+import API2 from "@/api/httpJchan";
 export default {
   components: {},
   data () {
@@ -172,16 +179,71 @@ export default {
       couponPrice: '',
       sessionId: '',
       pingId: null,
-      pingOrderId: null
+      pingOrderId: null,
+      addObj:{tc_name:"",tc_phone:"",tc_detailedt:""},
     }
   },
   methods: {
-    toOpen (parent, child) {
+    toOpen (parent) {
       this[parent] = true
-      this[child] = true
+      if(this.addressList.length>0){
+        this.addAddress=false;
+        this.selectAddress=true;
+      }else{
+        this.addAddress=true;
+        this.selectAddress=false;
+      }
     },
     toClose (name) {
-      this[name] = false
+      this[name] = false;
+      this.getAddress();
+    },
+    //添加地址,保存
+    popt(){
+      if(this.addObj.addressId){
+        this.editres();
+      }else{
+        this.addres();
+      }
+      this.addressBox=false;
+      this.getAddress();
+      this.addObj={tc_name:"",tc_phone:"",tc_detailedt:""};
+    },
+    async addres() {
+      let value = this.region.join(",");
+      const addres = await API2.addres({
+        name: this.addObj.tc_name,
+        mobile: this.addObj.tc_phone,
+        address: this.addObj.tc_detailedt,
+        value: this.region.join(","),
+        isChoice: 1,
+        areaId: this.recode,
+      });
+      // this.addresList = addres.data.list;
+      // console.log(addres.data);
+      // console.log(this.address);
+    },
+    //编辑地址
+    editAddress(e){
+      this.selectAddress=false;
+      this.addAddress=true;
+      this.addObj.tc_name=e.name;
+      this.addObj.tc_phone=e.mobile;
+      this.addObj.tc_detailedt=e.address;
+      this.region=e.value.split(",");
+      this.addObj.addressId=e.id;
+    },
+    async editres(){
+
+       const editddres = await API2.editddres({
+        name: this.addObj.tc_name,
+        mobile: this.addObj.tc_phone,
+        address: this.addObj.tc_detailedt,
+        value: this.region.join(","),
+        isChoice: 1,
+        areaId: this.recode,
+        addressId:this.addObj.addressId,
+      });
     },
     // 选择地址
     defaultAddress (id, index) {
@@ -234,6 +296,12 @@ export default {
           let val = list[0].value
           this.addressDetails = val.split(',').join('') + list[0].address
         }
+      }
+      if(list.length==0){
+          this.addressId = ""
+          this.name =""
+          this.phone =""
+          this.addressDetails =""
       }
     },
     // 获取优惠券
@@ -411,7 +479,8 @@ export default {
     }
     this.getAddress()
     this.getCoupon()
-  }
+  },
+
 }
 </script>
 <style type="text/sass" lang="sass" scoped>
@@ -700,7 +769,7 @@ export default {
       .address-list
         height: 622px
         background: #f1f1f1
-        overflow-y: auto
+        overflow: hidden
         .item
           box-sizing: border-box
           padding: 10px 32px 0 32px
@@ -825,7 +894,5 @@ export default {
         right: 80px
         color: #fff
         font-size: 40px
-
-
 
 </style>
