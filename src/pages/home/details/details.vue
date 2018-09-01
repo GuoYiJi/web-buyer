@@ -69,7 +69,7 @@
       <div class="immediately" @click="popup(2)">立即购买</div>
     </div>
     <!-- 悬挂按钮 -->
-    <div class="suspension" v-if="(suspension == 1)">
+    <div class="suspension" v-if="suspension == 1">
       <div class="top">
         <i class="top_img"></i>
         <p class="top_text">顶部</p>
@@ -95,9 +95,9 @@
         <i class="gb" @click="popupShow=false"></i>
       </div>
       <div class="kuang_2">
-        <p class="k2_title">选择颜色和尺码</p>
+        <p class="k2_title">颜色</p>
         <div class="k2_btnk">
-          <span class="k2_btn" :class="{active : index === isSpec }" v-for="(item, index) in specGroup[0].specAttr" :key="index" @click="selectSpec(index,item.name)">{{item.name}}
+          <span class="k2_btn" :class="{active : index === colorIndex }" v-for="(item, index) in skuAttr" :key="index" @click="selectColorSpec(index,item.colorVal)">{{item.colorVal}}
             <!--<span class="k2_dian">0</span>-->
           </span>
         </div>
@@ -107,26 +107,19 @@
           <li class="s_item">尺码</li>
           <li class="s_item">购买数量</li>
         </ul>
-        <ul class="s_item_box" v-for="(item, index) in specGroup[1].specAttr" :key="index">
-          <li class="s_item">{{item.name}}</li>
+        <ul class="s_item_box" v-for="(item, index) in skuAttr[colorIndex].sizeArray" :key="index">
+          <li class="s_item">{{item.sizeVal}}</li>
           <li class="s_item">
-            <!--<i-input-number :value="value" min="0" max="100" @change="handleChange" />-->
-            <span class="minus" @click="minus(item.id)"></span>
-            <span class="count">{{count}}</span>
-            <span class="add" @click="add()"></span>
+            <span class="minus" @click="minus(colorIndex, index)"></span>
+            <span class="count">{{item.sizeNum}}</span>
+            <span class="add" @click="add(colorIndex, index)"></span>
           </li>
         </ul>
-        <!--<ul class="s_item_box">-->
-          <!--<li class="s_item">M</li>-->
-          <!--<li class="s_item">-->
-            <!--<i-input-number :value="value2" min="0" max="100" @change="handleChange2" />-->
-          <!--</li>-->
-        <!--</ul>-->
       </div>
       <div class="kuang_4">
         <p class="k4_title">已选</p>
-        <p class="k4_text">绿色：S/1件；M/1件</p>
-        <p class="k4_text">红色：S/1件；M/1件</p>
+        <p class="k4_text" v-for="(item,index) in skuAttr" :key="index">{{item.colorVal}}：<span v-for="(item,i) in item.sizeArray" :key="i">{{item.sizeVal}}/{{item.sizeNum}}件;</span></p>
+        <!--<p class="k4_text">红色：S/1件；M/1件</p>-->
       </div>
       <span class="btn" @click="confirmBth()">确定</span>
     </div>
@@ -141,13 +134,7 @@ export default {
   data () {
     return {
       sessionId: '',
-      imgUrls: [
-        'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-        'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-        'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-        'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-        'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg'
-      ],
+      imgUrls: [],
       indicatorDots: true,
       autoplay: true,
       interval: 5000,
@@ -156,16 +143,14 @@ export default {
       isLike: 0,
       visible1: false,
       popupShow: false,
-      buyType: '',
-      count: 1,
-      goodsInfo: {},
-      tags: [],
-      details: [],
-      specGroup: '',
-      skuList: '',
-      isSpec: '',
-      selectSkuId: [],
-      selectSkuText: []
+      buyType: '', // 加入购物车or立即购买
+      goodsInfo: {}, // 商品信息
+      tags: [], // 标签
+      details: [], // 详情图片
+      specGroup: '', // 规格列表
+      skuList: '', // 规格组合列表
+      colorIndex: 0, // 是否选中状态,及其下标
+      skuAttr: [] // 处理可用的规格数组
     }
   },
   onPageScroll (e) {
@@ -213,6 +198,52 @@ export default {
     // 确定按钮
     confirmBth () {
       let that = this
+      let skuAttr = []
+      let skuCode = []
+      let totalNum = 0
+      let price = that.goodsInfo.sellPrice
+      let totalPrice = 0
+      for (let i = 0; i < that.skuAttr.length; i++) {
+
+        for (let j = 0; j < that.skuAttr[i].sizeArray.length; j++) {
+          let obj = {}
+          if (that.skuAttr[i].sizeArray[j].sizeNum === 0) {
+            continue
+          }
+          let colorVal = that.skuAttr[i].colorVal
+          let colorId = that.skuAttr[i].color
+          let sizeVal = that.skuAttr[i].sizeArray[j].sizeVal
+          let sizeId = that.skuAttr[i].sizeArray[j].sizeId
+          let num = that.skuAttr[i].sizeArray[j].sizeNum
+          let attrIds = colorId + ',' + sizeId
+          let skuVal = ''
+          let ishas = false
+          for (let g = 0; g < skuCode.length; g++) {
+            let str = skuCode[g].substring(0, 1)
+            if (str === colorVal) {
+              skuCode[g] += sizeVal + '/' + num + '件;'
+              ishas = true
+              break
+            }
+          }
+          if (!ishas) {
+            skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
+            skuCode.push(skuVal)
+          }
+          totalNum += Number(num)
+          for (let k = 0; k < that.skuList.length; k++) {
+            if (that.skuList[k].attrIds === attrIds) {
+              obj.skuId = that.skuList[k].id
+            }
+          }
+          obj.num = num
+          skuAttr.push(obj)
+        }
+      }
+      console.log(skuAttr)
+      console.log(skuCode)
+      totalPrice = totalNum * price
+      // 加入购物车
       if (this.buyType === 1) {
         const TEST_URL = config.url
         const BASE_URL = config.url
@@ -221,9 +252,9 @@ export default {
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
-          num: 1,
-          skuId: this.skuList[0].id,
-          goodsCard: [{ skuId: this.skuList[0].id, num: 1 }]
+          num: totalNum,
+          skuCode: skuCode,
+          goodsCard: skuAttr
         }
         wx.request({
           method: 'POST',
@@ -240,45 +271,96 @@ export default {
           }
         })
       }
+      // 立即购买
       if (this.buyType === 2) {
-        let skuObj = []
-        skuObj.push({skuId: this.skuList[0].id, num: 1})
         let obj = {
           goods: this.goodsInfo,
-          skuObj: skuObj,
-          sKuCode: this.skuList[0].skuCode,
-          totalPrice: 60,
-          totalNum: 1
+          skuObj: skuAttr,
+          skuCode: skuCode,
+          totalPrice: totalPrice,
+          totalNum: totalNum
         }
-        this.$router.push({path: '/pages/shopping/order/order', query: {details: JSON.stringify(obj)}})
+        this.$router.push({
+          path: '/pages/shopping/order/order',
+          query: {details: JSON.stringify(obj)}
+        })
       }
     },
     // 选择规格
-    selectSpec (index, name) {
-      this.isSpec = index
-      console.log(name)
+    selectColorSpec (index) {
+      this.colorIndex = index
     },
-    minus () {
-      if (this.count === 0) {
+    // 减
+    minus (colorIndex, sizeIndex) {
+      // console.log(colorIndex, sizeIndex)
+      let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
+      if (num === 0) {
         return false
       } else {
-        this.count--
+        this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum--
       }
     },
-    add () {
-      this.count++
+    // 加
+    add (colorIndex, sizeIndex) {
+      // console.log(colorIndex, sizeIndex)
+      let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
+      if (num === 100) {
+        return false
+      } else {
+        this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum++
+      }
     }
   },
   async mounted () {
     this.sessionId = await wx.getStorageSync('sessionId')
+    // 商品信息
     this.goodsInfo = JSON.parse(this.$route.query.obj)
+    // 图片列表
     this.imgUrls = this.goodsInfo.images.split(',')
+    // 标签列表
     this.tags = this.goodsInfo.tagsList
+    // 详情列表
     this.details = this.goodsInfo.content.split(',')
+    // 规格数组
     this.specGroup = this.goodsInfo.sku.specGroup
+    // 规格组合数组
     this.skuList = this.goodsInfo.sku.skuList
+    // 是否收藏
     this.isLike = this.goodsInfo.isLike
-    console.log(this.goodsInfo)
+    // 规格文字
+    // let specGroup = this.goodsInfo.sku.specGroup
+    // 规格id
+    let skuList = this.goodsInfo.sku.skuList
+    let attrArray = []
+    // 定义规格数组
+    for (let i = 0; i < skuList.length; i++) {
+      let sku = skuList[i]
+      let obj = {}
+      let attrIds = sku.attrIds.split(',')
+      let attrVal = sku.skuCode.split(',')
+      obj.color = attrIds[0]
+      obj.colorVal = attrVal[0]
+      let sizeArray = []
+      let sizeObj = {}
+      sizeObj.sizeId = attrIds[1]
+      sizeObj.sizeVal = attrVal[1]
+      sizeObj.sizeNum = 0
+      sizeArray.push(sizeObj)
+      obj.sizeArray = sizeArray
+      let isHas = false
+      for (let j = 0; j < attrArray.length; j++) {
+        if (attrArray[j].color === obj.color) {
+          // let skuSize = attrArray[j]
+          attrArray[j].sizeArray.push(sizeObj)
+          isHas = true
+          break
+        }
+      }
+      if (!isHas) {
+        attrArray.push(obj)
+      }
+    }
+    this.skuAttr = attrArray
   }
 }
 </script>
@@ -582,11 +664,11 @@ export default {
     .kuang_2
       margin-top: 35px
       height: 120px
-      padding-left: 24px
+      padding: 0 24px
       .k2_title
         font-size: 24px
         color: #000
-        margin-bottom: 30px
+        padding-bottom: 30px
       .k2_btnk
         .k2_btn
           display: inline-block

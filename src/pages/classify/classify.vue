@@ -75,7 +75,7 @@ export default {
     // 获取二级分类函数
     async getClassify (id) {
       const data = await API.getClassify({pid: id})
-      console.log('二级分类数据', data)
+      // console.log('二级分类数据', data)
       this.classifyList = data.data
     },
     // 搜索
@@ -89,7 +89,7 @@ export default {
   async mounted () {
     // 获取一级分类接口
     const tabsList = await API.getTabs({types: '2'})
-    console.log('一级分类数据', tabsList)
+    // console.log('一级分类数据', tabsList)
     this.tabs = tabsList.data
     // 获取二级分类
     this.getClassify(this.pid)

@@ -73,71 +73,63 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import footers from "@/commond/footer.vue";
-import mixin from "@/mixin";
-import API from "@/api/httpJchan";
+import wx from 'wx'
+import footers from '@/commond/footer.vue'
+import mixin from '@/mixin'
+import API from '@/api/httpJchan'
 export default {
   mixins: [mixin],
   components: { footers },
-  data() {
+  data () {
     return {
       prePayment: 0,
       delivery: 0,
       receive: 0,
       commented: 0,
       refund: 0
-    };
+    }
   },
   methods: {
-    order(tag) {
+    order (tag) {
       this.$router.push({
-        path: "/pages/my/order/myorder",
+        path: '/pages/my/order/myorder',
         query: { tag: tag }
-      });
+      })
     },
-    toRouteMyget() {
-      this.$router.push("/pages/my/myget/get");
+    toRouteMyget () {
+      this.$router.push('/pages/my/myget/get')
     },
-    after() {
-      this.$router.push("/pages/my/after");
+    after () {
+      this.$router.push('/pages/my/after')
     },
-    myCoupon() {
-      this.$router.push("/pages/my/marketingMgt/myCoupon");
+    myCoupon () {
+      this.$router.push('/pages/my/marketingMgt/myCoupon')
     },
-    like() {
-      this.$router.push("/pages/my/like");
+    like () {
+      this.$router.push('/pages/my/like')
     },
-    tuig() {
-      this.$router.push("/pages/my/procedures");
-      // this.$router.push("/pages/my/sales");
+    tuig () {
+      this.$router.push('/pages/my/procedures')
     }
   },
-  async mounted() {
-    const myorder = await API.myorder({});
-    this.myorderList = myorder.data.list;
-    console.log(myorder.data);
-    var order = myorder.data.list;
-    for (var i = 0; i < order.length; i++) {
-      if (order[i].state == 1) {
-        this.prePayment += 1;
-      } else if (order[i].state == 5) {
-        this.delivery += 1;
-      } else if (order[i].state == 6) {
-        this.receive += 1;
-      }
-    }
+  async mounted () {
+    const prePayment = await API.myorder({isPing: 0, state: 1})
+    const delivery = await API.myorder({isPing: 0, state: 5})
+    const receive = await API.myorder({isPing: 0, state: 6})
+    // 获取待收货，待发货，待付款订单的个数
+    this.prePayment = prePayment.data.totalRow
+    this.delivery = delivery.data.totalRow
+    this.receive = receive.data.totalRow
     wx.setStorage({
-      key: "qwe",
+      key: 'qwe',
       data: 123
-    });
-    console.log(myorder.data.pageSize, 1231);
-    const afterList = await API.after({});
-    console.log(afterList.data);
+    })
+    // const afterList = await API.after({})
+    // console.log(afterList.data)
   }
-};
+}
 </script>
-<style lang="sass" scoped>
+<style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .menu-2
   margin-top: 20px
