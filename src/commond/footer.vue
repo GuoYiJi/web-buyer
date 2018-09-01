@@ -61,7 +61,7 @@ export default {
     color: #afc1d7
     border-top: 1px solid $border-color  
     background: #fff!important
-    z-index: 999999
+    z-index: 999
     text-align: center
     a
       color: #999999

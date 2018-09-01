@@ -382,7 +382,7 @@ export default {
       this.buyType = 2
       let goods = JSON.parse(this.$route.query.cart)
       this.goodsInfo = goods.goods
-      this.skuObj = goods.skuObj
+      this.skuObj = goods.skuList
       this.totalPrice = goods.totalPrice
       this.totalNum = goods.totalNum
       this.totalPack = goods.goods.length

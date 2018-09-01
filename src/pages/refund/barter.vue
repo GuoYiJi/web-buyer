@@ -15,7 +15,7 @@
 
           <img v-else src="../../assets/img/my/upimg.png" alt="">
 
-          <span v-if="img1" class="close"@click="closeImg('img1',event)"></span>
+          <span v-if="img1" class="close" @click="closeImg('img1',event)"></span>
 
         </div>
         <div v-if="img1" class="img" @click="chooseImg(2)">
@@ -23,7 +23,7 @@
 
           <img v-else src="../../assets/img/my/upimg.png" alt="">
 
-          <span v-if="img2" class="close"@click="closeImg('img2',event)"></span>
+          <span v-if="img2" class="close" @click="closeImg('img2',event)"></span>
 
         </div>
         <div v-if="img2" class="img" @click="chooseImg(3)">
