@@ -3,7 +3,7 @@
   <div class="home">
     <div class="head">
       <i class="h-img"></i>
-      <span>等待买家付款</span>
+      <span>订单已取消</span>
     </div>
     <div class="diz" v-if="details.orderAddress">
       <i class="dz-img"></i>
