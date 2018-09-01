@@ -36,34 +36,34 @@
                 <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
               </block>
             </div>
-        </div>
-        <div class="below">
-          <div class="total">
-            <p class="t-right">
-              共<span class="piece">{{item.goodsListSize}}</span>件商品, 合计:<span class="money">￥{{item.count}}</span>
-            </p>
           </div>
+          <div class="below">
+            <div class="total">
+              <p class="t-right">
+                共<span class="piece">{{item.goodsListSize}}</span>件商品, 合计:<span class="money">￥{{item.count}}</span>
+              </p>
+            </div>
+          </div>
+          <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
+            <tr>
+              <th></th>
+              <th>颜色</th>
+              <th>码数</th>
+              <th>总件数</th>
+              <th>已发</th>
+              <th>未发</th>
+              <th></th>
+            </tr>
+            <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
+              <td></td>
+              <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
+              <td></td>
+            </tr>
+          </table>
         </div>
       </div>
         
-      </div>
       <div class="below">
-        <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
-          <tr>
-            <th></th>
-            <th>颜色</th>
-            <th>码数</th>
-            <th>总件数</th>
-            <th>已发</th>
-            <th>未发</th>
-            <th></th>
-          </tr>
-          <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
-            <td></td>
-            <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
-            <td></td>
-          </tr>
-        </table>
         <div class="total" v-for="(cOder,idx) in item.children" :key="idx" >
           <span class="t-left" @click="bxq(cOder.id, cOder.state)">子订单编号({{stateName[cOder.state]}}): {{cOder.orderNo}}</span>
           <span class="t-right">></span>
@@ -202,7 +202,8 @@ export default {
           let size = Citem.skuCode.split(':')[1];
           // console.log(color, Citem);
           this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
-          console.log(this.skuCodeList);
+          // console.log(this.skuCodeList);
+          
         })
       })
       
