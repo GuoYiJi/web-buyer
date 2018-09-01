@@ -55,7 +55,7 @@ export default {
       }
     },
     btn() {
-      console.log(this.recode);
+      console.log("recode",this.recode);
       if (this.recode.length === 1) {
         this.recode = this.recode[0];
       } else if (this.recode.length === 2) {

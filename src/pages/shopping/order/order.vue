@@ -4,9 +4,9 @@
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
       <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
     </div>
-    <div class="address"  @click="toOpen('addressBox','selectAddress')">
+    <div class="address"  @click="toOpen('addressBox')">
       <i class="dt"></i>
-      <p class="add_text">收货人：{{name + phone}}</p>
+      <p class="add_text">收货人：{{name}}&nbsp;&nbsp;{{phone}}</p>
       <p class="add_text">收货地址：{{addressDetails}}</p>
       <p v-if="addressList.length == 0" class="add_text">添加收货地址</p>
     </div>
@@ -78,40 +78,46 @@
         <div class="address-add" v-if="addAddress">
           <p class="tc_text">
             <span class="tc_name">收货人:</span>
-            <input class="tc_namet" type="text" v-model="tc_namet">
+            <input class="tc_namet" v-model="addObj.tc_name" type="text">
           </p>
           <p class="tc_text">
             <span class="tc_phone">联系电话:</span>
-            <input class="tc_phonet" type="text" v-model="tc_phonet">
+            <input class="tc_phonet" v-model="addObj.tc_phone" type="text">
           </p>
           <p class="tc_text">
             <span class="tc_region">所在地址:</span>
             <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
               <view class="picker">
-                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '' }}
+                {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '所在地址:' }}
               </view>
             </picker>
           </p>
           <p class="tc_text">
             <span class="tc_detailed">详细地址:</span>
-            <input class="tc_detailedt" type="text">
+            <input class="tc_detailedt" v-model="addObj.tc_detailedt" type="text">
           </p>
           <span class="btn" @click="popt()">添加</span>
         </div>
 
         <!--选择地址-->
+        
         <scroll-view class="address-list" v-if="selectAddress">
-          <div class="item"  v-for="(item,index) in addressList" :key="index">
-            <p class="name">{{item.name+ '  ' + item.mobile}}</p>
-            <p class="details">
-              收货地址：{{item.value + item.address}}
-            </p>
-            <div class="select">
-              <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
-              <span class="edit">编辑</span>
+          <div class="select-cont" style="height: 100%;overflow: auto">
+            <div  style="margin-bottom:64px">
+              <div class="item"  v-for="(item,index) in addressList" :key="index">
+                <p class="name">{{item.name+ '  ' + item.mobile}}</p>
+                <p class="details">
+                  收货地址：{{item.value + item.address}}
+                </p>
+                <div class="select">
+                  <span class="check" :class="{active : item.isChoice == 1}" @click="defaultAddress(item.id,index)">默认地址</span>
+                  <span class="edit" @click="editAddress(item)">编辑</span>
+                </div>
+              </div>
             </div>
+            <span class="btn" @click="confirm()">确认</span>
           </div>
-          <span class="btn" @click="confirm()">确认</span>
+          
         </scroll-view>
       </div>
     </div>
@@ -142,12 +148,12 @@
 import wx from 'wx'
 import config from '@/config.js'
 import API from '@/api/httpShui'
+import API2 from "@/api/httpJchan";
 export default {
   components: {},
   data () {
     return {
-      isDetails: null,
-      isGroup: false,
+      buyType: null,
       selectAddressId: '',
       region: [],
       customItem: '全部',
@@ -173,23 +179,71 @@ export default {
       couponPrice: '',
       sessionId: '',
       pingId: null,
-      pingOrderId: null
+      pingOrderId: null,
+      addObj:{tc_name:"",tc_phone:"",tc_detailedt:""},
     }
   },
   methods: {
-    toOpen (parent, child) {
+    toOpen (parent) {
+      this[parent] = true
       if(this.addressList.length>0){
-        this[parent] = false;
-        this[child]=true;
+        this.addAddress=false;
+        this.selectAddress=true;
       }else{
-        this[parent] = true
-        this[child]=false;
+        this.addAddress=true;
+        this.selectAddress=false;
       }
-      
-      
     },
     toClose (name) {
-      this[name] = false
+      this[name] = false;
+      this.getAddress();
+    },
+    //添加地址,保存
+    popt(){
+      if(this.addObj.addressId){
+        this.editres();
+      }else{
+        this.addres();
+      }
+      this.addressBox=false;
+      this.getAddress();
+      this.addObj={tc_name:"",tc_phone:"",tc_detailedt:""};
+    },
+    async addres() {
+      let value = this.region.join(",");
+      const addres = await API2.addres({
+        name: this.addObj.tc_name,
+        mobile: this.addObj.tc_phone,
+        address: this.addObj.tc_detailedt,
+        value: this.region.join(","),
+        isChoice: 1,
+        areaId: this.recode,
+      });
+      // this.addresList = addres.data.list;
+      // console.log(addres.data);
+      // console.log(this.address);
+    },
+    //编辑地址
+    editAddress(e){
+      this.selectAddress=false;
+      this.addAddress=true;
+      this.addObj.tc_name=e.name;
+      this.addObj.tc_phone=e.mobile;
+      this.addObj.tc_detailedt=e.address;
+      this.region=e.value.split(",");
+      this.addObj.addressId=e.id;
+    },
+    async editres(){
+
+       const editddres = await API2.editddres({
+        name: this.addObj.tc_name,
+        mobile: this.addObj.tc_phone,
+        address: this.addObj.tc_detailedt,
+        value: this.region.join(","),
+        isChoice: 1,
+        areaId: this.recode,
+        addressId:this.addObj.addressId,
+      });
     },
     // 选择地址
     defaultAddress (id, index) {
@@ -278,17 +332,22 @@ export default {
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
       let appId = config.appId
-      if (this.isGroup === true) {
-        let obj = {
-          sessionId: this.sessionId,
-          appId: appId,
-          addressId: this.addressId,
-          remark: this.remark,
-          skuList: this.skuObj,
-          couponId: this.couponId,
-          pingId: this.pingId,
-          pingOrderId: '',
-          expressWay: this.expressWay
+      let obj = {
+        sessionId: this.sessionId,
+        appId: appId,
+        addressId: this.addressId,
+        remark: this.remark,
+        skuList: this.skuObj,
+        couponId: this.couponId,
+        expressWay: this.expressWay
+      }
+      // 拼团购买
+      if (this.buyType === 3) {
+        if (this.pingId != null) {
+          obj.pingId = this.pingId
+        }
+        if (this.pingOrderId != null) {
+          obj.pingOrderId = this.pingOrderId
         }
         wx.request({
           method: 'POST',
@@ -298,7 +357,8 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
-            that.wxSign(res.data.data.id)
+            console.log(res)
+            that.wxSign(res.data.data.id, 2)
           }
         })
       }
@@ -312,6 +372,7 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
+            console.log(res)
             if (res.data.code === 1) {
               that.wxSign(res.data.data.id, 1)
             }
@@ -320,7 +381,7 @@ export default {
       }
     },
     // 微信支付
-    async wxSign (orderId) {
+    async wxSign (orderId, type) {
       let that = this
       const data = await API.wxSign({ orderId: orderId })
       console.log(data)
@@ -373,7 +434,7 @@ export default {
     this.sessionId = await wx.getStorageSync('sessionId')
     // 详情过来
     if (this.$route.query.details) {
-      this.isDetails = true
+      this.buyType = 1
       let goods = JSON.parse(this.$route.query.details)
       console.log(goods)
       this.goodsInfo = goods.goods
@@ -708,7 +769,7 @@ export default {
       .address-list
         height: 622px
         background: #f1f1f1
-        overflow-y: auto
+        overflow: hidden
         .item
           box-sizing: border-box
           padding: 10px 32px 0 32px
@@ -833,4 +894,5 @@ export default {
         right: 80px
         color: #fff
         font-size: 40px
+
 </style>

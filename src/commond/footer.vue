@@ -1,21 +1,21 @@
 <template lang="html">
   <div id="container">
-    <a href="/pages/home/home" class="bar" :class="[tag == 1 && 'active' ]">
+    <div class="bar" :class="[tag == 1 && 'active' ]" @click="push('/pages/home/home')">
       <i class="icon icon1"></i>
       <p>首页</p>
-    </a>
-    <a href="/pages/classify/classify" class="bar" :class="[tag == 2 && 'active' ]">
+    </div>
+    <div class="bar" :class="[tag == 2 && 'active' ]" @click="push('/pages/classify/classify')">
       <i class="icon icon2"></i>
       <p>分类</p>
-    </a>
-    <a href="/pages/shopping/shopping" class="bar" :class="[tag == 3 && 'active' ]">
+    </div>
+    <div class="bar" :class="[tag == 3 && 'active' ]" @click="push('/pages/shopping/shopping')">
       <i class="icon icon3"></i>
       <p>购物车</p>
-    </a>
-    <a href="/pages/my/my" class="bar" :class="[tag == 4 && 'active' ]">
+    </div>
+    <div class="bar" :class="[tag == 4 && 'active' ] " @click="push('/pages/my/my')">
       <i class="icon icon4"></i>
       <p>我的</p>
-    </a>
+    </div>
     <!-- <a href="/pages/home/home" class="bar" :class="[tag == 5 && 'active' ]">
       <i class="icon icon5"></i>
       <p>4</p>
@@ -28,6 +28,11 @@ export default {
     tag: {
       types: Number,
       default: 1
+    }
+  },
+  methods:{
+    push(url){
+      this.$router.replace(url);
     }
   }
 };
@@ -63,7 +68,7 @@ export default {
     background: #fff!important
     z-index: 999999
     text-align: center
-    a
+    div
       color: #999999
     .active
       color: #EE7527!important
@@ -89,9 +94,9 @@ export default {
         // width: 44px
         // height: 44px
       .icon4
-        +bg-img('home/my1.png')
-        width: 37px!important
-        height: 44px!important
+        +bg-img('home/a301.png')
+        // width: 38px!important
+        // height: 44px!important
       // .icon5
       //   +bg-img('home/footer5.png')
       .icon
@@ -99,18 +104,16 @@ export default {
       &.active .icon1
         +bg-img('home/home.png')
         +bg-size
-      // &.active .icon2
-      //   +bg-img('home/apply1.png')
-      //   +bg-size
+      &.active .icon2
+        +bg-img('home/fl.png')
+        +bg-size
       &.active .icon3
         +bg-img('shopping/gwc.png')
         +bg-size
-      // &.active .icon4
-      //   +bg-img('home/shop1.png')
-      //   +bg-size
-      // &.active .icon5
-      //   +bg-img('home/user1.png')
-      //   +bg-size
+      &.active .icon4
+        +bg-img('home/gr1.png')
+        +bg-size
+
         
 </style>
 
