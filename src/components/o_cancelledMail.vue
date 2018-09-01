@@ -3,72 +3,94 @@
   <div class="home">
     <div class="head">
       <i class="h-img"></i>
-      <span>交易取消</span>
+      <span>等待买家付款</span>
     </div>
-    <div class="diz">
+    <div class="diz" v-if="details.orderAddress">
       <i class="dz-img"></i>
-      <span class="dz-name">收货人：朱先森</span>
-      <span class="dz-phone">15632168160</span>
-      <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
+      <span class="dz-name">收货人：{{details.orderAddress.name}}</span>
+      <span class="dz-phone">{{details.orderAddress.mobile}}</span>
+      <p class="dz-dz">收货地址：{{details.orderAddress.value+details.orderAddress.address}}</p>
     </div>
-    <p class="title">菲斯的小店</p>
-    <div class="nav">
-      <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+    <p class="title">{{shopName}}</p>
+    <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
+      <img v-if="item.image" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <div class="n-right">
-        <p class="n-title">兔子的口袋2018夏季新款网红同款露背中长款宽松大T新款网红同款...</p>
-        <p class="yardage">白色：均码/2件</p>
-        <p class="yardage">黑色：均码/1件</p>
+        <p class="n-title">{{item.name}}</p>
+        <p class="yardage">{{item.skuCode}}</p>
+        <!--<p class="yardage">黑色：均码/1件</p>-->
       </div>
     </div>
     <div class="below">
       <div class="total">
         <p class="t-left">共
-          <span class="piece">3</span> 件商品</p>
-        <!-- 物流到付 -->
-        <p v-if="(wuliu == 1)" class="t-freight">（含运费￥10.00）</p>
+          <span class="piece">{{details.num}}</span> 件商品
+        </p>
+        <p class="t-freight">（含运费￥{{details.freight}}）</p>
         <p class="t-right">合计:
-          <span class="money">￥154.00</span>
+          <span class="money">￥{{details.count}}</span>
         </p>
       </div>
-      <p class="message">买家留言：包装好一点</p>
+      <p class="message">买家留言：{{details.remark ? details.remark : '没有留言信息！'}}</p>
     </div>
     <div class="prices">
       <p>
         <span class="left">商品总价</span>
-        <span class="right">￥154.00</span>
+        <span class="right">￥{{details.count - details.freight}}</span>
       </p>
       <p>
         <span class="left">优惠劵折扣</span>
-        <span class="right">- ￥10.00</span>
+        <span class="right">-￥{{details.couponMoney ? details.couponMoney : 0}}</span>
       </p>
-      <!-- 物流到付 -->
-      <p v-if="(wuliu == 1)">
+      <p>
         <span class="left">运费</span>
-        <span class="right">+ ￥10.00</span>
+        <span class="right">+￥{{details.freight}}</span>
       </p>
       <div class="serial">
-        <p class="s-text">订单编号：2018062712345678904</p>
-        <p class="s-text">下单时间：2018-06-16 12:27:12</p>
-        <!-- 物流到付||邮寄-->
-        <p v-if="(wuliu == 2||youji == 2)" class="s-text">支付时间：2018-06-16 12:27:12</p>
-        <p v-if="(wuliu == 3||youji == 2)" class="s-text">发货时间：2018-06-16 12:27:12</p>
+        <p class="s-text">订单编号：{{details.orderNo}}</p>
+        <p class="s-text">下单时间：{{details.createTime}}</p>
       </div>
     </div>
-    <div style="height: 100px"></div>
     <div class="foot">
-      <span class="pay">删除订单</span>
+      <span class="pay" @click="delOrder(details.id)">删除订单</span>
     </div>
   </div>
 </template>
 <script>
-import wx from "wx";
+import API from '@/api/httpShui'
 export default {
   components: {},
+  props : ['id'],
   data() {
-    return { wuliu: 0, youji: 0 };
+    return { wuliu: 0, youji: 0 ,shopName:'',details:{orderAddress:{}}};
   },
-  methods: {},
-  mounted() {}
+  methods: {
+    async delOrder(id){
+      const data = await API.delOrderShow({orderId: id})
+      if (data.code === 1) {
+        // this.visible3 = false;
+        this.$router.go(-1);
+        // this.$emit('refreshOrder');
+      }
+    },
+    async getOrderDetails (id) {
+      const data = await API.getOrderDetails({orderId: id})
+      console.log('待付款订单详情', data)
+      this.details = data.data
+      console.log('待付款订单详情', this.details)
+    },
+  },
+  mounted() {
+    console.log(this.id);
+    this.getOrderDetails(this.id);
+    let that = this
+    wx.getStorage({
+      key: 'shopName',
+      success: function (res) {
+        that.shopName = res.data
+      }
+    })
+  }
 };
 </script>
 <style lang="sass" scoped>

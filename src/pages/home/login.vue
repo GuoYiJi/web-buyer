@@ -21,43 +21,43 @@ import API from "@/api/httpJsong";
 export default {
   mixins: [mixin],
   components: {},
-  data() {
+  data () {
     return {
       userInfoBool: false,
       userInfo: {},
-      code: ""
-    };
+      code: ''
+    }
   },
   computed: {
-    showBtn() {
-      return this.userInfoBool;
+    showBtn () {
+      return this.userInfoBool
     }
   },
   methods: {
-    async getPhoneNumber(e) {
+    async getPhoneNumber (e) {
       // console.log(e.mp.detail);
       if (!e.mp.detail.encryptedData) {
-        this.handleError("需要同意授权才可以使用噢！");
+        this.handleError('需要同意授权才可以使用噢！')
         // console.log()
       } else {
-        const val = await wx.getStorageSync("sessionId");
+        const val = await wx.getStorageSync('sessionId')
         if (val) {
-          return this.toRoute("home/home");
+          return this.toRoute('home/home')
         }
-        this.login(e.mp.detail);
+        this.login(e.mp.detail)
       }
     },
-    getUserInfo(e) {
-      console.log(e);
+    getUserInfo (e) {
+      console.log(e)
       if (!e.mp.detail.encryptedData) {
-        this.handleError("需要同意授权才可以使用噢！");
+        this.handleError('需要同意授权才可以使用噢！')
       } else {
-        this.userInfoBool = true;
-        this.userInfo = e.mp.detail;
-        this.login();
+        this.userInfoBool = true
+        this.userInfo = e.mp.detail
+        this.login()
       }
     },
-    async login(encryptedData) {
+    async login (encryptedData) {
       const data = await API.authLogin({
         code: this.code,
         avatar: this.userInfo.userInfo.avatarUrl,
@@ -78,32 +78,32 @@ export default {
       this.toRoute("home/home");
     }
   },
-  async mounted() {
+  async mounted () {
     wx.login({
       success: async res => {
         if (res.code) {
-          this.code = res.code;
+          this.code = res.code
           wx.getUserInfo({
             success: res => {
               // console.log(res);
-              this.userInfoBool = true;
-              this.userInfo = res;
-              this.login();
+              this.userInfoBool = true
+              this.userInfo = res
+              this.login()
             },
             fail: err => {
               // this.userInfoBool = true
             }
-          });
+          })
         } else {
-          console.log("登录失败！" + res.errMsg);
+          console.log('登录失败！' + res.errMsg)
         }
       },
       fail: () => {
-        self.handleError("授权失败！");
+        self.handleError('授权失败！')
       }
-    });
+    })
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'

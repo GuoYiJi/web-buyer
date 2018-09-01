@@ -252,8 +252,6 @@ export default {
         let obj = {
           sessionId: this.sessionId,
           appId: appId,
-          num: totalNum,
-          skuCode: skuCode,
           goodsCard: skuAttr
         }
         wx.request({

@@ -76,14 +76,14 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import footers from "@/commond/footer.vue";
-import mixin from "@/mixin";
-import API from "@/api/httpJchan";
+import wx from 'wx'
+import footers from '@/commond/footer.vue'
+import mixin from '@/mixin'
+import API from '@/api/httpJchan'
 export default {
   mixins: [mixin],
   components: { footers },
-  data() {
+  data () {
     return {
       prePayment: 0,
       delivery: 0,
@@ -94,20 +94,20 @@ export default {
     };
   },
   methods: {
-    order(tag) {
+    order (tag) {
       this.$router.push({
-        path: "/pages/my/order/myorder",
+        path: '/pages/my/order/myorder',
         query: { tag: tag }
-      });
+      })
     },
-    toRouteMyget() {
-      this.$router.push("/pages/my/myget/get");
+    toRouteMyget () {
+      this.$router.push('/pages/my/myget/get')
     },
-    after() {
-      this.$router.push("/pages/my/after");
+    after () {
+      this.$router.push('/pages/my/after')
     },
-    myCoupon() {
-      this.$router.push("/pages/my/marketingMgt/myCoupon");
+    myCoupon () {
+      this.$router.push('/pages/my/marketingMgt/myCoupon')
     },
     like() {
       this.$router.push("/pages/my/like");
@@ -139,7 +139,7 @@ export default {
     this.delivery = delivery.data.totalRow;
     this.receive = receive.data.totalRow;
     wx.setStorage({
-      key: "qwe",
+      key: 'qwe',
       data: 123
     });
     wx.getStorage({
@@ -152,7 +152,7 @@ export default {
     // const afterList = await API.after({})
     // console.log(afterList.data)
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'

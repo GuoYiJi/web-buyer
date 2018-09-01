@@ -5,11 +5,11 @@
       <i class="h-img"></i>
       <span>等待卖家发货</span>
     </div>
-    <div class="diz">
+    <div class="diz" v-if="details.orderAddress">
       <i class="dz-img"></i>
-      <span class="dz-name">收货人：朱先森</span>
-      <span class="dz-phone">15632168160</span>
-      <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
+      <span class="dz-name">收货人：{{details.orderAddress.name}}</span>
+      <span class="dz-phone">{{details.orderAddress.mobile}}</span>
+      <p class="dz-dz">收货地址：{{details.orderAddress.value+details.orderAddress.address}}</p>
     </div>
     <p class="title">菲斯的小店</p>
     <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
@@ -123,7 +123,7 @@ export default {
       wuliu: 0,
       youji: 0,
       zhuzi: 0,
-      details: {}
+      details:{orderAddress:{}}
     }
   },
   methods: {
@@ -145,6 +145,7 @@ export default {
       this.details = data.data
       console.log('待发货订单详情', this.details)
       // this.isRetreat = data.data.isHasChildren
+      
       if (data.data.isHasChildren === 0 && data.data.isPing === 0) {
         this.isRetreat = true
       }

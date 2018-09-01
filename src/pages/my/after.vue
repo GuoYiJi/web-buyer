@@ -20,7 +20,7 @@
           <p class="t-left">共
             <span class="piece">{{item.goodsList.length}}</span>个款</p>
           <p class="t-left">
-            <span class="piece">86</span>件商品</p>
+            <span class="piece">{{item.num}}</span>件商品</p>
           <!--<p class="t-freight">（含运费￥10.00）</p>-->
           <p v-if="item.refundType != 2" class="t-right">合计:
             <span class="money">￥{{item.price}}</span>
