@@ -72,21 +72,21 @@
       <div class="btn" v-else-if="item.state === 5">
         <span class="button" @click="toPinDetails">查看详情</span>
         <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
+          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
         </span>
       </div>
       <!-- 待收货 -->
       <div class="btn" v-else-if="item.state === 6">
         <span class="button" @click="toPinDetails">查看详情</span>
         <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
+          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
         </span>
       </div>
       <!-- 待收货已拆单 -->
       <div v-else-if="item.state === 6 && item.layer ===2">
         <div class="btn">
           <span>
-            <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head + ')'}"></i>
+            <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head + ')'}"></i>
           </span>
         </div>
         <div class="btn">

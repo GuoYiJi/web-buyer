@@ -46,6 +46,9 @@ class API {
   afterService = params => http.post('api/order/refund/selectOrderRefund', params)
   // 售后详情
   getRefundDetails = params => http.post('api/order/refund/selectOrderRefundDetail', params)
+  //删除订单
+  delOrderShow = params => http.post('api/order/closeShow', params)
+  
 }
 
 export default new API()

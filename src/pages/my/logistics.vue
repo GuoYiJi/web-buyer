@@ -1,19 +1,20 @@
 <template>
   <!-- 查看物流 -->
   <div class="home">
-    <div class="kuang" v-show="kuang">
+    <div class="kuang" v-if="order.logistics">
       <div class="head">
         <i class="h-img"></i>
         <span class="h-text">物流公司：中通快递</span>
       </div>
       <div class="head">
-        <span class="ht-text">快递单号：123456</span>
+        <span class="ht-text">快递单号：{{order.logistics.logisticsNo}}}</span>
       </div>
       <div class="img-box">
-        <img class="img" :src="img">
+        <img class="img" v-if="order.logistics.image" :src="order.logistics.image">
+        <img class="img" v-else :src="img">
       </div>
     </div>
-    <div class="kuang">
+    <div class="kuang" v-else>
       <div class="kong">
         <p class="k-text">无物流状态</p>
       </div>
@@ -22,16 +23,31 @@
 </template>
 <script>
 import wx from "wx";
+import api from '@/api/httpJchan'
 export default {
   components: {},
   data() {
     return {
       kuang: false,
-      img: "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+      img: "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg",
+      order:{}
     };
   },
-  methods: {},
-  mounted() {}
+  methods: {
+    // 获取订单详情
+    async getOrderDeatil() {
+      let res = await api.obligation({
+        orderId: this.$route.query.orderId
+      })
+      console.log(res);
+      this.order = res.data;
+        
+    }
+  },
+  mounted() {
+    // let orderId = this.$route.query.orderId;
+    this.getOrderDeatil();
+  }
 };
 </script>
 <style lang="sass" scoped>

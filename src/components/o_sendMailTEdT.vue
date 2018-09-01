@@ -5,11 +5,11 @@
       <i class="h-img"></i>
       <span>等待卖家收货</span>
     </div>
-    <div class="diz">
+    <div class="diz" v-if="details.orderAddress">
       <i class="dz-img"></i>
-      <span class="dz-name">收货人：朱先森</span>
-      <span class="dz-phone">15632168160</span>
-      <p class="dz-dz">收货地址：广州市越秀区 西城都荟三层3012</p>
+      <span class="dz-name">收货人：{{details.orderAddress.name}}</span>
+      <span class="dz-phone">{{details.orderAddress.mobile}}</span>
+      <p class="dz-dz">收货地址：{{details.orderAddress.value+details.orderAddress.address}}</p>
     </div>
     <p class="title">菲斯的小店</p>
     <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
@@ -55,7 +55,7 @@
       </div>
     </div>
     <!--<div style="height: 100px"></div>-->
-    <div class="foot">
+    <div class="foot" v-if="details.isHasChildren == 0">
       <span class="pay" @click="toOpen('visible2')">确认收货</span>
       <!--<span class="b-wl">查看物流</span>-->
       <span class="b-sh" @click="toOpen('visible1')">退货</span>
@@ -78,7 +78,7 @@ export default {
     return {
       visible1: false,
       visible2: false,
-      details: {}
+      details:{orderAddress:{}}
     }
   },
   methods: {
