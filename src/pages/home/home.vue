@@ -1,7 +1,8 @@
 <template>
   <div class="home">
-    <div class="head" @click="toRoute">
-      <img class="bg" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+    <div class="head">
+      <img v-if="coverImg" :src="coverImg" alt="">
+      <img v-else class="bg" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <img class="tx" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
       <p class="text">遇见不一样的自己</p>
     </div>
@@ -10,19 +11,18 @@
         <p class="search-icon">
           <i class="search"></i>
         </p>
-        <p class="input-box" @click="toRoute('shopMgr/search')">请搜索商品</p>
+        <p class="input-box" @click="toSearch()">请搜索商品</p>
       </div>
     </div>
     <div class="coupon-box">
-      <swiper :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval" :duration="duration">
-        <block v-for="(item,index) in yhq" :key="index">
+      <swiper class="swiper" :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval" :duration="duration">
+        <block v-for="(item,index) in coupon" :key="index">
           <swiper-item class="coupon-img">
             <div class="yhqk">
-              <p class="money">￥
-                <span class="money1">{{item.price}}</span>
-              </p>
+              <p class="money">￥<span class="money1">{{item.price}}</span></p>
               <p class="whole">全程满 <br/>
-                <span class="whole1">{{item.limitCount}}</span>使用</p>
+                <span class="whole1">{{item.limitCount}}</span>使用
+              </p>
               <span class="btn" @click="btn(item.id)">立即领取></span>
             </div>
           </swiper-item>
@@ -33,7 +33,7 @@
       <div class="list">
         <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">
           <img class="img" :src="item.img">
-          <p>{{item.text}}</p>
+          <p class="text">{{item.text}}</p>
         </span>
       </div>
     </div>
@@ -73,18 +73,18 @@
   </div>
 </template>
 <script>
-import wx from "wx";
+import wx from 'wx';
 // import API from '@/api/httpShui'
-import API from "@/api/httpJchan";
-import mixin from "@/mixin";
-import colligate from "@/components/h_colligate";
-import Upnew from "@/components/h_Upnew";
-import selling from "@/components/h_selling";
-import collocation from "@/components/h_collocation";
-import Collage from "@/components/h_Collage";
-import discount from "@/components/h_discount";
-import screen from "@/components/h_screen";
-import footers from "@/commond/footer";
+import API from '@/api/httpJchan'
+import mixin from '@/mixin'
+import colligate from '@/components/h_colligate'
+import Upnew from '@/components/h_Upnew'
+import selling from '@/components/h_selling'
+import collocation from '@/components/h_collocation'
+import Collage from '@/components/h_Collage'
+import discount from '@/components/h_discount'
+import screen from '@/components/h_screen'
+import footers from '@/commond/footer'
 export default {
   mixins: [mixin],
   components: {
@@ -99,7 +99,7 @@ export default {
   },
   data() {
     return {
-      nav: 1,
+      coverImg: '',
       indicatorDots: false,
       autoplay: false,
       interval: 5000,
@@ -108,65 +108,57 @@ export default {
       navData: [
         {
           id: 1,
-          text: "综合",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '综合',
+          img: require('../../assets/img/home/zonghe.png')
         },
         {
           id: 2,
-          text: "新品上新",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '新品上新',
+          img: require('../../assets/img/home/shangxin.png')
         },
         {
           id: 3,
-          text: "爆款精选",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '爆款精选',
+          img: require('../../assets/img/home/baokuan.png')
         },
         {
           id: 4,
-          text: "搭配专区",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '搭配专区',
+          img: require('../../assets/img/home/dapei.png')
         },
         {
           id: 5,
-          text: "拼团优惠",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '拼团优惠',
+          img: require('../../assets/img/home/pintuan.png')
         },
         {
           id: 6,
-          text: "特价折扣",
-          img:
-            "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
+          text: '特价折扣',
+          img: require('../../assets/img/home/tejia.png')
         }
       ],
-      state: 1,
-      pageSize: 5,
-      pageNumber: 1,
-      Sx: [],
-      Bk: [],
-      Zk: [],
-      Pt: [],
-      yhq: [],
+      coupon: [],
       selectMGP: []
     };
   },
   methods: {
-    toRoute() {
-      this.$router.push("/pages/home/details/detailsCg");
+    toSearch () {
+      this.$router.push('/pages/search/search')
     },
     handleNav(tag) {
       this.tag = tag;
     },
     async btn(id) {
-      const getCoupon = await API.getCoupon({ couponId: id });
+      const getCoupon = await API.getCoupon({ couponId: id })
       console.log(getCoupon);
     }
   },
   async mounted () {
+    // 首页封面图
+    const cover = await API.getImg({type: 5})
+    if (cover.code === 1) {
+      this.coverImg = cover.data[0].image
+    }
     const shopInfo = await API.getShopInfo()
     if (shopInfo.code === 1) {
       wx.setStorage({
@@ -174,16 +166,8 @@ export default {
         data: shopInfo.data.name
       })
     }
-    const pageByCreate = await API.pageByCreate({ state: 2 });
-    this.yhq = pageByCreate.data.list;
-    // console.log(this.yhq);
-    const selectMGP = await API.selectMGP({});
-    // console.log(selectMGP);
-    // this.selectMGP = selectMGP.data.list;
-    // this.goodsList(1)
-    // let bk = this.goodsList(2)
-    // let zk = this.goodsList(3)
-    // let pt = this.goodsList(4)
+    const pageByCreate = await API.pageByCreate()
+    this.coupon = pageByCreate.data.list;
   }
 };
 </script>
@@ -191,12 +175,10 @@ export default {
 @import '~@/assets/css/mixin'
 .head
   position: relative
-  top: 0px
-  left: 0px
+  width: 100%
+  height: 900px
   .bg
-    position: absolute
-    top: 0px
-    left: 0px
+    display: block
     width: 100%
     height: 900px
   .tx
@@ -208,24 +190,22 @@ export default {
     border-radius: 50px
   .text
     display: inline-block
+    box-sizing: border-box
+    height: 60px
+    line-height: 60px
+    padding: 0 22px
     background: #fff
     text-align: center
-    line-height: 57px
     position: absolute
-    top: 752px
-    left: 155px
-    width: 265px
-    height: 57px
+    top: 750px
+    left: 154px
     border-radius: 8px
     font-size: 28px
     color: #000
-
 .search-box
-  position: absolute
   padding: 30px 0
   background: #fff
   width: 100%
-  top: 900px
   .input
     display: flex
     padding: 0px 35px
@@ -245,61 +225,66 @@ export default {
       border: none
       color: #999999
 .coupon-box
-  height: 170px
   width: 100%
-  position: absolute
-  top: 1016px
+  height: 126px
+  padding-bottom: 30px 
   overflow: hidden
   background: #fff
-  .coupon-img
-    width: 210px!important
+  .swiper
     height: 126px
-    .yhqk
-      +bg-img('home/yhq.png')
-      width: 210px!important
+    .coupon-img
+      width: 210px !important
       height: 126px
-      color: #fff
-      margin: 0 10px
-      position: relative
-      .money
-        position: absolute
-        top: 5px
-        left: 18px
-        .money1
-          font-size: 45px
-      .whole
-        position: absolute
-        width: 100px
-        height: 55px
-        font-size: 20px
-        left: 90px
-        top: 10px
-        text-align: center
-      .btn
-        position: absolute
-        font-size: 20px
-        width: 150px
-        height: 35px
-        display: inline-block
-        color: #ff7272
-        background: #fff
-        border-radius: 10px
-        text-align: center
-        line-height: 35px
-        top: 80px
-        left: 35px
+      .yhqk
+        box-sizing: border-box
+        +bg-img('home/yhq.png')
+        width: 210px !important
+        height: 126px
+        color: #fff
+        margin: 0 10px
+        padding-top: 5px
+        position: relative
+        .money
+          display: inline-block
+          width: 90px
+          // position: absolute
+          // top: 0
+          // left: 15px
+          padding-left: 10px
+          font-size: 24px
+          text-align: center
+          .money1
+            font-size: 48px
+        .whole
+          display: inline-block
+          position: absolute
+          width: 110px
+          font-size: 20px
+          left: 90px
+          text-align: center
+        .btn
+          position: absolute
+          font-size: 20px
+          width: 150px
+          height: 35px
+          display: inline-block
+          color: #ff7272
+          background: #fff
+          border-radius: 10px
+          text-align: center
+          line-height: 35px
+          top: 80px
+          left: 35px
 .active
   color: #F67C2F
 .nav
-  position: relative
-  height: 200px
-  top: 1210px
+  width: 100%
+  padding: 30px 0
   font-size: 26px
   color: #999
   overflow: hidden
   text-align: center
   background: #f5f5f5
-  width: 100%
   .list
     font-size: 26px
     color: #000
@@ -315,10 +300,11 @@ export default {
       .img
         width: 90px
         height: 90px
+      .text
+        font-size: 26px
 .content
   position: relative
   height: 100%
-  top: 1170px
   background: #fff
 </style>
 

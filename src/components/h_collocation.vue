@@ -76,7 +76,6 @@ export default {
   async mounted() {
     const selectMGP = await API.selectMGP({});
     this.selectMGP = selectMGP.data.list;
-    // console.log(selectMGP);
   }
 };
 </script>

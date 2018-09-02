@@ -30,6 +30,8 @@ class API {
   selectMyLike = params => http.post('api/like/goods/selectMyLike', params)
   // 申请售后
   doubleBack = params => http.post('api/order/doubleBack', params)
+  // 获取首页封面
+  getImg = params => http.post('api/img/getImg', params)
   // 首页红包
   pageByCreate = params => http.post('api/coupon/pageByCreate', params)
   getCoupon = params => http.post('api/coupon/getCoupon', params)

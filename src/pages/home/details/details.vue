@@ -204,7 +204,6 @@ export default {
       let price = that.goodsInfo.sellPrice
       let totalPrice = 0
       for (let i = 0; i < that.skuAttr.length; i++) {
-
         for (let j = 0; j < that.skuAttr[i].sizeArray.length; j++) {
           let obj = {}
           if (that.skuAttr[i].sizeArray[j].sizeNum === 0) {
@@ -264,7 +263,7 @@ export default {
           success: function (res) {
             console.log(res)
             if (res.data.code === 1) {
-              that.$router.push({path: '/pages/shopping/shopping'})
+              // that.$router.push({path: '/pages/shopping/shopping'})
             }
           }
         })

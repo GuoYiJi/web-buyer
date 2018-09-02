@@ -57,7 +57,7 @@ export default {
         pageSize: 5,
         pageNumber: page
       })
-      // console.log(data)
+      console.log('每日上新', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)

@@ -8,46 +8,15 @@
     </div>
     <div class="content">
         <orderItem v-for="(item,idx) in orderList" :key="idx" :item="item" @refreshOrder="refreshOrder" :shopName="shopName"></orderItem>
-      <!-- <div v-if="tag == '1'">
-        <obligation />
-        <send />
-        <receiving />
-        <stocks />
-        <orderMgr />
-      </div>
-      <div v-if="tag == '2'">
-        <obligation />
-      </div>
-      <div v-if="tag == '3'">
-        <send />
-      </div>
-      <div v-if="tag == '4'">
-        <receiving />
-      </div>
-      <div v-if="tag == '5'">
-        <stocks />
-      </div> -->
-    
     </div>
   </div>
 </template>
 <script>
-// import wx from 'wx'
-// import orderMgr from '@/components/o_orderMgr'
-import obligation from '@/components/o_obligation'
-import send from '@/components/o_send'
-import receiving from '@/components/o_receiving'
-import stocks from '@/components/o_stocks'
+import wx from 'wx'
 import orderItem from '@/components/o_orderItem'
 import API from '@/api/httpShui'
-
 export default {
   components: {
-    // orderMgr,
-    obligation,
-    send,
-    receiving,
-    stocks,
     orderItem
   },
   data () {
