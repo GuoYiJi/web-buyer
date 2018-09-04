@@ -19,7 +19,7 @@
         <i class="gwc" @click="clickItem(item)"></i>
       </div>
     </div>
-    <div class="More">
+    <div class="More" v-if="!lastPage">
       <span class="More_text" @click="getMore()">查看更多</span>
       <i class="img"></i>
     </div>
@@ -32,20 +32,10 @@ export default {
   components: {},
   data () {
     return {
-      // discountLest: [
-      //   {
-      //     img:
-      //       'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-      //     title: '标题标题标题标题标题…',
-      //     xh: '现货',
-      //     xl: '123',
-      //     money: 55,
-      //     money_1: 500
-      //   }
-      // ],
       List: [],
       page: 1,
-      totalPage: 0
+      totalPage: 0,
+      lastPage: ''
     }
   },
   methods: {
@@ -56,7 +46,8 @@ export default {
         pageSize: 5,
         pageNumber: page
       })
-      // console.log(data)
+      this.lastPage = data.data.lastPage
+      // console.log('特价折扣', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)
@@ -170,7 +161,7 @@ export default {
     border-radius: 4px
     display: flex
     border: 1px solid #999
-    margin: 26px 0 0 65px
+    margin: 0 auto
     .More_text
       padding-left: 240px
       padding-top: 8px

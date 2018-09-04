@@ -21,7 +21,7 @@
         </div>
       </div>
     </div>
-    <div class="More">
+    <div class="More" v-if="!lastPage">
       <span class="More_text" @click="getMore()">查看更多</span>
       <i class="img"></i>
     </div>
@@ -34,19 +34,10 @@ export default {
   components: {},
   data () {
     return {
-      // upnewList: [
-      //   {
-      //     title: '标题标题标题标题标题标题标题标标题标题',
-      //     img:
-      //       'http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg',
-      //     Goods: '现货',
-      //     volume: '123',
-      //     money: '55'
-      //   }
-      // ],
       List: [],
       page: 1,
-      totalPage: 0
+      totalPage: 0,
+      lastPage: ''
     }
   },
   methods: {
@@ -57,7 +48,8 @@ export default {
         pageSize: 5,
         pageNumber: page
       })
-      console.log('每日上新', data)
+      this.lastPage = data.data.lastPage
+      // console.log('每日上新', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)
@@ -114,16 +106,16 @@ export default {
       position: absolute
       width: 98px
       height: 4px
-      background: #999;
-      top: 95px;
-      left: 18%;
+      background: #999
+      top: 95px
+      left: 18%
     .xian_1
       position: absolute
       width: 98px
       height: 4px
-      background: #999;
-      top: 95px;
-      left: 66%;
+      background: #999
+      top: 95px
+      left: 66%
   .content
     margin-top: 20px
     .kuang
@@ -148,7 +140,7 @@ export default {
           font-size: 30px
           color: #000000
           +moreLine(2)
-          margin-bottom: 33px;
+          margin-bottom: 33px
         .money
           color: #FF0000
           font-size: 30px
@@ -163,16 +155,15 @@ export default {
           line-height: 60px
           border-radius: 8px
           left: 310px
-          position: absolute;
-          top: 197px;
+          position: absolute
+          top: 197px
   .More
     width: 600px
     height: 70px
     border-radius: 4px
     display: flex
     border: 1px solid #999
-    margin: 26px 0 0 65px
-    // padding: 29px 22px
+    margin: 0 auto
     .More_text
       padding-left: 240px
       padding-top: 8px
@@ -182,7 +173,4 @@ export default {
       height: 18px
       margin-top: 25px
       margin-left: 20px
-
-
-
 </style>

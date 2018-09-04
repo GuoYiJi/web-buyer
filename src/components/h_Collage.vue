@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div class="More">
+    <div class="More" v-if="!lastPage">
       <span class="More_text" @click="getMore()">查看更多</span>
       <i class="img"></i>
     </div>
@@ -39,7 +39,8 @@ export default {
     return {
       List: [],
       page: 1,
-      totalPage: 0
+      totalPage: 0,
+      lastPage: ''
     }
   },
   methods: {
@@ -49,6 +50,7 @@ export default {
         pageSize: 5,
         pageNumber: page
       })
+      this.lastPage = data.data.lastPage
       // console.log('拼团商品', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
@@ -175,7 +177,7 @@ export default {
     border-radius: 4px
     display: flex
     border: 1px solid #999
-    margin: 26px 0 0 65px
+    margin: 0 auto
     .More_text
       padding-left: 240px
       padding-top: 8px
