@@ -67,6 +67,13 @@
         <discount/>
       </div>
     </div>
+    <div class="toTop">
+      <div class="top" @click="toTop()">
+        <i class="top_img"></i>
+        <p class="top_text">顶部</p>
+      </div>
+    </div>
+    
     <div class="footer">
       <footers :tag="1" />
     </div>
@@ -142,6 +149,12 @@ export default {
     };
   },
   methods: {
+    // 回到顶部
+    toTop () {
+      console.log(document)
+      document.body.scrollTop = 0
+      document.documentElement.scrollTop = 0
+    },
     toSearch () {
       this.$router.push('/pages/search/search')
     },
@@ -173,138 +186,164 @@ export default {
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
-.head
+.home
   position: relative
-  width: 100%
-  height: 900px
-  .bg
-    display: block
+  .toTop
+    position: fixed
+    bottom: 120px
+    right: 30px
+    width: 96px
+    heitght: 96px
+    text-align: center
+    font-size: 22px
+    color: #666
+    z-index: 9999
+    .top
+      display: inline-block
+      background: rgba(234,234,234,1)
+      border-radius: 60px
+      width: 96px
+      height: 76px
+      overflow: hidden
+      margin-top: 20px
+      padding: 10px 0
+      .top_img
+        +bg-img('home/xqtb.png')
+        width: 38px
+        height: 40px
+        margin: 0 auto
+  .head
+    position: relative
     width: 100%
     height: 900px
-  .tx
-    position: absolute
-    top: 720px
-    left: 24px
-    width: 120px
-    height: 120px
-    border-radius: 50px
-  .text
-    display: inline-block
-    box-sizing: border-box
-    height: 60px
-    line-height: 60px
-    padding: 0 22px
-    background: #fff
-    text-align: center
-    position: absolute
-    top: 750px
-    left: 154px
-    border-radius: 8px
-    font-size: 28px
-    color: #000
-.search-box
-  padding: 30px 0
-  background: #fff
-  width: 100%
-  .input
-    display: flex
-    padding: 0px 35px
-    .search
-      +bg-img('home/search.png')
-      +icon(38px)
-      margin-top: 7px
-    .search-icon
-      position: absolute
-      left: 60px
-    .input-box
-      background-color: #f5f5f5
-      border-radius: 4px
+    .bg
+      display: block
       width: 100%
-      text-align: left
-      padding: 8px 85px
-      border: none
-      color: #999999
-.coupon-box
-  width: 100%
-  height: 126px
-  padding-bottom: 30px 
-  overflow: hidden
-  background: #fff
-  .swiper
+      height: 900px
+    .tx
+      position: absolute
+      top: 720px
+      left: 24px
+      width: 120px
+      height: 120px
+      border-radius: 50px
+    .text
+      display: inline-block
+      box-sizing: border-box
+      height: 60px
+      line-height: 60px
+      padding: 0 22px
+      background: #fff
+      text-align: center
+      position: absolute
+      top: 750px
+      left: 154px
+      border-radius: 8px
+      font-size: 28px
+      color: #000
+  .search-box
+    padding: 30px 0
+    background: #fff
+    width: 100%
+    .input
+      display: flex
+      padding: 0px 35px
+      .search
+        +bg-img('home/search.png')
+        +icon(38px)
+        margin-top: 7px
+      .search-icon
+        position: absolute
+        left: 60px
+      .input-box
+        background-color: #f5f5f5
+        border-radius: 4px
+        width: 100%
+        text-align: left
+        padding: 8px 85px
+        border: none
+        color: #999999
+  .coupon-box
+    width: 100%
     height: 126px
-    .coupon-img
-      width: 210px !important
+    padding-bottom: 30px 
+    overflow: hidden
+    background: #fff
+    .swiper
       height: 126px
-      .yhqk
-        box-sizing: border-box
-        +bg-img('home/yhq.png')
+      .coupon-img
         width: 210px !important
         height: 126px
-        color: #fff
-        margin: 0 10px
-        padding-top: 5px
-        position: relative
-        .money
-          display: inline-block
-          width: 90px
-          // position: absolute
-          // top: 0
-          // left: 15px
-          padding-left: 10px
-          font-size: 24px
-          text-align: center
-          .money1
-            font-size: 48px
-        .whole
-          display: inline-block
-          position: absolute
-          width: 110px
-          font-size: 20px
-          left: 90px
-          text-align: center
-        .btn
-          position: absolute
-          font-size: 20px
-          width: 150px
-          height: 35px
-          display: inline-block
-          color: #ff7272
-          background: #fff
-          border-radius: 10px
-          text-align: center
-          line-height: 35px
-          top: 80px
-          left: 35px
-.active
-  color: #F67C2F
-.nav
-  width: 100%
-  padding: 30px 0
-  font-size: 26px
-  color: #999
-  overflow: hidden
-  text-align: center
-  background: #f5f5f5
-  .list
-    font-size: 26px
-    color: #000
-    background: #f5f5f5
-    overflow-y: hidden
-    overflow-x: auto
-    position: relative
-    display: flex
+        .yhqk
+          box-sizing: border-box
+          +bg-img('home/yhq.png')
+          width: 210px !important
+          height: 126px
+          color: #fff
+          margin: 0 10px
+          padding-top: 5px
+          position: relative
+          .money
+            display: inline-block
+            width: 90px
+            // position: absolute
+            // top: 0
+            // left: 15px
+            padding-left: 10px
+            font-size: 24px
+            text-align: center
+            .money1
+              font-size: 48px
+          .whole
+            display: inline-block
+            position: absolute
+            width: 110px
+            font-size: 20px
+            left: 90px
+            text-align: center
+          .btn
+            position: absolute
+            font-size: 20px
+            width: 150px
+            height: 35px
+            display: inline-block
+            color: #ff7272
+            background: #fff
+            border-radius: 10px
+            text-align: center
+            line-height: 35px
+            top: 80px
+            left: 35px
+  .active
+    color: #F67C2F
+  .nav
     width: 100%
-    .item
-      flex: 1
-      box-sizing: border-box
-      .img
-        width: 90px
-        height: 90px
-      .text
-        font-size: 26px
-.content
-  position: relative
-  height: 100%
-  background: #fff
+    padding: 30px 0
+    font-size: 26px
+    color: #999
+    overflow: hidden
+    text-align: center
+    background: #f5f5f5
+    .list
+      font-size: 26px
+      color: #000
+      background: #f5f5f5
+      overflow-y: hidden
+      overflow-x: auto
+      position: relative
+      display: flex
+      width: 100%
+      .item
+        flex: 1
+        box-sizing: border-box
+        .img
+          width: 90px
+          height: 90px
+        .text
+          font-size: 26px
+  .content
+    position: relative
+    height: 100%
+    background: #fff
 </style>
 

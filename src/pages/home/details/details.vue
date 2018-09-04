@@ -70,20 +70,20 @@
     </div>
     <!-- 悬挂按钮 -->
     <div class="suspension" v-if="suspension == 1">
-      <div class="top">
+      <div class="top" @click="toTop()">
         <i class="top_img"></i>
         <p class="top_text">顶部</p>
       </div>
       <br/>
-      <div class="home">
+      <div class="home" @click="toRoute('/pages/home/home')">
         <i class="home_img"></i>
         <p class="home_text">首页</p>
       </div>
       <br/>
-      <div class="shopping">
+      <div class="shopping" @click="toRoute('/pages/shopping/shopping')">
         <i class="sp_img"></i>
         <p class="sp_text">购物车</p>
-        <i class="sp_dian">12</i>
+        <!-- <i class="sp_dian">12</i> -->
       </div>
     </div>
     <!-- 弹窗 -->
@@ -123,6 +123,10 @@
       </div>
       <span class="btn" @click="confirmBth()">确定</span>
     </div>
+    <!-- 提示语 -->
+    <div class="wellMsg" v-show="wellMsgShow">
+      {{msg}}
+    </div>
   </div>
 </template>
 <script>
@@ -139,10 +143,12 @@ export default {
       autoplay: true,
       interval: 5000,
       duration: 1000,
-      suspension: 0,
+      suspension: 1,
       isLike: 0,
       visible1: false,
       popupShow: false,
+      msg: '',
+      wellMsgShow: false,
       buyType: '', // 加入购物车or立即购买
       goodsInfo: {}, // 商品信息
       tags: [], // 标签
@@ -153,14 +159,25 @@ export default {
       skuAttr: [] // 处理可用的规格数组
     }
   },
-  onPageScroll (e) {
-    if (e.scrollTop > 600) {
-      this.suspension = 1
-    } else if (e.scrollTop < 600) {
-      this.suspension = 0
-    }
-  },
+  // onPageScroll (e) {
+  //   console.log(e.scrollTop)
+  //   if (e.scrollTop > 600) {
+  //     this.suspension = 1
+  //   } else if (e.scrollTop < 600) {
+  //     this.suspension = 0
+  //   }
+  // },
   methods: {
+    // 回到顶部
+    toTop () {
+      console.log(document)
+      document.body.scrollTop = 0
+      document.documentElement.scrollTop = 0
+    },
+    // 跳转
+    toRoute (path) {
+      this.$router.push({path: path})
+    },
     // 打开分享
     toOpen (name) {
       this[name] = true
@@ -263,7 +280,7 @@ export default {
           success: function (res) {
             console.log(res)
             if (res.data.code === 1) {
-              // that.$router.push({path: '/pages/shopping/shopping'})
+              that.mySetTimeout('加入购物车成功')
             }
           }
         })
@@ -307,6 +324,16 @@ export default {
       } else {
         this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum++
       }
+    },
+    // 定时器弹窗
+    mySetTimeout (msg) {
+      let that = this
+      that.wellMsgShow = true
+      that.msg = msg
+      setTimeout(function () {
+        that.wellMsgShow = false
+        that.msg = ''
+      }, 1000)
     }
   },
   async mounted () {
@@ -559,54 +586,56 @@ export default {
       line-height: 98px
   .suspension
     position: fixed
+    width: 96px
     right: 30px
+    text-align: center 
+    font-size: 22px
+    color: #666
     bottom: 500px
+    z-index: 9999
     .top
       display: inline-block
-      background: #fff
+      background: rgba(234,234,234,1)
       border-radius: 60px
-      width: 121px
-      height: 121px
+      width: 96px
+      height: 76px
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .top_img
         +bg-img('home/xqtb.png')
-        width: 63px
-        height: 65px
-        margin: 7px auto 0
-      .top_text
-        padding-left: 31px
+        width: 38px
+        height: 40px
+        margin: 0 auto
     .home
       display: inline-block
-      background: #fff
+      background: rgba(234,234,234,1)
       border-radius: 60px
-      width: 121px
-      height: 121px
+      width: 96px
+      height: 76px
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .home_img
         +bg-img('home/xqsy.png')
-        width: 70px
-        height: 65px
-        margin: 7px auto 0
-      .home_text
-        padding-left: 31px
+        width: 45px
+        height: 40px
+        margin: 0 auto
     .shopping
       display: inline-block
-      background: #fff
+      background: rgba(234,234,234,1)
       border-radius: 60px
-      width: 121px
-      height: 121px
+      width: 96px
+      height: 76px
       position: relative
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .sp_img
         +bg-img('home/xqgwc.png')
-        width: 69px
-        height: 65px
-        margin: 7px auto 0
-      .sp_text
-        padding-left: 19px
+        width: 45px
+        height: 40px
+        margin: 0 auto
       .sp_dian
         position: absolute
         top: 10px
@@ -752,7 +781,19 @@ export default {
       color: #fff
       border-radius: 8px
       font-size: 32px
-
-
-
+  .wellMsg
+    position: absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
+    margin: auto
+    width: 305px
+    height: 114px
+    line-height: 114px
+    border-radius: 10px
+    background: rgba(0,0,0,.8)
+    color: #ffffff
+    font-size: 30px
+    text-align: center
 </style>
