@@ -227,7 +227,7 @@ export default {
 .coupon-box
   width: 100%
   height: 126px
-  padding-bottom: 30px 
+  padding-bottom: 30px
   overflow: hidden
   background: #fff
   .swiper

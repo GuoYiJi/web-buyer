@@ -1,59 +1,42 @@
 <template>
   <div class="nav">
     <div class="content">
-      <scroll-view scroll-y>
-        <div class="item_b">
-          <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-            <div class="g_box clearfix" :style="{width: 242*4 + 384 + 'rpx'}">
-              <div class="g_left">
-                <div class="left_box" v-for="(item, index) in selectMGP" :key="index">
-                  <div class="title">
-                    <p>
-                      <i class="i_new"></i>{{item.title}}系列</p>
-                  </div>
-                  <div class="card_box shop-card" v-for="(ite, inde) in item.matchGoods" :key="inde" v-if="inde == 0">
-                    <div class="img_box">
-                      <p class="img_1"><img v-if="inde == 0" :src="ite.image"></p>
-                    </div>
-                    <div class="desc" v-if="inde == 0">
-                      <p class="d_text">{{ite.name}}</p>
-                      <p class="d_time">货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</p>
-                    </div>
-                    <p class="price">
-                      <span>售价:￥{{ite.sellPrice}}</span>
-                      <i class="sell"></i>
-                    </p>
-                  </div>
-                </div>
+      <div v-for="(item, index) in selectMGP" :key="index" class="xK">
+        <scroll-view scroll-x="true" style="width: 100%">
+          <div class="scroll-x" :style="{width: 445 + 290 * widthArr[index]+ 'rpx'}">
+            <div class="left-box">
+              <div class="title">
+                <i class="icon"></i>
+                <span>{{item.title || '未设置标题'}}</span>
               </div>
-              <div class="g_right">
-                <div class="scard_box" :style="{width: 242*4 + 'rpx'}">
-                  <div class="scard_box" v-for="(item, i) in selectMGP" :key="i">
-                    <div class="p_card" v-for="(ite, j) in item.matchGoods" :key="j">
-                      <div class="g_boxs">
-                        <div class="card_boxs shop-cards">
-                          <div class="img_box">
-                            <p class="img_1"><img :src="ite.images"></p>
-                          </div>
-                          <div class="descs">
-                            <p class="d_texts">{{ite.name}}</p>
-                            <p class="d_times">货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</p>
-                          </div>
-                          <p class="price">
-                            <span>售价:￥{{ite.sellPrice}}</span>
-                            <span class="sell"></span>
-                          </p>
-                          <i class="cancel_shop" v-if="cancel"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="main-img">
+                <div class="border">
+                  <i class="shop-img" :style="{background: 'url(' + item.matchGoods[0].images + ')'}"></i>
                 </div>
+                <span class="title">{{item.matchGoods[0].name}}</span>
+                <span class="desc"> 货期:{{item.matchGoods[0].delivery}}丨销量:{{item.matchGoods[0].sellCount}}</span>
+                <span class="price">
+                  <strong>售价:￥{{item.matchGoods[0].sellPrice}}</strong>
+                </span>
+                <i class="M-img" @click="Tiao(item.matchGoods[0])"></i>
               </div>
             </div>
-          </scroll-view>
-        </div>
-      </scroll-view>
+            <div class="right-box" :style="{width: 290 * widthArr[index] + 50 +'rpx'}">
+              <div class="item-img" v-for="(ite, inx) in item.matchGoods" :key="inx" v-if="inx > 0">
+                <div class="border">
+                  <i class="shop-img" :style="{background: 'url(' + ite.images + ')'}"></i>
+                </div>
+                <span class="title">{{ite.name}}</span>
+                <span class="desc"> 货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</span>
+                <span class="price">
+                  <strong>售价:￥{{ite.sellPrice}}</strong>
+                </span>
+                <i class="I-img" @click="TiaoZhuan(ite)"></i>
+              </div>
+            </div>
+          </div>
+        </scroll-view>
+      </div>
     </div>
     <div class="More">
       <span class="More_text">查看更多</span>
@@ -72,15 +55,46 @@ export default {
       selectMGP: []
     };
   },
-  methods: {},
+  computed: {
+    widthArr() {
+      let arr = [];
+      this.selectMGP.forEach((item, index) => {
+        arr[index] = Math.round((item.matchGoods.length - 1) / 2);
+      });
+      return arr;
+    }
+  },
+  methods: {
+    Tiao(obj) {
+      console.log(obj);
+      let objStr = JSON.stringify(obj);
+      this.$router.push({
+        path: "/pages/home/details/details",
+        query: { obj: objStr }
+      });
+    },
+    TiaoZhuan(obj) {
+      console.log(obj);
+      let objStr = JSON.stringify(obj);
+      this.$router.push({
+        path: "/pages/home/details/details",
+        query: { obj: objStr }
+      });
+    }
+  },
   async mounted() {
     const selectMGP = await API.selectMGP({});
     this.selectMGP = selectMGP.data.list;
+    console.log(selectMGP, 123134132);
   }
 };
 </script>
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
+
+.xK
+  border-bottom: 10rpx solid #999
+
 .nav
   padding-bottom: 25px
   border-bottom: 1px solid #999
@@ -90,8 +104,8 @@ export default {
     position: relative
     top: 0
     left: 0
-    height: 100px
-    margin-bottom: 90px
+    // height: 100px
+    // margin-bottom: 90px
     .title_1
       position: absolute
       font-size: 32px
@@ -118,168 +132,119 @@ export default {
       top: 95px
       left: 66%
   .content
-    .item_b
-      +border(10px,top,#F5F5F5)
-    .item_b:first-child
-      border: none
-    .left_box
-      position: relative
-      top: 0
-      left: 20px
-      width: 344px
-    .scard_box
+    .scroll-x
       display: flex
-      flex-wrap: wrap
-      .p_card
-        height: 444px
-        padding-right: 26px
-        padding-bottom: 20px
-        width: 216px
-        .g_boxs
-          height: 422px
-          width: 216px
-        .card_boxs
-          padding-bottom: 4px
-          .img_box
-            +border(2px,all, #ccc)
-            padding: 16px 0px
-            .img_1
-              height: 300px
-              width: 212px
-        .d_name
-          color: #e3e3e3
-          font-size: 14px
-        .shop-cards
+      width: 100%
+      padding: 40px 0
+      background-color: #ffffff
+      .left-box
+        width: 395px
+        div.title
+          width: 344px
+          height: 165px
+          margin: 0 25px
+          display: flex
+          align-items: center
+          justify-content: center
+          i.icon
+            display: inline-block
+            width: 34px
+            height: 31px
+            background: url("~@/assets/img/shopMgr/group_1.png") no-repeat center
+            background-size: 100% 100%
+            margin: auto 14px
+          span
+            color: #6EB1F5
+            font-size: 32px
+        .main-img
+          margin: 0 25px
+          width: 344px
+          overflow: hidden
+          display: flex
+          flex-wrap: wrap
           position: relative
-          img
-            width: 100%
-            border-radius: 4px
-        .descs
-          margin: 5px 0
-          font-size: 20px
-        .d_texts
-          color: #000
-          font-size: 24px
-          +singleFile
-        // .price
-        //   color: #FF0000
-        //   font-weight: bold
-        //   font-size: 24px
-        //   padding-top: 10px
-        //   height: 24px
-        //   line-height: 24px
-        //   +singleFile
-        //   text-align: left
-          // .sell
-          //   color: #333
-          //   font-size: 22px
-          //   font-weight: 500
-        .d_times
-          font-size: 20px
-          color: #999
-          +singleFile
-          text-align: left
-    .g_box
-      padding-top: 60px
-      background: #fff
-      .g_left
-        float: left
-        width: 384px
-        height: 900px
-        position: relative
-        .title
-          color: #6EB1F5
-          height: 205px
-          line-height: 205px
-          text-align: center
-          .i_new
-            +icon(34px)
-            +bg-img('home/d1.png')
-            margin-right: 14px
-        .title_1
-          color: #CF6E98
-          height: 205px
-          line-height: 205px
-          text-align: center
-          .i_new_1
-            +icon(34px)
-            +bg-img('home/d2.png')
-            margin-right: 14px
-        .title_2
-          height: 205px
-          line-height: 205px
-          text-align: center
-          color: #F5B76E
-          .i_new_2
-            +icon(34px)
-            +bg-img('home/d3.png')
-            margin-right: 14px
-        .title_3
-          height: 205px
-          line-height: 205px
-          text-align: center
-          color: #40C452
-          .i_new_3
-            +icon(34px)
-            +bg-img('home/d4.png')
-            margin-right: 14px
-        .title_4
-          height: 205px
-          line-height: 205px
-          text-align: center
-          color: #6E6EF5
-          .i_new_4
-            +icon(34px)
-            +bg-img('home/d5.png')
-            margin-right: 14px
-        .card_box
-          .img_box
-            +border(2px,all, #ccc)
+          .M-img
+            +bg-img('home/gwc.png')
+            width: 47px
+            height: 42px
+            position: absolute
+            bottom: 0px
+            right: 10px
+          .border
+            width: 344px
+            height: 458px
+            border: 2px solid #CCCCCC
             padding: 16px 30px
-            .img_1
-              height: 425px
-              width: 283px
-
-      .g_right
-        float: left
-    .d_name
-      color: #e3e3e3
-      font-size: 14px
-    .shop-card
-      position: relative
-      img
-        width: 100%
-        border-radius: 4px
-      .desc
-        overflow: hidden
-        margin: 5px 0
-        font-size: 25px
-        +desc
-        .d_text
-          +singleFile()
-          color: #000
-          font-size: 28px
-
-    .price
-      color: #FF0000
-      font-weight: bold
-      font-size: 28px
-      padding-top: 10px
-      height: 24px
-      line-height: 24px
-      position: relative
-      display: flex
-      .sell
-        +bg-img('home/gwc.png')
-        width: 47px
-        height: 42px
-        position: absolute
-        right: 20px
-        top: 0px
-    .d_time
-      font-size: 24px
-      color: #999
-      +singleFile
+            i.shop-img
+              display: inline-block
+              width: 100%
+              height: 100%
+              background-repeat: no-repeat
+              background-position: center
+              background-size: 100% 100%
+          span.title
+            width: 100%
+            font-size: 30px
+            padding-top: 18px
+            +singleFile
+          span.desc
+            width: 100%
+            color: #999999
+            font-size: 26px
+          span.price
+            width: 100%
+            font-size: 28px
+            color: #333333
+            +singleFile
+            strong
+              font-size: 30px
+              color: #FF0000
+      .right-box
+        background-color: #ffffff
+        display: flex
+        margin-left: 50px
+        flex-wrap: wrap
+        .item-img
+          display: flex
+          width: 270px
+          overflow: hidden
+          flex-wrap: wrap
+          margin: 0 10px 20px
+          position: relative
+          .I-img
+            +bg-img('home/gwc.png')
+            width: 47px
+            height: 42px
+            position: absolute
+            bottom: 0px
+            right: 10px
+          .border
+            width: 270px
+            height: 416px
+            border: 2px solid #CCCCCC
+            padding: 16px 0
+            i.shop-img
+              display: inline-block
+              width: 100%
+              height: 100%
+              background-repeat: no-repeat
+              background-position: center
+              background-size: 100% 100%
+          span.title
+            width: 100%
+            font-size: 26px
+            padding-top: 10px
+          span.desc
+            width: 100%
+            color: #999999
+            font-size: 22px
+          span.price
+            width: 100%
+            font-size: 22px
+            color: #333333
+            strong
+              font-size: 24px
+              color: #FF0000
 
   .More
     width: 600px
