@@ -170,9 +170,9 @@ export default {
   methods: {
     // 回到顶部
     toTop () {
-      console.log(document)
-      document.body.scrollTop = 0
-      document.documentElement.scrollTop = 0
+      wx.pageScrollTo({
+        scrollTop:0
+      })
     },
     // 跳转
     toRoute (path) {
@@ -617,7 +617,7 @@ export default {
       margin-top: 20px
       padding: 10px 0
       .home_img
-        +bg-img('home/xqsy.png')
+        +bg-img('home/homecheck.png')
         width: 45px
         height: 40px
         margin: 0 auto

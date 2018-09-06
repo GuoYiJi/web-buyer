@@ -729,7 +729,7 @@ export default {
       overflow: hidden
       margin-top: 20px
       .home_img
-        +bg-img('home/xqsy.png')
+        +bg-img('home/homecheck.png')
         width: 70px
         height: 65px
         margin: 7px auto 0

@@ -79,10 +79,10 @@ export default {
         margin-top: 4px
       // padding-bottom: 5px;/*no*/
       i
-        width: 44px
-        height: 44px
+        width: 46px
+        height: 46px
       .icon1
-        +bg-img('home/home.png')
+        +bg-img('home/homecheck.png')
         // width: 42px
         // height: 42px
       .icon2

@@ -151,9 +151,9 @@ export default {
   methods: {
     // 回到顶部
     toTop () {
-      console.log(document)
-      document.body.scrollTop = 0
-      document.documentElement.scrollTop = 0
+      wx.pageScrollTo({
+        scrollTop: 0
+      });
     },
     toSearch () {
       this.$router.push('/pages/search/search')

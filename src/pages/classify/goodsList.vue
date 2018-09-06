@@ -14,10 +14,10 @@
       <li class="sortItem" :class="{active : sortTabs==2, fx : sortStyle==2, fs : sortStyle ==3}" @click="sortFn(2,sortSales)">销量</li>
       <li class="sortItem" :class="{active : sortTabs==3, fx : sortStyle==4, fs : sortStyle ==5}" @click="sortFn(3,sortPrice)">价格</li>
       <li class="sortItem sx">筛选</li>
-      <li class="sortItem menu"></li>
+      <li class="sortItem menu" @click="showType = !showType"></li>
     </ul>
     <div class="goodsList clearfix">
-      <div class="item" v-for="(item,index) in goodsList" :key="index">
+      <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType">
         <div class="img">
           <img v-if="item.image" :src="item.image" alt="">
           <img v-else src="../../assets/img/classify/goods.png" alt="">
@@ -34,22 +34,24 @@
           </p>
         </div>
       </div>
-      <!--<div class="item">-->
-        <!--<div class="img">-->
-          <!--<img src="../../assets/img/classify/goods.png" alt="">-->
-        <!--</div>-->
-        <!--<div class="text">-->
-          <!--<p class="title">标题</p>-->
-          <!--<p class="intro clearfix">-->
-            <!--<span class="qh">期货：现货</span>-->
-            <!--<span class="xl">销量：200</span>-->
-          <!--</p>-->
-          <!--<p class="price-btn">-->
-            <!--<span class="price">批货价：￥55</span>-->
-            <!--<span class="btn">立即采购</span>-->
-          <!--</p>-->
-        <!--</div>-->
-      <!--</div>-->
+      <div class="line-item"  v-for="(item,index) in goodsList" :key="index" v-if="!showType">
+        <div class="img">
+          <img v-if="item.image" :src="item.image" alt="">
+          <img v-else src="../../assets/img/classify/goods.png" alt="">
+        </div>
+        <div class="text">
+          <p class="title">{{item.name}}</p>
+          <p class="qh">期货:{{item.delivery}}</p>
+          <p class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</p>
+          <p class="price-btn clearfix">
+            <span class="price">批货价:￥{{item.sellPrice}}</span>
+            <span class="btn" @click="clickItem(item)">立即采购</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="wellMsg" v-show="wellMsgShow">
+      {{msg}}
     </div>
   </div>
 </template>
@@ -59,8 +61,10 @@
   export default {
     data () {
       return {
-        isSearch: '',
+        showType: true,
         keyword: '',
+        wellMsgShow: false,
+        msg: '',
         goodsList: [],
         sortTabs: 0,
         sortTime: 0,
@@ -96,11 +100,7 @@
         if (ob === 5) {
           this.sortPrice = this.sortStyle = 4
         }
-        if (this.isSearch) {
-          this.setGoodsList('', this.state, ob, this.pageSize, this.pageNumber, this.keyword)
-        } else {
-          this.setGoodsList(this.$route.query.id, this.state, ob, this.pageSize, this.pageNumber, '')
-        }
+        this.setGoodsList(this.$route.query.id, this.state, ob, this.pageSize, this.pageNumber)
       },
       clickItem (obj) {
         let objStr = JSON.stringify(obj)
@@ -109,20 +109,19 @@
       // 搜索
       search () {
         if (this.keyword) {
-          this.isSearch = true
-          // console.log(this.keyword)
-          this.setGoodsList('', this.state, this.sortTime, this.pageSize, this.pageNumber, this.keyword)
+          this.$router.push({path: '/pages/search/search', query: {key: this.keyword}})
+        } else {
+          this.mySetTimeout('请输入关键词')
         }
       },
       // 设置商品列表
-      async setGoodsList (labelId, state, ob, pageSize, pageNumber, keyword) {
+      async setGoodsList (labelId, state, ob, pageSize, pageNumber) {
         const data = await API.getGoods({
           labelId: labelId,
           state: state,
           ob: ob,
           pageSize: pageSize,
           pageNumber: pageNumber,
-          keyword: keyword
         })
         if (data.code === 1) {
           // console.log('商品列表', data.data)
@@ -131,18 +130,23 @@
           this.pageNumber = data.data.pageNumber
           this.totalPage = data.data.totalPage
         }
+      },
+      // 定时器弹窗
+      mySetTimeout (msg) {
+        let that = this
+        that.wellMsgShow = true
+        that.msg = msg
+        setTimeout(function () {
+          that.wellMsgShow = false
+          that.msg = ''
+        }, 1000)
       }
     },
     async mounted () {
       this.sortTabs = 1
       if (this.$route.query.id) {
         this.isSearch = false
-        this.setGoodsList(this.$route.query.id, this.state, this.sortTime, this.pageSize, this.pageNumber, '')
-      }
-      if (this.$route.query.key) {
-        this.isSearch = true
-        this.keyword = this.$route.query.key
-        this.setGoodsList('', this.state, this.sortTime, this.pageSize, this.pageNumber, this.$route.query.key)
+        this.setGoodsList(this.$route.query.id, this.state, this.sortTime, this.pageSize, this.pageNumber)
       }
     }
   }
@@ -274,4 +278,65 @@
             text-align: center
     .item:nth-child(even)
       margin-right: 0
+    .line-item
+      height: 240px
+      padding-left: 260px
+      background: #fff
+      position: relative
+      margin-bottom: 15px
+      .img
+        width: 240px
+        height: 240px
+        position: absolute
+        top: 0
+        left: 0
+        img
+          width: 100%
+          height: 100%
+      .text
+        padding: 10px 10px 0 0
+        .title
+          height: 68px
+          line-height: 34px    
+          font-size: 30px
+          color: #000
+          margin-bottom: 30px
+          overflow : hidden
+          text-overflow: ellipsis
+          display: -webkit-box
+          -webkit-line-clamp: 2
+          -webkit-box-orient: vertical
+        .qh,.xl
+          font-size: 26px
+          color: #999
+          line-height: 35px
+        .price-btn
+          heigth: 45px
+          line-height: 45px
+          .price
+            font-size: 30px
+            color: #FF0000
+          .btn
+            float: right
+            padding: 5px 15px
+            text-align: center
+            font-size: 26px
+            color: #fff
+            background: #EE7527
+            border-radius: 10px  
+  .wellMsg
+    position: absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
+    margin: auto
+    width: 305px
+    height: 114px
+    line-height: 114px
+    border-radius: 10px
+    background: rgba(0,0,0,.8)
+    color: #ffffff
+    font-size: 30px
+    text-align: center    
 </style>
