@@ -729,7 +729,7 @@ export default {
       overflow: hidden
       margin-top: 20px
       .home_img
-        +bg-img('home/homecheck.png')
+        +bg-img('home/home3.png')
         width: 70px
         height: 65px
         margin: 7px auto 0
@@ -805,7 +805,6 @@ export default {
         right: 24px
     .kuang_2
       margin-top: 35px
-      height: 120px
       padding: 0 24px
       .k2_title
         font-size: 24px
@@ -854,23 +853,27 @@ export default {
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../../assets/img/shopping/minus.png') no-repeat
+          background: url('../../../assets/img/shopping/minus.png') no-repeat center
           background-size: 30px 40px
         .count
           display: inline-block
+          position: relative
+          top: -10px
           width: 70px
           height: 38px
+          margin: 0 10px
           text-align: center
           line-height: 38px
           border: 1px solid #ccc
-          margin: 0 10px
         .add
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../../assets/img/shopping/add.png') no-repeat
+          background: url('../../../assets/img/shopping/add.png') no-repeat center
           background-size: 30px 40px
     .kuang_4
       .k4_title

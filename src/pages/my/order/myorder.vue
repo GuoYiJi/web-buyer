@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     refreshOrder (tag) {
-      if(tag){
+      if (tag) {
         this.tag = tag;
       }
       this.getOrder(this.navData[this.tag-1].state);
@@ -72,7 +72,6 @@ export default {
     },
     // 获取订单
     async getOrder (state) {
-      // debugger
       let param = {
         isPing: 0,
         pageSize : 10
@@ -83,13 +82,29 @@ export default {
       const Myorder = await API.myOrder(param)
       console.log( Myorder)
       this.orderList = Myorder.data.list
-      // 更改规格显示
+      // 规格显示
       for (let i = 0; i < this.orderList.length; i++) {
         for (let j = 0; j < this.orderList[i].goodsList.length; j++) {
+          let sizeTextArray = []
           for (let g = 0; g < this.orderList[i].goodsList[j].skuList.length; g++) {
-            let skuCode = this.orderList[i].goodsList[j].skuList[g].skuCode
-            this.orderList[i].goodsList[j].skuList[g].skuCode = skuCode.replace(/,/g, ':')
+            let sku = this.orderList[i].goodsList[j].skuList[g]
+            let skuObj = {}
+            let attrVal = sku.skuCode.split(',')
+            skuObj.colorVal = attrVal[0]
+            skuObj.text =  attrVal[0] + ":" +attrVal[1] + "/" + sku.num + "件"
+            let ishasColor = false
+            for (let a = 0; a < sizeTextArray.length; a++) {
+               if (sizeTextArray[a].colorVal === attrVal[0]) {
+                  sizeTextArray[a].text += ";" +attrVal[1]  + "/" +  sku.num + "件"
+                  ishasColor = true
+                  break
+               }
+            }
+            if(!ishasColor){
+              sizeTextArray.push(skuObj)
+            }
           }
+          this.orderList[i].goodsList[j].sizeTextArray =  sizeTextArray
         }
       }
     }
@@ -97,7 +112,7 @@ export default {
   mounted () {
     let type = this.$route.query.tag
     // this.tag = type;
-    this.refreshOrder(type);
+    this.refreshOrder(type)
     let that = this
     wx.getStorage({
       key: 'shopName',

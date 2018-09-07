@@ -3,16 +3,14 @@
   <div class="home">
     <div class="kuang" v-for="(item, index) in list" :key="index">
       <div class="head">
-        <span class="h-title">菲斯的小店</span>
+        <span class="h-title">{{shopName}}</span>
         <span class="h-text">
-          {{item.refundType == 0 ? '退款' : item.refundType == 1 ? '退货' : item.refundType == 2 ? '换货' : ''}},
-          {{item.state == 0 ? '等待商家处理' : item.state == 1 ? '商家已同意' : item.state == 2 ? '商家已拒绝' : item.state == 3 ? '商家已同意' : item.state == 4 ? '商家已发货' : item.state == 5 ? '已撤销' : item.state == 6 ? '确认收货' : ''}}
+          {{state[item.refundType]}},
+          {{stateName[item.state]}}
         </span>
       </div>
-      <div class="nav">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+      <div class="nav" @click="goodsList(item.goodsList)">
+        <img v-if="i<3" class="n-img" v-for="(ite,i) in item.goodsList" :key="i" :src="ite.image" alt="">
         <i class="n-icon"></i>
       </div>
       <div class="below">
@@ -20,7 +18,7 @@
           <p class="t-left">共
             <span class="piece">{{item.goodsList.length}}</span>个款</p>
           <p class="t-left">
-            <span class="piece">{{item.num}}</span>件商品</p>
+            <span class="piece">{{item.num}}</span>{{item.countGoodsNum}}件商品</p>
           <!--<p class="t-freight">（含运费￥10.00）</p>-->
           <p v-if="item.refundType != 2" class="t-right">合计:
             <span class="money">￥{{item.price}}</span>
@@ -31,33 +29,6 @@
         </div>
       </div>
     </div>
-    <!--<div class="kuang">-->
-      <!--<div class="head">-->
-        <!--<span class="h-title">菲斯的小店</span>-->
-        <!--<span class="h-text">换货，已拒绝换货</span>-->
-      <!--</div>-->
-      <!--<div class="nav">-->
-        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
-        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
-        <!--<img class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
-        <!--<i class="n-icon"></i>-->
-      <!--</div>-->
-      <!--<div class="below">-->
-        <!--<div class="total">-->
-          <!--<p class="t-left">共-->
-            <!--<span class="piece">3</span>个款</p>-->
-          <!--<p class="t-left">-->
-            <!--<span class="piece">86</span>件商品</p>-->
-          <!--<p class="t-freight">（含运费￥10.00）</p>-->
-          <!--<p class="t-right">合计:-->
-            <!--<span class="money">￥154.00</span>-->
-          <!--</p>-->
-        <!--</div>-->
-        <!--<div class="btn">-->
-          <!--<span class="b-xq">查看详情</span>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
   </div>
 </template>
 <script>
@@ -67,8 +38,14 @@ export default {
   components: {},
   data () {
     return {
+      shopName: '',
+      state: ['退款', '退货', '换货'],
+      stateName: ['等待商家处理', '商家已同意', '商家已拒绝', '商家已同意', '商家已发货', '已撤销', '确认收货'],
       list: []
     }
+  },
+  onShow () {
+    this.getList()
   },
   methods: {
     refundDetails (id, type) {
@@ -83,15 +60,29 @@ export default {
           query: {id: id}
         })
       }
+    },
+    // 商品清单
+    goodsList (list) {
+
+    },
+    async getList () {
+      const data = await API.afterService()
+      console.log('售后列表', data)
+      if (data.code === 1) {
+        this.list = data.data.list
+      }
+      let that = this
+      wx.getStorage({
+        key: 'shopName',
+        success: function (res) {
+          that.shopName = res.data
+        }
+      })
     }
   },
-  async mounted () {
-    const data = await API.afterService()
-    // console.log('售后列表', data)
-    if (data.code === 1) {
-      this.list = data.data.list
-    }
-  }
+  // async mounted () {
+  //   this.getList()
+  // }
 }
 </script>
 <style type="text/sass" lang="sass" scoped>

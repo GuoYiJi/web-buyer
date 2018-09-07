@@ -1,5 +1,4 @@
 <template>
-  <!-- 全部订单-待付款 -->
   <div class="home">
     <div class="head">
         <span class="h-title">{{shopName}}</span>
@@ -19,7 +18,7 @@
                 <span class="piece">{{item.goodsListSize}}</span>个款，合计<span class="piece">{{item.num}}</span>件</p>
               <p class="t-freight">（含运费￥{{item.freight}}）</p>
               <p class="t-right">合计:
-                <span class="money">￥{{item.count}}</span>
+                <span class="money">￥{{item.paid}}</span>
               </p>
             </div>
           </div>
@@ -32,37 +31,30 @@
             <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
             <div class="n-right">
               <p class="n-title">{{goods.name}}</p>
-              <block v-for="(sku, s) in goods.skuList" :key="s">
-                <p class="yardage">{{sku.skuCode}}/{{sku.num}}件</p>
-              </block>
+              <p class="yardage" v-for="(ite,i) in goods.sizeTextArray" :key="i" v-if="i<=2">{{ite.text}}</p>
             </div>
           </div>
           <div class="below">
             <div class="total">
               <p class="t-right">
-                共<span class="piece">{{goods.countNum}}</span>件商品, 合计:<span class="money">￥{{goods.countPrice}}</span>
+                共<span class="piece">{{goods.countNum}}</span>件商品, 合计:<span class="money">￥{{item.paid}}</span>
               </p>
             </div>
           </div>
           <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
             <tr>
-              <th></th>
               <th>颜色</th>
               <th>码数</th>
               <th>总件数</th>
               <th>已发</th>
               <th>未发</th>
-              <th></th>
             </tr>
             <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
-              <td></td>
               <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
-              <td></td>
             </tr>
           </table>
         </div>
       </div>
-        
       <div class="below">
         <div class="total" v-for="(cOder,idx) in item.children" :key="idx" >
           <span class="t-left" @click="bxq(cOder.id, cOder.state)">子订单编号({{stateName[cOder.state]}}): {{cOder.orderNo}}</span>
@@ -72,10 +64,10 @@
           <span class="b-xq" v-if="item.state==1" @click="toOpen('visible1')">确认付款</span>
           <span class="b-xq" v-if="item.state==2" @click="toOpen('visible3')">删除订单</span>
           <span class="b-sc" v-if="item.state==1" @click="toOpen('visible2')">取消订单</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==5"  class="b-xq" @click="toOpen('visible4')">退款</span>
+          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==5"  class="b-xq" @click="afterSale(item.id, item.paid, item.freight, 0)">申请退款</span>
           <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-xq" @click="toOpen('visible5')">确认收货</span>
           <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-sc" @click="logistics(item.id)">查看物流</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-sc" @click="afterSale(item.id)">查看售后</span>
+          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-sc" @click="afterSale(item.id, item.paid, item.freight, 1)">申请售后</span>
           <span class="b-sc" @click="bxq(item.id,item.state)">查看详情</span>
         </div>
         <i-modal :visible="visible1" @ok="bxq(item.id,item.state)" @cancel="toClose('visible1')">
@@ -121,8 +113,6 @@ export default {
   methods: {
     // 订单详情
     bxq (id, xq) {
-      // console.log(id)
-      // console.log(xq)
       this.visible1 = false;
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
@@ -132,13 +122,11 @@ export default {
     buyPay(orderId){
       // 跳去支付页面
     },
-    // 申请退款
-    retreat (id, type, price, freight) {
-      this.visible4 = false;
-      this.visible5 = false;
+    //申请售后1 or 退款0 
+    afterSale (orderId, price, freight, type) {
       this.$router.push({
-        path: '/pages/refund/refund',
-        query: {orderId: id, type: type, price: price, freight: freight}
+        path: '/pages/refund/applyCustomer',
+        query: {orderId: orderId, price: price, freight: freight, type: type}
       })
     },
     // 查看物流
@@ -147,10 +135,6 @@ export default {
         path: '/pages/my/logistics',
         query: {orderId: orderId}
       })
-    },
-    //申请售后
-    afterSale(orderId){
-
     },
     toOpen (name) {
       this[name] = true
@@ -192,17 +176,17 @@ export default {
     // this.getOrder()
   },
   created(){
-    // console.log(this.item);
+    // console.log(this.item)
     if(this.item && this.item.goodsList && this.item.goodsList.length > 0){
-      let gArr = this.item.goodsList;
+      let gArr = this.item.goodsList
       gArr.forEach((good,idx)=>{
-        this.skuCodeList[idx] = [];
+        this.skuCodeList[idx] = []
         good.skuList.forEach((Citem, Cindex) => {
-          let color = Citem.skuCode.split(':')[0];
-          let size = Citem.skuCode.split(':')[1];
+          let color = Citem.skuCode.split(',')[0]
+          let size = Citem.skuCode.split(',')[1]
           // console.log(color, Citem);
-          this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
-          // console.log(this.skuCodeList);
+          this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
+          // console.log(this.skuCodeList)
           
         })
       })
@@ -266,7 +250,7 @@ table.skuCode
       font-size: 28px
       color: #000
       +moreLine(2)
-      height: 96px
+      height: 60px
     .yardage
       font-size: 24px
       color: #999

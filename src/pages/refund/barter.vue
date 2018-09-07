@@ -190,16 +190,6 @@ export default {
   mounted () {
     this.orderId = this.$route.query.orderId
     this.type = this.$route.query.type
-    // this.price = Number(this.$route.query.price)
-    // this.freight = Number(this.$route.query.freight)
-    if (this.type === '1') {
-      this.price -= this.freight
-      this.isType = false
-    }
-    // console.log(this.orderId)
-    // console.log(this.type)
-    // console.log(this.price)
-    // console.log(this.freight)
   }
 }
 </script>

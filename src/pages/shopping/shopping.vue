@@ -323,10 +323,10 @@ export default {
           that.kong = 1
         } else {
           that.kong = 0
-          let skuAttr = []
           for (let k = 0; k < list.length; k++) {
             list[k].check = false
             let skuList = list[k].skuList
+            let skuAttr = []
             // 定义规格数组
             for (let i = 0; i < skuList.length; i++) {
               let sku = skuList[i]
@@ -347,7 +347,6 @@ export default {
               let isHas = false
               for (let j = 0; j < skuAttr.length; j++) {
                 if (skuAttr[j].color === obj.color) {
-                  // let skuSize = skuAttr[j]
                   skuAttr[j].sizeArray.push(sizeObj)
                   isHas = true
                   break
@@ -417,10 +416,10 @@ export default {
         that.kong = 1
       } else {
         that.kong = 0
-        let skuAttr = []
         for (let k = 0; k < list.length; k++) {
           list[k].check = false
           let skuList = list[k].skuList
+          let skuAttr = []
           // 定义规格数组
           for (let i = 0; i < skuList.length; i++) {
             let sku = skuList[i]
@@ -463,10 +462,7 @@ export default {
               }
               let colorVal = skuAttr[a].colorVal
               let sizeVal = skuAttr[a].sizeArray[b].sizeVal
-              // let colorId = skuAttr[a].color
-              // let sizeId = skuAttr[a].sizeArray[b].sizeId
               let num = skuAttr[a].sizeArray[b].sizeNum
-              // let attrIds = colorId + ',' + sizeId
               totalNum += Number(num)
               // 处理规格文字
               let ishas = false
@@ -483,13 +479,6 @@ export default {
                 skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
                 skuCode.push(skuVal)
               }
-              // for (let k = 0; k < that.skuList.length; k++) {
-              //   if (that.skuList[k].attrIds === attrIds) {
-              //     obj.skuId = that.skuList[k].id
-              //   }
-              // }
-              // obj.num = num
-              // skuAttr.push(obj)
             }
           }
           list[k].skuCode = skuCode
@@ -763,7 +752,6 @@ export default {
         right: 24px
     .kuang_2
       margin-top: 35px
-      height: 120px
       padding-left: 24px
       .k2_title
         font-size: 24px
@@ -796,7 +784,6 @@ export default {
             line-height: 34px
             text-align: center
     .kuang_3
-      // height: 230px
       padding-bottom: 20px
       border-bottom: 1px solid #EAEAEA
       .s_item_box
@@ -813,23 +800,27 @@ export default {
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../assets/img/shopping/minus.png') no-repeat
+          background: url('../../assets/img/shopping/minus.png') no-repeat center
           background-size: 30px 40px
         .count
           display: inline-block
+          position: relative
+          top: -10px
           width: 70px
           height: 38px
+          margin: 0 10px
           text-align: center
           line-height: 38px
           border: 1px solid #ccc
-          margin: 0 10px
         .add
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../assets/img/shopping/add.png') no-repeat
+          background: url('../../assets/img/shopping/add.png') no-repeat center
           background-size: 30px 40px
     .kuang_4
       .k4_title

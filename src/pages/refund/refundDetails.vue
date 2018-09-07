@@ -1,41 +1,56 @@
 <template>
   <div class="wrapper">
-    <!--<p class="refundState"> </p>-->
     <div class="refundInfo">
-      <p class="title">{{state == 0 ? '等待商家处理' : state == 1 ? '商家已同意' : state == 2 ? '商家已拒绝' : state == 3 ? '商家已同意' : state == 4 ? '商家已发货' : state == 5 ? '已撤销' : state == 6 ? '确认收货' : ''}}</p>
+      <!-- 售后状态 -->
+      <p class="refundState">
+        {{state[details.refundType] + ',' + stateName[details.state]}}
+      </p>
+      <!-- 商家同意申请填写物流单号 -->
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
+      <!-- 商家收货地址 -->
       <div v-if="isFh" class="addressBox">
-        <p class="name">收货人：朱先森 15632168160</p>
-        <p class="address">收货地址：广州市越秀区 西城都荟三层3012</p>
+        <p class="name">收货人：{{details.addressName + '     ' + details.addressMobile}}</p>
+        <p class="address">收货地址：{{details.addressValue}}</p>
       </div>
+      <!-- 物流单号 -->
       <div v-if="isFh" class="logisticsNumber">
         <p class="text">物流单号</p>
-        <p class="number">12454676891245467689</p>
+        <p v-if="details.state == 4 || details.state == 6" class="num"></p>
+        <div v-if="details.state == 3" class="label">
+          <input class="number" type="number" v-model="logisticsNum">
+          <span class="btn" @click="sendNum(details.id)">点击发送</span>
+        </div>
       </div>
-      <p class="title">退款信息</p>
+      <!-- 商品信息 -->
+      <p class="title">{{state[details.refundType]}}信息</p>
       <div class="refundGoods" v-for="(item,index) in goods" :key="index">
         <div class="img">
-          <img v-if="item.image" src="../../assets/img/classify/goods.png" alt="">
+          <img v-if="item.image" :src="item.image" alt="">
           <img v-else src="../../assets/img/classify/goods.png" alt="">
         </div>
         <div class="text">
           <p class="name">{{item.name}}</p>
           <p class="spec">{{item.skuCode}} / {{item.num}}件</p>
-          <!--<p class="spec">黑色：均码/1件</p>-->
         </div>
       </div>
+      <!-- 卖家信息 -->
       <div class="businessInfo">
-        <p>买家：{{shopName}}</p>
-        <p>退款原因：{{details.result}}</p>
+        <p>卖家：{{shopName}}</p>
+        <p>{{state[details.refundType]}}原因：{{details.result}}</p>
         <p>退款金额：{{details.price}}</p>
         <p>申请时间：{{details.createTime}}</p>
-        <p>退款编号：{{details.orderRefundNo}}</p>
+        <p>编号：{{details.orderRefundNo}}</p>
       </div>
+
     </div>
+
     <div class="btnGroup clearfix">
-      <div class="revise" @click="revise">修改申请</div>
-      <div class="cancel" @click="revokes">撤销申请</div>
+      <div class="revise" v-if="details.state == 0 || details.state == 2" @click="revise">修改申请</div>
+      <div class="cancel" v-if="details.state == 0" @click="revokes">撤销申请</div>
       <div class="cancel">联系客服</div>
+    </div>
+    <div class="wellMsg" v-show="wellMsgShow">
+      {{msg}}
     </div>
   </div>
 </template>
@@ -46,25 +61,46 @@ export default {
   data () {
     return {
       isFh: false,
+      msg: '',
+      wellMsgShow: false,
+      state: ['退款', '退货', '换货'],
+      stateName: ['等待商家处理', '商家确认收货', '商家已拒绝', '商家已同意', '等待商家确认收货', '已撤销'],
       shopName: '',
       details: {},
       goods: [],
-      refundType: '',
-      state: ''
+      stateIndex: '',
+      refundTypeIndex: '',
+      logisticsNum: ''
     }
   },
-  components: {
-
-  },
   methods: {
+    // 发送物流单号
+    async sendNum (id) {
+      if (this.logisticsNum != '') {
+        const data = await API.sendLogisticsNum({logistics: this.logisticsNum, orderRefundId: id})
+        console.log(data)
+      } else {
+        this.mySetTimeout('请输入物流单号！')
+      }
+    },
     revise () {
       this.$router.back()
     },
     revokes () {
       this.$router.back()
+    },
+    // 定时器弹窗
+    mySetTimeout (msg) {
+      let that = this
+      that.wellMsgShow = true
+      that.msg = msg
+      setTimeout(function () {
+        that.wellMsgShow = false
+        that.msg = ''
+      }, 1000)
     }
   },
-  async mounted () {
+  async created () {
     let that = this
     wx.getStorage({
       key: 'shopName',
@@ -72,24 +108,24 @@ export default {
         that.shopName = res.data
       }
     })
+  },
+  async mounted () {
     const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
     if (data.code === 1) {
+      console.log(data)
       this.details = data.data
       this.goods = data.data.goodsList
-      // this.refundType = data.data.refundType
-      // this.state = data.data.state
+      this.stateIndex = data.data.state
+      this.refundTypeIndex = data.data.refundType
       // 订单状态
       let refundType = data.data.refundType
       // 商家回复状态
       let state = data.data.state
-      if (refundType === 0) {
-        this.isFh = false
-      }
       if (refundType === 1 || refundType === 2) {
         if (state === 0 || state === 2 || state === 5) {
           this.isFh = false
         }
-        if (state === 1 || state === 3 || state === 4 || state === 6) {
+        if (state === 1 || state === 3 || state === 4) {
           this.isFh = true
         }
       }
@@ -115,6 +151,7 @@ export default {
     color: #F67C2F
     padding: 0 24px
     background: #FFFFFF
+    margin-bottom: 20px
   .refundInfo
     margin-top: 20px
     .title
@@ -122,7 +159,7 @@ export default {
       padding: 0 24px
       line-height: 80px
       font-size: 28px
-      color: #000000
+      color: #333
       background: #ffffff
       box-sizing: border-box
     .title:first-child
@@ -142,17 +179,44 @@ export default {
         color: #666666
     .logisticsNumber
       height: 120px
-      padding: 0 24px
+      padding: 20px 24px
       background: #ffffff
       margin-bottom: 20px
       .text
         line-height: 60px
         font-size: 22px
-        color: #999999
-      .number
-        line-height: 60px
-        font-size: 32px
-        color: #EE7527
+        color: #666
+      .num
+        height: 50px
+        line-height: 50px
+        padding: 0 20px
+        font-size: 28px
+        color: #EE7527  
+      .label
+        display: block
+        position: relative
+        .number
+          height: 50px
+          line-height: 50px
+          padding: 0 145px 0 20px
+          border-left: 1px solid #ccc
+          border-right: 1px solid #ccc
+          border-top: 1px solid #ccc
+          border-bottom: 1px solid #ccc
+          border-radius: 50px
+          font-size: 28px
+          color: #EE7527
+        .btn
+          position: absolute
+          top: 0
+          right: 0
+          width: 95px
+          height: 54px
+          padding: 0 25px
+          line-height: 54px
+          border-left: 1px solid #ccc
+          font-size: 22px
+          color: #EE7527
     .refundGoods
       height: 200px
       padding: 20px 24px 20px 213px
@@ -208,4 +272,19 @@ export default {
     .revise
       color: #ffffff
       background: #EE7527
+  .wellMsg
+    position: absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
+    margin: auto
+    width: 305px
+    height: 114px
+    line-height: 114px
+    border-radius: 10px
+    background: rgba(0,0,0,.8)
+    color: #ffffff
+    font-size: 30px
+    text-align: center
 </style>

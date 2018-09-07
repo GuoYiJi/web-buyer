@@ -82,7 +82,8 @@ export default {
         width: 46px
         height: 46px
       .icon1
-        +bg-img('home/homecheck.png')
+        background: url('../assets/img/home/home3.png')
+        background-size: 46px 46px
         // width: 42px
         // height: 42px
       .icon2

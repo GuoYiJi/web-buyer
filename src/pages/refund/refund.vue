@@ -1,21 +1,21 @@
 <template>
   <div class="wrapper">
-    <p v-if="isType" class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
-    <p v-if="!isType" class="refundReason" @click="wellShow = true">退货原因<span class="reason">{{reason}}</span></p>
+    <p v-if="type == 0" class="refundReason" @click="wellShow = true">退款原因<span class="reason">{{reason}}</span></p>
+    <p v-if="type == 1" class="refundReason" @click="wellShow = true">退货原因<span class="reason">{{reason}}</span></p>
     <p class="refundPrice">
       退款金额：<span class="price">￥{{price}}</span>
-      <span v-if="isType" class="freight">含邮费 ￥{{freight}}</span>
-      <span v-if="!isType" class="freight">不含邮费 ￥{{freight}}</span>
+      <span v-if="type == 0" class="freight">含邮费 ￥{{freight}}</span>
+      <span v-if="type == 1" class="freight">不含邮费 ￥{{freight}}</span>
     </p>
     <!--<p v-if="type == '0'" class="refundMsg">含邮费￥{{freight}}</p>-->
     <!--<p v-else class="refundMsg">不含邮费￥{{freight}}</p>-->
     <div class="refundExplain">
-      <p class="title">退款说明：<span>(最多可输入50个字)</span></p>
+      <p class="title">{{type == 0 ? '退款说明' : '退货说明'}}：<span>(最多可输入50个字)</span></p>
       <textarea v-model="explain" class="explain" name="" id="" maxlength=50>
 
       </textarea>
     </div>
-    <div v-if="!isType" class="refundVoucher">
+    <div v-if="type == 1" class="refundVoucher">
       <p class="title">上传凭证：<span>(最多可上传3张)</span></p>
       <div class="images" >
         <div class="img" @click="chooseImg(1)">
@@ -47,8 +47,8 @@
     <div class="submit" @click="submit">提交</div>
     <div class="well" v-show="wellShow">
       <div class="box">
-        <p v-if="isType" class="head">请选择退款原因</p>
-        <p v-if="!isType" class="head">请选择退货原因</p>
+        <p v-if="type == 0" class="head">请选择退款原因</p>
+        <p v-if="type == 1" class="head">请选择退货原因</p>
         <p class="select" @click="check(item.id,item.text)" v-for="(item,index) in reasonList" :key="index">
           <span class="check" :class="{checked : isCheck == item.id}"></span>
           <span>{{item.text}}</span>
@@ -75,7 +75,6 @@ export default {
       type: '',
       freight: '',
       price: '',
-      isType: true,
       isCheck: 0,
       reasonList: [
         {id: 1, text: '原因一'},
@@ -143,10 +142,10 @@ export default {
         success: function (res) {
           console.log(res)
           if (res.statusCode === 400) {
-            that.handleError('上传的图片大小不能超过2m!')
+            that.mySetTimeout('图片大小不能超过2m!')
           } else if (res.statusCode === 200) {
             if (that.maxNum && that.imgList.length >= that.maxNum) {
-              that.handleError('不能超过3张图片噢！')
+              that.mySetTimeout('不能超过3张图片噢！')
               return
             }
             callback (
@@ -203,9 +202,9 @@ export default {
     this.type = this.$route.query.type
     this.price = Number(this.$route.query.price)
     this.freight = Number(this.$route.query.freight)
-    if (this.type === '1') {
+    if (this.type === 1) {
       this.price -= this.freight
-      this.isType = false
+      this.isRefund = false
     }
     // console.log(this.orderId)
     // console.log(this.type)
@@ -354,7 +353,7 @@ export default {
   top: 0
   bottom: 0
   margin: auto
-  width: 305px
+  padding: 40px 50px
   height: 114px
   line-height: 114px
   border-radius: 10px

@@ -23,6 +23,7 @@ class API {
   deleteCollect = params => http.post('api/like/goods/deleteMyLike', params)
   // 获取地址
   address = params => http.post('api/address/page', params)
+  // 修改地址
   editAddress = params => http.post('api/address/edit', params)
   // 获取优惠券
   coupon = params => http.post('api/coupon/page', params)
@@ -46,7 +47,9 @@ class API {
   afterService = params => http.post('api/order/refund/selectOrderRefund', params)
   // 售后详情
   getRefundDetails = params => http.post('api/order/refund/selectOrderRefundDetail', params)
-  //删除订单
+  // 发送物流单号
+  sendLogisticsNum = params => http.post('api/order/perfectRefundLogistics',params)
+  // 删除订单
   delOrderShow = params => http.post('api/order/closeShow', params)
   
 }

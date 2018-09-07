@@ -89,7 +89,7 @@
     <!-- 弹窗 -->
     <div class="popup" v-if="popupShow">
       <div class="kuang_1">
-        <img class="pop_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+        <img class="pop_img" :src="goodsInfo.image">
         <p class="pop_money">￥{{goodsInfo.sellPrice}}</p>
         <p class="pop_title" v-text="goodsInfo.name"></p>
         <i class="gb" @click="popupShow=false"></i>
@@ -306,7 +306,6 @@ export default {
     },
     // 减
     minus (colorIndex, sizeIndex) {
-      console.log('减515')
       // console.log(colorIndex, sizeIndex)
       let num = this.skuAttr[colorIndex].sizeArray[sizeIndex].sizeNum
       if (num === 0) {
@@ -337,9 +336,11 @@ export default {
     }
   },
   async mounted () {
+    this.popupShow = false
     this.sessionId = await wx.getStorageSync('sessionId')
     // 商品信息
     this.goodsInfo = JSON.parse(this.$route.query.obj)
+    console.log(this.goodsInfo)
     // 图片列表
     this.imgUrls = this.goodsInfo.images.split(',')
     // 标签列表
@@ -592,7 +593,7 @@ export default {
     font-size: 22px
     color: #666
     bottom: 500px
-    z-index: 9999
+    z-index: 999
     .top
       display: inline-block
       background: rgba(234,234,234,1)
@@ -617,7 +618,7 @@ export default {
       margin-top: 20px
       padding: 10px 0
       .home_img
-        +bg-img('home/homecheck.png')
+        +bg-img('home/home3.png')
         width: 45px
         height: 40px
         margin: 0 auto
@@ -656,6 +657,7 @@ export default {
     left: 0px
     background: #fff
     padding-bottom: 30px
+    z-index: 999
     .kuang_1
       height: 170px
       position: relative
@@ -690,7 +692,6 @@ export default {
         right: 24px
     .kuang_2
       margin-top: 35px
-      height: 120px
       padding: 0 24px
       .k2_title
         font-size: 24px
@@ -741,23 +742,27 @@ export default {
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../../assets/img/shopping/minus.png') no-repeat
+          background: url('../../../assets/img/shopping/minus.png') no-repeat center
           background-size: 30px 40px
         .count
           display: inline-block
+          position: relative
+          top: -10px
           width: 70px
           height: 38px
+          margin: 0 10px
           text-align: center
           line-height: 38px
           border: 1px solid #ccc
-          margin: 0 10px
         .add
           display: inline-block
           width: 30px
           height: 40px
+          margin-top: 10px
           text-align: center
-          background: url('../../../assets/img/shopping/add.png') no-repeat
+          background: url('../../../assets/img/shopping/add.png') no-repeat center
           background-size: 30px 40px
     .kuang_4
       .k4_title
