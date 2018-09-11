@@ -23,7 +23,7 @@
               <p class="whole">全程满 <br/>
                 <span class="whole1">{{item.limitCount}}</span>使用
               </p>
-              <span class="btn" @click="btn(item.id)">立即领取></span>
+              <span class="btn" @click="btn(item.id)">立即领取</span>
             </div>
           </swiper-item>
         </block>
@@ -38,6 +38,94 @@
       </div>
     </div>
     <div class="content">
+      <!--<div class="home" v-if="tag === 2 || tag === 3 || tag === 5 || tag === 6">-->
+        <!--<div class="sort-select">-->
+          <!--<div class="top-nav">-->
+            <!--<ul>-->
+              <!--&lt;!&ndash; <li :class="[tag === 1 && 'nav-active']" @click="handleTag(1)">综合</li> &ndash;&gt;-->
+              <!--<li :class="[tag === 2 && 'nav-active']" @click="handleTag(2)">销量-->
+                <!--<div class="sort-box">-->
+                  <!--<i class="sort-top" :class="asceSale && 'sort-active'"></i>-->
+                  <!--<i :class="!asceSale && 'sort-active'" class="sort-bottom"></i>-->
+                <!--</div>-->
+              <!--</li>-->
+              <!--<li :class="[tag === 4 && 'nav-active']" @click="handleTag(4)">价格-->
+                <!--<div class="sort-box">-->
+                  <!--<i class="sort-top" :class="ascePrice && 'sort-active'"></i>-->
+                  <!--<i :class="!ascePrice  && 'sort-active'" class="sort-bottom"></i>-->
+                <!--</div>-->
+              <!--</li>-->
+              <!--<li :class="[tag === 5 && 'nav-active']" @click="handleTag(5)">筛选-->
+                <!--<div class="sort-box">-->
+                  <!--<i class="option-icon"></i>-->
+                <!--</div>-->
+              <!--</li>-->
+            <!--</ul>-->
+          <!--</div>-->
+          <!--<i-drawer mode="right" :visible="showRight1" @close="toggleRight1">-->
+            <!--<div class="demo-container">-->
+              <!--<div class="title">-->
+                <!--<i class="zuo"></i>-->
+                <!--<span class="screen">筛选</span>-->
+              <!--</div>-->
+              <!--<div class="item-box">-->
+                <!--<div class="item">-->
+                  <!--<p class="i_title">品类</p>-->
+                  <!--<ul class="s_item_box">-->
+                    <!--<li class="s_item">一级分类</li>-->
+                    <!--<li class="s_item">一级分类</li>-->
+                    <!--<li class="s_item">一级分类</li>-->
+                    <!--<li class="s_item">一级分类</li>-->
+                    <!--<li class="s_item">一级分类</li>-->
+                    <!--<li class="s_item">一级分类</li>-->
+                  <!--</ul>-->
+                  <!--&lt;!&ndash; <ul v-if="more1" class="s_item_box">-->
+                    <!--<li class="s_item">档口1</li>-->
+                    <!--<li class="s_item">档口2</li>-->
+                    <!--<li class="s_item">档口3</li>-->
+                  <!--</ul> &ndash;&gt;-->
+                  <!--<p class="more">-->
+                <!--<span @click="toOpen('more1')" v-if="!more1">查看更多-->
+                  <!--<i class="goback"></i>-->
+                <!--</span>-->
+                    <!--<span @click="toClose('more1')" v-else>点击收起</span>-->
+                  <!--</p>-->
+                <!--</div>-->
+                <!--<div class="item">-->
+                  <!--<p class="i_title">货期情况</p>-->
+                  <!--<ul class="s_item_box">-->
+                    <!--<li class="s_item">现货</li>-->
+                    <!--<li class="s_item">3-5天</li>-->
+                    <!--<li class="s_item">6-10天</li>-->
+                    <!--<li class="s_item">订货</li>-->
+                    <!--<li class="s_item">11-15天</li>-->
+                    <!--<li class="s_item">一个月内</li>-->
+                  <!--</ul>-->
+                <!--</div>-->
+                <!--<div class="item">-->
+                  <!--<p class="i_title">价格区间</p>-->
+                  <!--<ul class="s_item_box">-->
+                    <!--<li class="s_item">0-70</li>-->
+                    <!--<li class="s_item">3-5天</li>-->
+                    <!--<li class="s_item">6-10天</li>-->
+                    <!--<li class="s_item">-->
+                      <!--<input type="text" placeholder="最低价">-->
+                    <!--</li>-->
+                    <!--&#45;&#45;-->
+                    <!--<li class="s_item">-->
+                      <!--<input type="text" placeholder="最高价">-->
+                    <!--</li>-->
+                  <!--</ul>-->
+                <!--</div>-->
+              <!--</div>-->
+              <!--<div class="f_btn">-->
+                <!--<p class="reset">重置</p>-->
+                <!--<p class="confirm">确定</p>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</i-drawer>-->
+        <!--</div>-->
+      <!--</div>-->
       <div v-if="tag == 1">
         <colligate/>
         <Upnew/>
@@ -55,7 +143,6 @@
         <selling/>
       </div>
       <div v-else-if="tag == 4">
-        <screen/>
         <collocation/>
       </div>
       <div v-else-if="tag == 5">
@@ -67,7 +154,7 @@
         <discount/>
       </div>
     </div>
-    <div class="toTop">
+    <div class="toTop" v-show="top">
       <div class="top" @click="toTop()">
         <i class="top_img"></i>
         <p class="top_text">顶部</p>
@@ -81,7 +168,6 @@
 </template>
 <script>
 import wx from 'wx'
-// import API from '@/api/httpShui'
 import API from '@/api/httpJchan'
 import mixin from '@/mixin'
 import colligate from '@/components/h_colligate'
@@ -104,8 +190,9 @@ export default {
     screen,
     footers
   },
-  data() {
+  data () {
     return {
+      top: false,
       coverImg: '',
       indicatorDots: false,
       autoplay: false,
@@ -148,6 +235,13 @@ export default {
       selectMGP: []
     }
   },
+  onPageScroll (e) {
+    if (e.scrollTop > 500) {
+      this.top = true
+    } else if (e.scrollTop < 500) {
+      this.top = false
+    }
+  },
   methods: {
     // 回到顶部
     toTop () {
@@ -179,7 +273,8 @@ export default {
         data: shopInfo.data.name
       })
     }
-    const pageByCreate = await API.pageByCreate()
+    const pageByCreate = await API.pageByCreate({state: 1})
+    console.log('优惠券', pageByCreate)
     this.coupon = pageByCreate.data.list
   }
 }
@@ -205,7 +300,6 @@ export default {
       width: 96px
       height: 76px
       overflow: hidden
-      margin-top: 20px
       padding: 10px 0
       .top_img
         +bg-img('home/xqtb.png')
@@ -226,7 +320,7 @@ export default {
       left: 24px
       width: 120px
       height: 120px
-      border-radius: 50px
+      border-radius: 50%
     .text
       display: inline-block
       box-sizing: border-box
@@ -286,9 +380,6 @@ export default {
           .money
             display: inline-block
             width: 90px
-            // position: absolute
-            // top: 0
-            // left: 15px
             padding-left: 10px
             font-size: 24px
             text-align: center
@@ -314,6 +405,8 @@ export default {
             line-height: 35px
             top: 80px
             left: 35px
+        .yhqk.active
+          background: rgba(0,0,0,.8)
   .active
     color: #F67C2F
   .nav

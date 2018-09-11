@@ -87,8 +87,8 @@ export default {
     position: relative
     top: 0
     left: 0
-    height: 100px
-    margin-bottom: 90px
+    height: 120px
+    margin-bottom: 50px
     .title_1
       position: absolute
       font-size: 32px

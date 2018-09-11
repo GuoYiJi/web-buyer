@@ -10,10 +10,8 @@
   justify-content: center
 
 @mixin bg-img($name)  // 背景图片
-  background-image: url("~@/assets/img/#{$name}")
-  background-position: center
+  background: url('~@/assets/img/#{$name}') no-repeat center
   background-size: 100% 100%
-  background-repeat: no-repeat
 
 @mixin border ($px, $direction:all,$color: $border-color)
   @if $direction == 'all'

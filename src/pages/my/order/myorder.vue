@@ -56,9 +56,9 @@ export default {
   methods: {
     refreshOrder (tag) {
       if (tag) {
-        this.tag = tag;
+        this.tag = tag
       }
-      this.getOrder(this.navData[this.tag-1].state);
+      this.getOrder(this.navData[this.tag - 1].state)
     },
     // toRoute(path) {
     //   this.$router.push('/pages/home/' + path)

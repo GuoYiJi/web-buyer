@@ -2,14 +2,15 @@ const home = [{
   path: '/pages/home/home',
   name: 'home',
   config: {
-    // enablePullDownRefresh: true,
+    navigationBarTitleText: '首页',
     navigationBarBackgroundColor: '#FA8134',
     'usingComponents': {
       'i-drawer': '/iview/drawer/index',
       'i-modal': '/iview/modal/index'
     }
   }
-},{
+},
+{
   path: '/pages/home/login',
   // name: 'login',
   config: {

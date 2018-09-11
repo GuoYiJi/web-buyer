@@ -93,9 +93,9 @@
 import API from '@/api/httpShui'
 export default {
   components: {},
-  props:{
-    item :{},
-    shopName:''
+  props: {
+    item: {},
+    shopName: ''
   },
   data () {
     return {
@@ -104,10 +104,9 @@ export default {
       visible3: false,
       visible4: false,
       visible5: false,
-      // myorderList: [],
-      stateName : ['','待付款','交易取消','已支付','支付失败','待发货','待收货','已完成','交易关闭','拼单中'],
+      stateName: ['', '待付款', '交易取消', '已支付', '支付失败', '待发货', '待收货', '已完成', '交易关闭', '拼单中'],
       id: '',
-      skuCodeList : []
+      skuCodeList: []
     }
   },
   methods: {
@@ -119,10 +118,10 @@ export default {
         query: { id: id, xq: xq }
       })
     },
-    buyPay(orderId){
+    buyPay (orderId) {
       // 跳去支付页面
     },
-    //申请售后1 or 退款0 
+    // 申请售后1or退款0
     afterSale (orderId, price, freight, type) {
       this.$router.push({
         path: '/pages/refund/applyCustomer',
@@ -130,7 +129,7 @@ export default {
       })
     },
     // 查看物流
-    logistics (orderId){
+    logistics (orderId) {
       this.$router.push({
         path: '/pages/my/logistics',
         query: {orderId: orderId}
@@ -149,16 +148,16 @@ export default {
       if (data.code === 1) {
         this.visible2 = false
         // this.$router.back();
-        this.$emit('refreshOrder');
+        this.$emit('refreshOrder')
       }
     },
-    //删除订单
-    async delOrder(id){
+    // 删除订单
+    async delOrder (id) {
       const data = await API.delOrderShow({orderId: id})
       if (data.code === 1) {
-        this.visible3 = false;
+        this.visible3 = false
         // this.$router.back();
-        this.$emit('refreshOrder');
+        this.$emit('refreshOrder')
       }
     },
     // 确认收货
@@ -167,32 +166,27 @@ export default {
       console.log('确认收货', data)
       if (data.code === 1) {
         this.visible5 = false
-        this.$emit('refreshOrder');
+        this.$emit('refreshOrder')
       }
-    },
+    }
   },
   async mounted () {
     // console.log(this.item);
     // this.getOrder()
   },
-  created(){
+  created () {
     // console.log(this.item)
-    if(this.item && this.item.goodsList && this.item.goodsList.length > 0){
+    if (this.item && this.item.goodsList && this.item.goodsList.length > 0) {
       let gArr = this.item.goodsList
-      gArr.forEach((good,idx)=>{
+      gArr.forEach((good, idx) => {
         this.skuCodeList[idx] = []
         good.skuList.forEach((Citem, Cindex) => {
           let color = Citem.skuCode.split(',')[0]
           let size = Citem.skuCode.split(',')[1]
-          // console.log(color, Citem);
           this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
-          // console.log(this.skuCodeList)
-          
         })
       })
-      
     }
-    
   }
 }
 </script>

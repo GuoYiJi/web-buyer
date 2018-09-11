@@ -14,10 +14,10 @@
   </div>
 </template>
 <script>
-import wx from "wx";
-import mixin from "@/mixin";
-import config from "@/config";
-import API from "@/api/httpJsong";
+import wx from 'wx';
+import mixin from '@/mixin';
+import config from '@/config';
+import API from '@/api/httpJsong';
 export default {
   mixins: [mixin],
   components: {},
@@ -48,7 +48,6 @@ export default {
       }
     },
     getUserInfo (e) {
-      console.log(e)
       if (!e.mp.detail.encryptedData) {
         this.handleError('需要同意授权才可以使用噢！')
       } else {
@@ -68,24 +67,25 @@ export default {
         // ivPhone: encryptedData.iv,
         encryptedData: this.userInfo.encryptedData,
         iv: this.userInfo.iv
-      });
-      console.log(data.data);
+      })
+      console.log(data.data)
       wx.setStorage({
-        key: "no",
+        key: 'no',
         data: data.data.no
-      });
-      await wx.setStorageSync("sessionId", data.data.sessionId);
-      this.toRoute("home/home");
+      })
+      await wx.setStorageSync('sessionId', data.data.sessionId)
+      this.toRoute('home/home')
     }
   },
   async mounted () {
+    let self = this
     wx.login({
       success: async res => {
         if (res.code) {
           this.code = res.code
           wx.getUserInfo({
             success: res => {
-              // console.log(res);
+              // console.log(res)
               this.userInfoBool = true
               this.userInfo = res
               this.login()

@@ -90,8 +90,8 @@ export default {
       receive: 0,
       commented: 0,
       refund: 0,
-      no: ""
-    };
+      no: ''
+    }
   },
   methods: {
     order (tag) {
@@ -110,47 +110,45 @@ export default {
       this.$router.push('/pages/my/marketingMgt/myCoupon')
     },
     like() {
-      this.$router.push("/pages/my/like");
+      this.$router.push('/pages/my/like')
     }
     // tuig() {
     //   this.$router.push("/pages/my/procedures");
     // }
   },
-  onShareAppMessage: function(res) {
-    if (res.from === "button") {
+  onShareAppMessage: function (res) {
+    if (res.from === 'button') {
       // 来自页面内转发按钮
-      console.log(res.target);
+      console.log(res.target)
     }
     return {
-      title: "申请小程序",
-      path: "/pages/my/procedures",
+      title: '申请小程序',
+      path: '/pages/my/procedures',
       imageUrl:
-        "http://img0.ph.126.net/AE8LWDjxdZzUWfgWnuqJmQ==/141300438409203738.jpg"
+        'http://img0.ph.126.net/AE8LWDjxdZzUWfgWnuqJmQ==/141300438409203738.jpg'
       // path: "/pages/my/invate/invateDetail/user?id=123"
-    };
+    }
   },
-  async mounted() {
-    var that = this;
-    const prePayment = await API.myorder({ isPing: 0, state: 1 });
-    const delivery = await API.myorder({ isPing: 0, state: 5 });
-    const receive = await API.myorder({ isPing: 0, state: 6 });
+  async mounted () {
+    var that = this
+    const prePayment = await API.myorder({ isPing: 0, state: 1 })
+    const delivery = await API.myorder({ isPing: 0, state: 5 })
+    const receive = await API.myorder({ isPing: 0, state: 6 })
     // 获取待收货，待发货，待付款订单的个数
-    this.prePayment = prePayment.data.totalRow;
-    this.delivery = delivery.data.totalRow;
-    this.receive = receive.data.totalRow;
+    this.prePayment = prePayment.data.totalRow
+    this.delivery = delivery.data.totalRow
+    this.receive = receive.data.totalRow
     wx.setStorage({
       key: 'qwe',
       data: 123
-    });
+    })
     wx.getStorage({
-      key: "no",
-      success: function(res) {
-        console.log(res.data);
-        that.no = res.data;
+      key: 'no',
+      success: function (res) {
+        console.log(res.data)
+        that.no = res.data
       }
-    });
-    // const afterList = await API.after({})
-    // console.log(afterList.data)
+    })
   }
 }
 </script>
@@ -171,15 +169,17 @@ export default {
     margin-bottom: 20px
     .h-bg
       display: inline-block
+      width: 120px
+      height: 120px
       position: absolute
       border-radius: 50%
       overflow: hidden
       top: 32px
       left: 32px
       .h-img
-        width: 120px
-        height: 120px
         display: inline-block
+        width: 100%
+        height: 100%
     .h-name
       position: absolute
       font-size: 34px

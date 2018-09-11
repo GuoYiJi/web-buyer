@@ -92,54 +92,52 @@
 import wx from "wx";
 export default {
   components: {},
-  data() {
+  data () {
     return {
-      searchIn: false,
       asceSale: true,
       ascePrice: true,
       tag: 1,
       shopNum: 0,
       showRight1: false,
-      edit: false,
       allCheck: false,
       more1: false
-    };
-  },
-  methods: {
-    handleTag(tag) {
-      this.tag = tag;
-      var type;
-      this.shopNum = 0;
-      if (tag === 2) {
-        //对销量sort
-        this.asceSale = !this.asceSale;
-        type = this.asceSale ? 2 : 3;
-      }
-      if (tag === 4) {
-        this.ascePrice = !this.ascePrice;
-        type = this.ascePrice ? 4 : 5;
-      }
-      if (tag === 5) {
-        this.toggleRight1();
-      }
-      this.type = type;
-    },
-    toggleRight1() {
-      this.showRight1 = !this.showRight1;
-    },
-    toOpen(name) {
-      this[name] = true;
-    },
-    toClose(name) {
-      this[name] = false;
-    },
-    selectAll() {
-      this.allCheck = !this.allCheck;
-      this.$refs.scard.selectAll(this.allCheck);
     }
   },
-  mounted() {}
-};
+  methods: {
+    handleTag (tag) {
+      this.tag = tag
+      let type
+      this.shopNum = 0
+      if (tag === 2) {
+        // 对销量sort
+        this.asceSale = !this.asceSale
+        type = this.asceSale ? 2 : 3
+      }
+      if (tag === 4) {
+        this.ascePrice = !this.ascePrice
+        type = this.ascePrice ? 4 : 5
+      }
+      if (tag === 5) {
+        this.toggleRight1()
+      }
+      this.type = type
+    },
+    toggleRight1 () {
+      this.showRight1 = !this.showRight1
+    },
+    toOpen (name) {
+      this[name] = true
+    },
+    toClose (name) {
+      this[name] = false
+    },
+    selectAll () {
+      this.allCheck = !this.allCheck
+      this.$refs.scard.selectAll(this.allCheck)
+    }
+  },
+  mounted () {}
+}
 </script>
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'
@@ -165,7 +163,7 @@ export default {
     border-top: 1px solid #E5E5E5
 .demo-container
 	width: 568px
-	height: 100vh
+	height: 100px
 	background: #fff
   font-size: 28px
   box-shadow: 1px 0px 13px rgba(8,0,0,0.17)

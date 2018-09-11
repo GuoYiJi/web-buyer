@@ -51,7 +51,6 @@ class API {
   sendLogisticsNum = params => http.post('api/order/perfectRefundLogistics',params)
   // 删除订单
   delOrderShow = params => http.post('api/order/closeShow', params)
-  
 }
 
 export default new API()

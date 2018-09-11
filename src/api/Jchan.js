@@ -8,11 +8,8 @@ import Vue from 'vue'
 import wx from 'wx'
 import qs from 'qs'
 const vm = new Vue()
-
-
-
 export default {
-  async post(url, params = {}) {
+  async post (url, params = {}) {
     var value = await wx.getStorageSync('sessionId')
     if (value) {
       params.sessionId = value

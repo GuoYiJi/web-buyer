@@ -56,9 +56,6 @@
     <div class="picture">
       <p class="title_2">实拍图片</p>
       <img v-if="item" v-for="(item,index) in details" :key="index" class="pic_img" :src="item">
-      <!--<img v-else class="pic_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
-      <!--<img class="pic_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
-      <!--<img class="pic_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">-->
     </div>
     <div class="foot">
       <div class="service">
@@ -69,7 +66,7 @@
       <div class="immediately" @click="popup(2)">立即购买</div>
     </div>
     <!-- 悬挂按钮 -->
-    <div class="suspension" v-if="suspension == 1">
+    <div class="suspension" v-if="suspension">
       <div class="top" @click="toTop()">
         <i class="top_img"></i>
         <p class="top_text">顶部</p>
@@ -92,7 +89,7 @@
         <img class="pop_img" :src="goodsInfo.image">
         <p class="pop_money">￥{{goodsInfo.sellPrice}}</p>
         <p class="pop_title" v-text="goodsInfo.name"></p>
-        <i class="gb" @click="popupShow=false"></i>
+        <i class="gb" @click="popupShow = false"></i>
       </div>
       <div class="kuang_2">
         <p class="k2_title">颜色</p>
@@ -143,7 +140,7 @@ export default {
       autoplay: true,
       interval: 5000,
       duration: 1000,
-      suspension: 1,
+      suspension: false,
       isLike: 0,
       visible1: false,
       popupShow: false,
@@ -159,19 +156,18 @@ export default {
       skuAttr: [] // 处理可用的规格数组
     }
   },
-  // onPageScroll (e) {
-  //   console.log(e.scrollTop)
-  //   if (e.scrollTop > 600) {
-  //     this.suspension = 1
-  //   } else if (e.scrollTop < 600) {
-  //     this.suspension = 0
-  //   }
-  // },
+  onPageScroll (e) {
+    if (e.scrollTop > 600) {
+      this.suspension = true
+    } else if (e.scrollTop < 600) {
+      this.suspension = false
+    }
+  },
   methods: {
     // 回到顶部
     toTop () {
       wx.pageScrollTo({
-        scrollTop:0
+        scrollTop: 0
       })
     },
     // 跳转

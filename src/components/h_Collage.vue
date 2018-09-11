@@ -88,10 +88,10 @@ export default {
   border-bottom: 1px solid #999
   .title
     position: relative
-    top: 0px
-    left: 0px
-    height: 100px
-    margin-bottom: 90px
+    top: 0
+    left: 0
+    height: 120px
+    margin-bottom: 50px
     .title_1
       position: absolute
       font-size: 32px
