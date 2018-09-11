@@ -73,14 +73,14 @@
         <p class="top_text">顶部</p>
       </div>
     </div>
-    
+
     <div class="footer">
       <footers :tag="1" />
     </div>
   </div>
 </template>
 <script>
-import wx from 'wx';
+import wx from 'wx'
 // import API from '@/api/httpShui'
 import API from '@/api/httpJchan'
 import mixin from '@/mixin'
@@ -146,24 +146,24 @@ export default {
       ],
       coupon: [],
       selectMGP: []
-    };
+    }
   },
   methods: {
     // 回到顶部
     toTop () {
       wx.pageScrollTo({
         scrollTop: 0
-      });
+      })
     },
     toSearch () {
       this.$router.push('/pages/search/search')
     },
-    handleNav(tag) {
-      this.tag = tag;
+    handleNav (tag) {
+      this.tag = tag
     },
-    async btn(id) {
+    async btn (id) {
       const getCoupon = await API.getCoupon({ couponId: id })
-      console.log(getCoupon);
+      console.log(getCoupon)
     }
   },
   async mounted () {
@@ -180,9 +180,9 @@ export default {
       })
     }
     const pageByCreate = await API.pageByCreate()
-    this.coupon = pageByCreate.data.list;
+    this.coupon = pageByCreate.data.list
   }
-};
+}
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
@@ -193,7 +193,7 @@ export default {
     bottom: 120px
     right: 30px
     width: 96px
-    heitght: 96px
+    height: 96px
     text-align: center
     font-size: 22px
     color: #666
@@ -266,7 +266,7 @@ export default {
   .coupon-box
     width: 100%
     height: 126px
-    padding-bottom: 30px 
+    padding-bottom: 30px
     overflow: hidden
     background: #fff
     .swiper

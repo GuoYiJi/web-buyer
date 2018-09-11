@@ -22,32 +22,32 @@ export default {
   data () {
     return {
       tag: null,
-      orderList : [],
-      shopName:'',
+      orderList: [],
+      shopName: '',
       navData: [
         {
           id: 1,
-          state : 0,
+          state: 0,
           text: '全部'
         },
         {
           id: 2,
-          state : 1,
+          state: 1,
           text: '待付款'
         },
         {
           id: 3,
-          state : 5,
+          state: 5,
           text: '待发货'
         },
         {
           id: 4,
-          state : 6,
+          state: 6,
           text: '待收货'
         },
         {
           id: 5,
-          state : 7,
+          state: 7,
           text: '已完成'
         }
       ]
@@ -74,13 +74,13 @@ export default {
     async getOrder (state) {
       let param = {
         isPing: 0,
-        pageSize : 10
+        pageSize: 10
       }
-      if(state){
-        param.state = state;
+      if (state) {
+        param.state = state
       }
       const Myorder = await API.myOrder(param)
-      console.log( Myorder)
+      console.log(Myorder)
       this.orderList = Myorder.data.list
       // 规格显示
       for (let i = 0; i < this.orderList.length; i++) {
@@ -91,20 +91,20 @@ export default {
             let skuObj = {}
             let attrVal = sku.skuCode.split(',')
             skuObj.colorVal = attrVal[0]
-            skuObj.text =  attrVal[0] + ":" +attrVal[1] + "/" + sku.num + "件"
+            skuObj.text = attrVal[0] + ':' + attrVal[1] + '/' + sku.num + '件'
             let ishasColor = false
             for (let a = 0; a < sizeTextArray.length; a++) {
-               if (sizeTextArray[a].colorVal === attrVal[0]) {
-                  sizeTextArray[a].text += ";" +attrVal[1]  + "/" +  sku.num + "件"
-                  ishasColor = true
-                  break
-               }
+              if (sizeTextArray[a].colorVal === attrVal[0]) {
+                sizeTextArray[a].text += ';' + attrVal[1] + '/' + sku.num + '件'
+                ishasColor = true
+                break
+              }
             }
-            if(!ishasColor){
+            if (!ishasColor) {
               sizeTextArray.push(skuObj)
             }
           }
-          this.orderList[i].goodsList[j].sizeTextArray =  sizeTextArray
+          this.orderList[i].goodsList[j].sizeTextArray = sizeTextArray
         }
       }
     }
