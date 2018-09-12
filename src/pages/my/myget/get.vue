@@ -39,7 +39,7 @@ export default {
   },
   data () {
     return {
-      tag: null,
+      tag: 1,
       skuCodeList: [],
       navData: [{
         id: 1,
@@ -77,6 +77,7 @@ export default {
   },
   methods: {
     handleNav (tag) {
+      console.log(tag)
       if (tag) {
         this.tag = tag
       }
@@ -104,7 +105,7 @@ export default {
     }
   },
   mounted () {
-    this.getOrderList(0)
+    this.getOrderList(null)
   }
 }
 </script>

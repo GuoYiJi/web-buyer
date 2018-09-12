@@ -1,15 +1,5 @@
 <template>
   <div class="home">
-    <!-- 订单详情-买家待付款 -->
-    <!-- <obliGat v-if="xq==1" :id="id"/> -->
-    <!-- 订单详情-待发货状态 -->
-    <!-- <senSon  v-if="xq==5" :id="id"/> -->
-    <!-- 订单详情-待收货状态-->
-    <!-- <sendMailTEdT v-if="xq==6" :id="id"/> -->
-    <!-- 订单详情-交易成功状态 -->
-    <!-- <succOrder v-if="xq==7" :id="id" /> -->
-    <!-- 订单详情-交易取消状态-->
-    <!-- <cancelledMail v-if="xq==2"  :id="id"/> -->
     <div class="head">
       <i class="h-img"></i>
       <span>{{stateName[details.state]}}</span>
@@ -18,7 +8,7 @@
       <i class="dz-img"></i>
       <span class="dz-name">收货人：{{details.orderAddress.name}}</span>
       <span class="dz-phone">{{details.orderAddress.mobile}}</span>
-      <p class="dz-dz">收货地址：{{details.orderAddress.value+details.orderAddress.address}}</p>
+      <p class="dz-dz">收货地址：{{details.orderAddress.value + details.orderAddress.address}}</p>
     </div>
     <p class="title">{{shopName}}</p>
     <div class="nav" v-for="(item,index) in details.orderGoods" :key="index">
@@ -96,7 +86,7 @@
   </div>
 </template>
 <script>
-// import wx from 'wx'
+import wx from 'wx'
 import API from '@/api/httpShui'
 import obliGat from '@/components/o_obliGat'
 import senSon from '@/components/o_senSon'
@@ -114,7 +104,7 @@ export default {
   data () {
     return {
       shopName: '',
-      stateName: ['','待付款','交易取消','已支付','支付失败','待发货','待收货','已完成','交易关闭','拼单中'],
+      stateName: ['', '待付款', '交易取消', '已支付', '支付失败', '待发货', '待收货', '已完成', '交易关闭', '拼单中'],
       details: {},
       skuCodeList: [],
       xq: null,
@@ -136,37 +126,35 @@ export default {
           let skuObj = {}
           let attrVal = sku.skuCode.split(',')
           skuObj.colorVal = attrVal[0]
-          skuObj.text =  attrVal[0] + ":" +attrVal[1] + "/" + sku.num + "件"
+          skuObj.text = attrVal[0] + ':' + attrVal[1] + '/' + sku.num + '件'
           let ishasColor = false
           for (let a = 0; a < sizeTextArray.length; a++) {
-              if (sizeTextArray[a].colorVal === attrVal[0]) {
-                sizeTextArray[a].text += ";" +attrVal[1]  + "/" +  sku.num + "件"
-                ishasColor = true
-                break
-              }
+            if (sizeTextArray[a].colorVal === attrVal[0]) {
+              sizeTextArray[a].text += ';' + attrVal[1] + '/' + sku.num + '件'
+              ishasColor = true
+              break
+            }
           }
-          if(!ishasColor){
+          if (!ishasColor) {
             sizeTextArray.push(skuObj)
           }
         }
-        orderGoods[i].sizeTextArray =  sizeTextArray
+        orderGoods[i].sizeTextArray = sizeTextArray
       }
       this.details.orderGoods = orderGoods
-      if(orderGoods && orderGoods.length > 0){
-      let gArr = orderGoods
-      gArr.forEach((good,idx)=>{
-        this.skuCodeList[idx] = []
-        good.orderGoods.forEach((Citem, Cindex) => {
-          let color = Citem.skuCode.split(',')[0]
-          let size = Citem.skuCode.split(',')[1]
-          // console.log(color, Citem);
-          this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
-          // console.log(this.skuCodeList)
-          
+      if (orderGoods && orderGoods.length > 0) {
+        let gArr = orderGoods
+        gArr.forEach((good, idx) => {
+          this.skuCodeList[idx] = []
+          good.orderGoods.forEach((Citem, Cindex) => {
+            let color = Citem.skuCode.split(',')[0]
+            let size = Citem.skuCode.split(',')[1]
+            // console.log(color, Citem)
+            this.skuCodeList[idx][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
+            // console.log(this.skuCodeList)
+          })
         })
-      })
-      
-    }
+      }
       if (data.data.isHasChildren === 0 && data.data.isPing === 0) {
         this.isRetreat = true
       }
@@ -189,7 +177,7 @@ export default {
   }
 }
 </script>
-<style type="text/sass" lang="sass" scoped>
+<style type='text/sass' lang='sass' scoped>
 @import '~@/assets/css/mixin'
 .head
   color: #F67C2F
