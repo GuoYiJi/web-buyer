@@ -44,23 +44,23 @@ export default {
       'list': [{
         'pagePath': 'pages/home/home',
         'text': '首页',
-        'iconPath': '/static/img/home3.png',
-        'selectedIconPath': '/static/img/home.png'
+        'iconPath': '/static/img/home1.png',
+        'selectedIconPath': '/static/img/home2.png'
       }, {
         'pagePath': 'pages/classify/classify',
         'text': '分类',
-        'iconPath': '/static/img/home1.png',
-        'selectedIconPath': '/static/img/fl.png'
+        'iconPath': '/static/img/fl1.png',
+        'selectedIconPath': '/static/img/fl2.png'
       }, {
         'pagePath': 'pages/shopping/shopping',
         'text': '购物车',
-        'iconPath': '/static/img/home2.png',
-        'selectedIconPath': '/static/img/gwc.png'
+        'iconPath': '/static/img/gwc1.png',
+        'selectedIconPath': '/static/img/gwc2.png'
       }, {
         'pagePath': 'pages/my/my',
         'text': '我的',
-        'iconPath': '/static/img/a301.png',
-        'selectedIconPath': '/static/img/gr1.png'
+        'iconPath': '/static/img/user1.png',
+        'selectedIconPath': '/static/img/user2.png'
       }]
     }
   }

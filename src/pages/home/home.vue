@@ -72,10 +72,6 @@
         <p class="top_text">顶部</p>
       </div>
     </div>
-
-    <!--<div class="footer">-->
-      <!--<footers :tag="1" />-->
-    <!--</div>-->
   </div>
 </template>
 <script>
@@ -89,7 +85,6 @@ import collocation from '@/components/h_collocation'
 import Collage from '@/components/h_Collage'
 import discount from '@/components/h_discount'
 import screen from '@/components/h_screen'
-// import footers from '@/commond/footer'
 export default {
   mixins: [mixin],
   components: {

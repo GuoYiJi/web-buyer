@@ -157,7 +157,6 @@ export default {
     }
   },
   onPageScroll (e) {
-    console.log(e.scrollTop)
     if (e.scrollTop > 300) {
       this.suspension = true
     } else if (e.scrollTop < 300) {
@@ -212,10 +211,15 @@ export default {
     // 确定按钮
     confirmBth () {
       let that = this
+      // 规格ID数量数组
       let skuAttr = []
+      // 规格文字拼接数组
       let skuCode = []
+      // 总数
       let totalNum = 0
+      // 单价
       let price = that.goodsInfo.sellPrice
+      // 总价
       let totalPrice = 0
       for (let i = 0; i < that.skuAttr.length; i++) {
         for (let j = 0; j < that.skuAttr[i].sizeArray.length; j++) {
@@ -253,8 +257,8 @@ export default {
           skuAttr.push(obj)
         }
       }
-      console.log(skuAttr)
-      console.log(skuCode)
+      // console.log(skuAttr)
+      // console.log(skuCode)
       totalPrice = totalNum * price
       // 加入购物车
       if (this.buyType === 1) {
@@ -275,9 +279,9 @@ export default {
             'content-type': 'application/json' // 默认值
           },
           success: function (res) {
-            console.log(res)
             if (res.data.code === 1) {
               that.mySetTimeout('加入购物车成功')
+              that.popupShow = false
             }
           }
         })
@@ -589,12 +593,12 @@ export default {
     text-align: center 
     font-size: 22px
     color: #666
-    bottom: 500px
+    bottom: 200px
     z-index: 999
     .top
       display: inline-block
       background: rgba(234,234,234,1)
-      border-radius: 60px
+      border-radius: 50%
       width: 96px
       height: 76px
       overflow: hidden
@@ -608,7 +612,7 @@ export default {
     .home
       display: inline-block
       background: rgba(234,234,234,1)
-      border-radius: 60px
+      border-radius: 50%
       width: 96px
       height: 76px
       overflow: hidden
@@ -622,7 +626,7 @@ export default {
     .shopping
       display: inline-block
       background: rgba(234,234,234,1)
-      border-radius: 60px
+      border-radius: 50%
       width: 96px
       height: 76px
       position: relative

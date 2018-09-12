@@ -119,20 +119,16 @@
           <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
         </span>
       </div>
-
-      <!-- <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
-      <div class="m_tips"></div>
-    </i-modal> -->
     </div>
   </div>
 </template>
 <script>
-import wx from "wx";
+import wx from 'wx'
 export default {
-  name: "orderList",
+  name: 'orderList',
   components: {},
-  data() {
-    return {};
+  data () {
+    return {}
   },
   props: {
     ordersValueList: {
@@ -149,31 +145,31 @@ export default {
     // }
   },
   methods: {
-    //数据处理
-    toOpen() {
+    // 数据处理
+    toOpen () {
       // thisname = true;
     },
-    toClose() {
+    toClose () {
       // this[name] = false;
     },
-    toPinDetails() {
-      this.$router.push("/pages/my/pinDetails/pinDetails");
+    toPinDetails () {
+      this.$router.push('/pages/my/pinDetails/pinDetails');
     }
   },
-  created() {
+  created () {
     this.ordersValueList.forEach((Pitem, Pindex) => {
-      this.skuCodeList[Pindex] = [];
+      this.skuCodeList[Pindex] = []
       Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
-        console.log(Citem, Pindex, Cindex);
-        let color = Citem.skuCode.split(',')[0];
-        let size = Citem.skuCode.split(',')[1];
-        console.log(color, size);
-        this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
+        console.log(Citem, Pindex, Cindex)
+        let color = Citem.skuCode.split(',')[0]
+        let size = Citem.skuCode.split(',')[1]
+        console.log(color, size)
+        this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
       })
-    });
-    console.log(this.skuCodeList);
+    })
+    console.log(this.skuCodeList)
   }
-};
+}
 </script>
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'

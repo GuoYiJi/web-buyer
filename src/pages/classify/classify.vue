@@ -39,14 +39,10 @@
         </ul>
       </div>
     </div>
-    <!--<div class="footer">-->
-      <!--<footers :tag="2"/>-->
-    <!--</div>-->
   </div>
 </template>
 <script>
 import wx from 'wx'
-// import footers from '@/commond/footer'
 import API from '@/api/httpShui'
 export default {
   data () {

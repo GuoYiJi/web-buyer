@@ -1,8 +1,8 @@
 const my = [{
   path: '/pages/my/my',
   config: {
-    navigationBarTitleText: '我的'
-    // navigationBarBackgroundColor: '#FA8134',
+    navigationBarTitleText: '我的',
+    navigationBarBackgroundColor: '#FA8134'
   }
 }, ]
 const pinDetails = require('./my/pinDetails')

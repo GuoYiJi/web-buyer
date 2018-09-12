@@ -207,9 +207,9 @@ export default {
     }
   },
   onPageScroll (e) {
-    if (e.scrollTop > 600) {
+    if (e.scrollTop > 300) {
       this.suspension = 1
-    } else if (e.scrollTop < 600) {
+    } else if (e.scrollTop < 300) {
       this.suspension = 0
     }
   },
@@ -643,25 +643,12 @@ export default {
     color: #666
     background: #fff
     margin-top: 10px
-    /*height: 184px*/
     .commodity
       font-size: 28px
       color: #666
       padding: 10px 0 0 22px
       span
         margin-right: 10px
-    /*.classification*/
-      /*display: inline-block*/
-      /*padding: 10px 0 0 22px*/
-    /*.color*/
-      /*display: inline-block*/
-      /*padding: 10px 0 0 183px*/
-    /*.size*/
-      /*display: inline-block*/
-      /*padding: 10px 0 0 22px*/
-    /*.material*/
-      /*display: inline-block*/
-      /*padding: 10px 0 0 183px*/
   .picture
     padding-bottom: 100px
     .title_2
@@ -703,54 +690,56 @@ export default {
       line-height: 98px
   .suspension
     position: fixed
+    width: 96px
     right: 30px
-    bottom: 500px
+    text-align: center
+    font-size: 22px
+    color: #666
+    bottom: 200px
+    z-index: 999
     .top
       display: inline-block
-      background: #fff
-      border-radius: 60px
-      width: 121px
-      height: 121px
+      background: rgba(234,234,234,1)
+      border-radius: 50%
+      width: 96px
+      height: 76px
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .top_img
         +bg-img('home/xqtb.png')
-        width: 63px
-        height: 65px
-        margin: 7px auto 0
-      .top_text
-        padding-left: 31px
+        width: 45px
+        height: 40px
+        margin: 0 auto
     .home
       display: inline-block
-      background: #fff
-      border-radius: 60px
-      width: 121px
-      height: 121px
+      background: rgba(234,234,234,1)
+      border-radius: 50%
+      width: 96px
+      height: 76px
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .home_img
         +bg-img('home/home3.png')
-        width: 70px
-        height: 65px
-        margin: 7px auto 0
-      .home_text
-        padding-left: 31px
+        width: 45px
+        height: 40px
+        margin: 0 auto
     .shopping
       display: inline-block
-      background: #fff
-      border-radius: 60px
-      width: 121px
-      height: 121px
+      background: rgba(234,234,234,1)
+      border-radius: 50%
+      width: 96px
+      height: 76px
       position: relative
       overflow: hidden
       margin-top: 20px
+      padding: 10px 0
       .sp_img
         +bg-img('home/xqgwc.png')
-        width: 69px
-        height: 65px
-        margin: 7px auto 0
-      .sp_text
-        padding-left: 19px
+        width: 45px
+        height: 40px
+        margin: 0 auto
       .sp_dian
         position: absolute
         top: 10px

@@ -30,89 +30,83 @@
 </div>
 </template>
 <script>
-import wx from "wx";
-import fasiAll from "@/components/p_fasiAll";
+import wx from 'wx'
+import fasiAll from '@/components/p_fasiAll'
 import api from '@/api/httpJchan'
-
 export default {
   components: {
-    fasiAll,
+    fasiAll
   },
-  data() {
+  data () {
     return {
-      tag: 1,
+      tag: null,
       skuCodeList: [],
       navData: [{
-          id: 1,
-          text: "全部"
-        },
-        {
-          id: 2,
-          text: "待付款"
-        },
-        {
-          id: 3,
-          text: "拼团中"
-        },
-        {
-          id: 4,
-          text: "待发货"
-        },
-        {
-          id: 5,
-          text: "待收货"
-        },
-        {
-          id: 6,
-          text: "已完成"
-        }
+        id: 1,
+        state: null,
+        text: '全部'
+      },
+      {
+        id: 2,
+        state: 1,
+        text: '待付款'
+      },
+      {
+        id: 3,
+        state: 9,
+        text: '拼团中'
+      },
+      {
+        id: 4,
+        state: 5,
+        text: '待发货'
+      },
+      {
+        id: 5,
+        state: 6,
+        text: '待收货'
+      },
+      {
+        id: 6,
+        state: 7,
+        text: '已完成'
+      }
       ],
       ordersValueList: []
-    };
+    }
   },
   methods: {
-    handleNav(tag) {
-      this.tag = tag;
-      if (this.tag === 1) {
-        this.getOrderList(null);
-      } else if (this.tag === 2) {
-        this.getOrderList(1);
-      } else if (this.tag === 3) {
-        this.getOrderList(9);
-      } else if (this.tag === 4) {
-        this.getOrderList(5);
-      } else if (this.tag === 5) {
-        this.getOrderList(6);
-      } else if (this.tag === 6) {
-        this.getOrderList(7);
+    handleNav (tag) {
+      if (tag) {
+        this.tag = tag
       }
+      this.getOrderList(this.navData[this.tag - 1].state)
     },
-    //获取相应拼单订单
-    async getOrderList(state) {
+    // 获取相应拼单订单
+    async getOrderList (state) {
       const response = await api.myorder({
         pageNumber: 1,
         pageSize: 20,
-        state,
+        state: state,
         isPing: 1
-      });
-      this.ordersValueList = response.data.list;
+      })
+      this.ordersValueList = response.data.list
       this.ordersValueList.forEach((Pitem, Pindex) => {
-        this.skuCodeList[Pindex] = [];
+        this.skuCodeList[Pindex] = []
         Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
-          console.log(Citem, Pindex, Cindex);
-          let color = Citem.skuCode.split(',')[0];
-          let size = Citem.skuCode.split(',')[1];
-          console.log(color, size);
-          this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum];
-        });
-      });
-      console.log(this.skuCodeList);
+          console.log(Citem, Pindex, Cindex)
+          let color = Citem.skuCode.split(',')[0]
+          let size = Citem.skuCode.split(',')[1]
+          this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
+        })
+      })
+      console.log(this.skuCodeList)
     }
   },
-  mounted() {
-    this.getOrderList(null);
+  mounted () {
+    this.getOrderList(0)
   }
-};
+}
 </script>
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'

@@ -112,7 +112,7 @@ export default {
   methods: {
     // 订单详情
     bxq (id, xq) {
-      this.visible1 = false;
+      this.visible1 = false
       this.$router.push({
         path: '/pages/my/orderDetails/obligation',
         query: { id: id, xq: xq }

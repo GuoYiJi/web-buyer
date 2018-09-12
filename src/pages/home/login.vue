@@ -74,7 +74,6 @@ export default {
         data: data.data.no
       })
       await wx.setStorageSync('sessionId', data.data.sessionId)
-      // this.toRoute('home/home')
       wx.switchTab({
         url: '/pages/home/home'
       })

@@ -70,14 +70,10 @@
         <i class="m-icon"></i>
       </li>
     </div>
-    <!--<div class="footer">-->
-      <!--<footers :tag="4" />-->
-    <!--</div>-->
   </div>
 </template>
 <script>
 import wx from 'wx'
-// import footers from '@/commond/footer.vue'
 import mixin from '@/mixin'
 import API from '@/api/httpJchan'
 export default {
