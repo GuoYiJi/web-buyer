@@ -80,15 +80,16 @@ export default {
 @import '~@/assets/css/mixin'
 .nav
   background: #EAEAEA
-  padding-top: 50px
+  margin-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #ccc
   .title
     position: relative
     top: 0
     left: 0
     height: 120px
     margin-bottom: 50px
+    background: #fff
     .title_1
       position: absolute
       font-size: 32px
@@ -113,7 +114,7 @@ export default {
       height: 4px
       background: #999
       top: 95px
-      left: 66%
+      left: 68%
   .content
     display: flex
     flex-wrap: wrap

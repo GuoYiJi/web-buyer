@@ -153,10 +153,11 @@ export default {
       // this[name] = false;
     },
     toPinDetails () {
-      this.$router.push('/pages/my/pinDetails/pinDetails');
+      this.$router.push('/pages/my/pinDetails/pinDetails')
     }
   },
   created () {
+    console.log(this.ordersValueList)
     this.ordersValueList.forEach((Pitem, Pindex) => {
       this.skuCodeList[Pindex] = []
       Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {

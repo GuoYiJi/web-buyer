@@ -29,6 +29,7 @@ export default {
 .nav
   display: flex
   padding: 29px 22px
+  border-bottom: 1px solid #ccc
   .left
     flex: 1
     .img

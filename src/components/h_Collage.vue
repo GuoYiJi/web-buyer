@@ -85,7 +85,7 @@ export default {
   background: #fff
   margin-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #ccc
   .title
     position: relative
     top: 0
@@ -107,16 +107,16 @@ export default {
       position: absolute
       width: 98px
       height: 4px
-      background: #999;
-      top: 95px;
-      left: 18%;
+      background: #999
+      top: 95px
+      left: 18%
     .xian_1
       position: absolute
       width: 98px
       height: 4px
-      background: #999;
-      top: 95px;
-      left: 66%;
+      background: #999
+      top: 95px
+      left: 68%
   .content
     margin-top: 20px
     .kuang

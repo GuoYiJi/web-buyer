@@ -138,10 +138,10 @@ export default {
       key: 'qwe',
       data: 123
     })
+    // 获取用户id
     wx.getStorage({
       key: 'no',
       success: function (res) {
-        console.log(res.data)
         that.no = res.data
       }
     })

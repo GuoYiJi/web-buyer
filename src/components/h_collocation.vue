@@ -1,5 +1,11 @@
 <template>
   <div class="nav">
+    <div class="title">
+      <span class="title_1">NEW SHOW</span>
+      <span class="title_2"> 推荐搭配，高人一等 </span>
+      <span class="xian"></span>
+      <span class="xian_1"></span>
+    </div>
     <div class="content">
       <div v-for="(item, index) in selectMGP" :key="index" class="xK">
         <scroll-view scroll-x="true" style="width: 100%">
@@ -91,21 +97,20 @@ export default {
 </script>
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
-
 .xK
-  border-bottom: 10rpx solid #999
-
+  border-bottom: 10px solid #ccc
 .nav
+  padding-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #ccc
   background: #fff
   position: relative
   .title
     position: relative
     top: 0
     left: 0
-    // height: 100px
-    // margin-bottom: 90px
+    height: 120px
+    margin-bottom: 50px
     .title_1
       position: absolute
       font-size: 32px
@@ -130,7 +135,7 @@ export default {
       height: 4px
       background: #999
       top: 95px
-      left: 66%
+      left: 68%
   .content
     .scroll-x
       display: flex

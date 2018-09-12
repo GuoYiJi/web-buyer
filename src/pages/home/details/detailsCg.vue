@@ -88,11 +88,10 @@
         <p class="home_text">首页</p>
       </div>
       <br/>
-      <div class="shopping">
-        <i class="sp_img"></i>
-        <p class="sp_text">购物车</p>
-        <i class="sp_dian">12</i>
-      </div>
+      <!--<div class="shopping">-->
+        <!--<i class="sp_img"></i>-->
+        <!--<p class="sp_text">购物车</p>-->
+      <!--</div>-->
     </div>
     <!-- 弹窗 -->
     <div class="popup" v-if="popupShow">

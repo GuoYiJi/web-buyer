@@ -92,16 +92,16 @@ export default {
         isPing: 1
       })
       this.ordersValueList = response.data.list
+      console.log(this.ordersValueList)
       this.ordersValueList.forEach((Pitem, Pindex) => {
         this.skuCodeList[Pindex] = []
         Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
-          console.log(Citem, Pindex, Cindex)
           let color = Citem.skuCode.split(',')[0]
           let size = Citem.skuCode.split(',')[1]
           this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
         })
       })
-      console.log(this.skuCodeList)
+      // console.log(this.skuCodeList)
     }
   },
   mounted () {
@@ -111,7 +111,6 @@ export default {
 </script>
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'
-
 .content
   // height: 60%
 .home

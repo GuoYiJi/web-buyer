@@ -8,13 +8,6 @@
     </div>
     <div class="content">
       <div class="kuang">
-        <!--<div class="left">-->
-          <!--<img :src="img" class="img">-->
-          <!--<p class="title">标题标题标题标题标…</p>-->
-          <!--<p class="volume">货期:现货丨销量:200</p>-->
-          <!--<p class="money">批发价:55元</p>-->
-          <!--<span class="btn">立即采购</span>-->
-        <!--</div>-->
         <div :class="{left : index == 0, right : index > 0}" v-for="(item, index) in List" :key="index">
           <img v-if="item.image" class="img" :src="item.image">
           <img v-else class="img" src="../assets/img/classify/goods.png">
@@ -23,13 +16,6 @@
           <p class="money">批发价:{{item.sellPrice}}</p>
           <span class="btn" @click="clickItem(item)">立即采购</span>
         </div>
-        <!--<div class="right">-->
-          <!--<img :src="img" class="img">-->
-          <!--<p class="title">标题标题标题标题标…</p>-->
-          <!--<p class="volume">货期:现货丨销量:200</p>-->
-          <!--<p class="money">批发价:55元</p>-->
-          <!--<span class="btn">立即采购</span>-->
-        <!--</div>-->
       </div>
     </div>
     <div class="More" v-if="!lastPage">
@@ -60,7 +46,7 @@ export default {
         pageNumber: page
       })
       this.lastPage = data.data.lastPage
-      // console.log('火爆热卖', data)
+      console.log('火爆热卖', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)
@@ -92,9 +78,9 @@ export default {
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .nav
-  padding-top: 50px
+  margin-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #ccc
   background: #EAEAEA
   .title
     position: relative
@@ -102,6 +88,7 @@ export default {
     left: 0
     height: 120px
     margin-bottom: 50px
+    background: #fff
     .title_1
       position: absolute
       font-size: 32px
@@ -126,7 +113,7 @@ export default {
       height: 4px
       background: #999
       top: 95px
-      left: 66%
+      left: 68%
   .content
     margin-top: 20px
     padding: 10px 22px

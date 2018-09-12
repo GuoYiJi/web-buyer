@@ -172,7 +172,9 @@ export default {
     },
     // 跳转
     toRoute (path) {
-      this.$router.push({path: path})
+      wx.switchTab({
+        url: path
+      })
     },
     // 打开分享
     toOpen (name) {
@@ -590,7 +592,7 @@ export default {
     position: fixed
     width: 96px
     right: 30px
-    text-align: center 
+    text-align: center
     font-size: 22px
     color: #666
     bottom: 200px

@@ -84,7 +84,7 @@ export default {
   background: #fff
   margin-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #ccc
   .title
     position: relative
     top: 0
@@ -115,7 +115,7 @@ export default {
       height: 4px
       background: #999
       top: 95px
-      left: 66%
+      left: 68%
   .content
     margin-top: 20px
     .kuang

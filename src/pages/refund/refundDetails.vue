@@ -64,7 +64,7 @@ export default {
       msg: '',
       wellMsgShow: false,
       state: ['退款', '退货', '换货'],
-      stateName: ['等待商家处理', '商家确认收货', '商家已拒绝', '商家已同意', '等待商家确认收货', '已撤销'],
+      stateName: ['等待商家处理', '已完成', '商家已拒绝', '商家已同意', '等待商家确认收货', '已撤销'],
       shopName: '',
       details: {},
       goods: [],
@@ -191,7 +191,7 @@ export default {
         line-height: 50px
         padding: 0 20px
         font-size: 28px
-        color: #EE7527  
+        color: #EE7527
       .label
         display: block
         position: relative

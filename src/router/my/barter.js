@@ -2,7 +2,8 @@ const barter = [{
   path: '/pages/refund/barter',
   name: 'barter',
   config: {
-    // navigationBarBackgroundColor: '#FA8134',
+    navigationBarTitleText: '换货申请',
+    navigationBarBackgroundColor: '#FA8134'
   }
 }, ]
 module.exports = barter

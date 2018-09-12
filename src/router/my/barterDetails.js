@@ -2,7 +2,8 @@ const barterDetails = [{
   path: '/pages/refund/barterDetails',
   name: 'barterDetails',
   config: {
-    // navigationBarTitleText: '',
+    navigationBarTitleText: '换货详情',
+    navigationBarBackgroundColor: '#FA8134'
   }
 }, ]
 

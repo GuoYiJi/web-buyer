@@ -37,9 +37,9 @@
       </div>
       <div class="settlement">
         <span class="s_btn" v-if="showBtn" @click="Buy()">结算({{count}})</span>
-        <span class="s_del" v-if="!showBtn" @click="toOpen('visible2')">删除({{count}})</span>
+        <span class="s_del" v-if="!showBtn" @click="deleteBtn()">删除({{count}})</span>
       </div>
-      <i-modal :visible="visible2" @ok="toClose('visible2')" @cancel="toClose('visible2')">
+      <i-modal :visible="visible2" @ok="delCard()" @cancel="visible2 = false">
         <div class="m_tips">确定删除商品</div>
       </i-modal>
     </div>
@@ -93,7 +93,6 @@
 import wx from 'wx'
 import API from '@/api/httpShui'
 import config from '@/config.js'
-// import footers from '@/commond/footer'
 export default {
   components: {},
   data () {
@@ -123,10 +122,13 @@ export default {
     toOpen (name) {
       this[name] = true
     },
+    toClose (name) {
+      this[name] = false
+    },
     // 去首页
     toHome () {
-      this.$router.push({
-        path: '/pages/home/home'
+      wx.switchTab({
+        url: '/pages/home/home'
       })
     },
     // 编辑(保存当前编辑商品的下标)
@@ -257,8 +259,16 @@ export default {
         that.count = that.selectArr.length
       }
     },
+    deleteBtn () {
+      let that = this
+      if (that.selectArr.length > 0) {
+        that.visible2 = true
+      } else {
+        this.mySetTimeout('请选择要删除的商品')
+      }
+    },
     // 删除购物车
-    async toClose (name) {
+    async delCard (name) {
       let that = this
       let idStr = []
       that.selectArr.forEach(function (item) {
@@ -268,7 +278,14 @@ export default {
       console.log('删除购物车', data)
       if (data.code === 1) {
         this.mySetTimeout('删除成功')
-        this[name] = false
+        this.visible2 = false
+        for (let i = 0; i < idStr.length; i++) {
+          for (let k = 0; k < that.selectArr.length; k++) {
+            if (idStr[i] === that.selectArr[k].id) {
+              that.selectArr.splice(k, 1)
+            }
+          }
+        }
         that.getCard()
       }
     },
@@ -315,7 +332,6 @@ export default {
       if (data.code === 1) {
         // console.log('购物车列表', data)
         let list = data.data
-        console.log(list)
         if (list === null) {
           that.kong = true
         } else {
