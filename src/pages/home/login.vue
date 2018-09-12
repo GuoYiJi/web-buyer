@@ -14,10 +14,10 @@
   </div>
 </template>
 <script>
-import wx from 'wx';
-import mixin from '@/mixin';
-import config from '@/config';
-import API from '@/api/httpJsong';
+import wx from 'wx'
+import mixin from '@/mixin'
+import config from '@/config'
+import API from '@/api/httpJsong'
 export default {
   mixins: [mixin],
   components: {},
@@ -74,7 +74,10 @@ export default {
         data: data.data.no
       })
       await wx.setStorageSync('sessionId', data.data.sessionId)
-      this.toRoute('home/home')
+      // this.toRoute('home/home')
+      wx.switchTab({
+        url: '/pages/home/home'
+      })
     }
   },
   async mounted () {

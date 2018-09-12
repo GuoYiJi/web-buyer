@@ -51,7 +51,7 @@ export default {
         pageNumber: page
       })
       this.lastPage = data.data.lastPage
-      // console.log('拼团商品', data)
+      console.log('拼团商品', data)
       if (data.code === 1) {
         if (this.List.length !== 0) {
           this.List.push.apply(this.List, data.data.list)

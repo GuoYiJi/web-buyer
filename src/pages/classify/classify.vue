@@ -39,14 +39,14 @@
         </ul>
       </div>
     </div>
-    <div class="footer">
-      <footers :tag="2"/>
-    </div>
+    <!--<div class="footer">-->
+      <!--<footers :tag="2"/>-->
+    <!--</div>-->
   </div>
 </template>
 <script>
 import wx from 'wx'
-import footers from '@/commond/footer'
+// import footers from '@/commond/footer'
 import API from '@/api/httpShui'
 export default {
   data () {
@@ -58,9 +58,7 @@ export default {
       keyword: ''
     }
   },
-  components: {
-    footers
-  },
+  components: {},
   methods: {
     // 点击一级分类标签
     clickTabs (i, id) {

@@ -157,9 +157,10 @@ export default {
     }
   },
   onPageScroll (e) {
-    if (e.scrollTop > 600) {
+    console.log(e.scrollTop)
+    if (e.scrollTop > 300) {
       this.suspension = true
-    } else if (e.scrollTop < 600) {
+    } else if (e.scrollTop < 300) {
       this.suspension = false
     }
   },

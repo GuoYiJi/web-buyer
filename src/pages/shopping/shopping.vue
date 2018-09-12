@@ -1,11 +1,11 @@
 <template>
   <div class="nav">
-    <div class="kong" v-if="(kong == 1)">
+    <div class="kong" v-if="kong">
       <img class="k_img" src="../../assets/img/shopping/kgwc.png">
       <p class="k_text">你的购物车还没有商品~</p>
-      <span class="k_btn">去首页逛逛吧</span>
+      <span class="k_btn" @click="toHome()">去首页逛逛吧</span>
     </div>
-    <div class="content" v-if="(kong == 0)">
+    <div class="content" v-if="!kong">
       <div class="head">
         <i class="xz" :class="{active : checkAll}" @click="clickCheckAll()"></i>
         <span class="h1_text" @click="clickCheckAll()">全选</span>
@@ -80,8 +80,12 @@
       <span class="btn" @click="confirmEdit(orderIndex)">确定</span>
     </div>
     <!-- <span class="dian">3</span> -->
-    <div class="footer">
-      <footers :tag="3" />
+    <!--<div class="footer">-->
+      <!--<footers :tag="3" />-->
+    <!--</div>-->
+    <!-- 提示语 -->
+    <div class="wellMsg" v-show="wellMsgShow">
+      {{msg}}
     </div>
   </div>
 </template>
@@ -89,16 +93,16 @@
 import wx from 'wx'
 import API from '@/api/httpShui'
 import config from '@/config.js'
-import footers from '@/commond/footer'
+// import footers from '@/commond/footer'
 export default {
-  components: {
-    footers
-  },
+  components: {},
   data () {
     return {
       sessionId: '',
-      kong: '',
+      kong: false,
       showBtn: true,
+      wellMsgShow: false,
+      msg: '',
       count: 0,
       popup: false,
       value1: 1,
@@ -116,33 +120,38 @@ export default {
     }
   },
   methods: {
-    // 编辑
+    toOpen (name) {
+      this[name] = true
+    },
+    // 去首页
+    toHome () {
+      this.$router.push({
+        path: '/pages/home/home'
+      })
+    },
+    // 编辑(保存当前编辑商品的下标)
     editOrder (index) {
       this.popup = true
       this.orderIndex = index
     },
-    // 选择规格
+    // 选择规格(保存颜色下标)
     selectColorSpec (index) {
       this.colorIndex = index
     },
     // 减
     minus (colorIndex, sizeIndex, orderIndex) {
       let that = this
-      // console.log(colorIndex, sizeIndex, orderIndex)
       let num = that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum
       if (num === 0) {
         return false
       } else {
         that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum--
         that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].editNum--
-
       }
     },
     // 加
     add (colorIndex, sizeIndex, orderIndex) {
       let that = this
-      // console.log(colorIndex, sizeIndex, orderIndex)
-      console.log(that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum)
       let num = that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum
       if (num === 100) {
         return false
@@ -151,7 +160,7 @@ export default {
         that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].editNum++
       }
     },
-    // 确认编辑
+    // 确认编辑(更新购物车)
     confirmEdit (orderIndex) {
       const TEST_URL = config.url
       const BASE_URL = config.url
@@ -161,9 +170,9 @@ export default {
       let skuAttr = that.cardList[orderIndex].skuAttr
       let skuList = that.cardList[orderIndex].skuList
       let goodsCard = []
-      for (let i = 0; i < skuAttr.length; i++){
+      for (let i = 0; i < skuAttr.length; i++) {
         let sizeArray = skuAttr[i].sizeArray
-        for (let k = 0; k < sizeArray.length; k++ ) {
+        for (let k = 0; k < sizeArray.length; k++) {
           console.log(sizeArray[k])
           // let editNum = sizeArray[k].editNum
           let newNum = sizeArray[k].newNum
@@ -183,36 +192,27 @@ export default {
         }
       }
       let data = {
-          sessionId: this.sessionId,
-          appId: appId,
-          goodsCard: goodsCard
-        }
+        sessionId: this.sessionId,
+        appId: appId,
+        goodsCard: goodsCard
+      }
       wx.request({
-          method: 'POST',
-          url: URL + '/api/goods/card/addGoodsCard',
-          data: JSON.stringify(data),
-          header: {
-            'content-type': 'application/json' // 默认值
-          },
-          success: function (res) {
-            console.log(res)
-            if (res.data.code === 1) {
-              // for (let i = 0; i < skuAttr.length; i++){
-              //   let sizeArray = skuAttr[i].sizeArray
-              //   for (let k = 0; k < sizeArray.length; k++ ) {
-              //     console.log(1)
-              //     sizeArray[k].sizeNum = sizeArray[k].newNum
-              //     console.log(sizeArray[k].sizeNum)
-              //   }
-              // }
-              // console.log(that.cardList[orderIndex])
-              that.getCard()
-              that.popup = false
-            }
+        method: 'POST',
+        url: URL + '/api/goods/card/addGoodsCard',
+        data: JSON.stringify(data),
+        header: {
+          'content-type': 'application/json' // 默认值
+        },
+        success: function (res) {
+          console.log(res)
+          if (res.data.code === 1) {
+            that.getCard()
+            that.popup = false
           }
-        })  
+        }
+      })
     },
-    // 删除
+    // 删除按钮切换
     delBtn () {
       this.count = this.selectArr.length
       if (this.showBtn) {
@@ -232,12 +232,10 @@ export default {
             that.selectArr.splice(i, 1)
           }
         }
-        // console.log('0', that.cardList[index])
       } else {
         that.count++
         that.cardList[index].check = true
         that.selectArr.push({id: id})
-        // console.log('1', this.cardList[index])
       }
     },
     // 全选
@@ -258,10 +256,6 @@ export default {
         })
         that.count = that.selectArr.length
       }
-      // console.log(that.selectArr)
-    },
-    toOpen (name) {
-      this[name] = true
     },
     // 删除购物车
     async toClose (name) {
@@ -270,9 +264,10 @@ export default {
       that.selectArr.forEach(function (item) {
         idStr.push(item.id)
       })
-      console.log(idStr.join(','))
       const data = await API.deleteCard({ids: idStr.join(',')})
+      console.log('删除购物车', data)
       if (data.code === 1) {
+        this.mySetTimeout('删除成功')
         this[name] = false
         that.getCard()
       }
@@ -310,19 +305,20 @@ export default {
         console.log(dataObj)
         this.$router.push({path: '/pages/shopping/order/order', query: {cart: JSON.stringify(dataObj)}})
       } else {
-        alert('请选择商品')
+        this.mySetTimeout('请选择商品')
       }
     },
+    // 获取购物车列表
     async getCard () {
       let that = this
       const data = await API.getCardList()
       if (data.code === 1) {
-        console.log('购物车列表', data)
+        // console.log('购物车列表', data)
         let list = data.data
-        if (list.length === 0) {
-          that.kong = 1
+        console.log(list)
+        if (list === null) {
+          that.kong = true
         } else {
-          that.kong = 0
           for (let k = 0; k < list.length; k++) {
             list[k].check = false
             let skuList = list[k].skuList
@@ -388,13 +384,6 @@ export default {
                   skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
                   skuCode.push(skuVal)
                 }
-                // for (let k = 0; k < that.skuList.length; k++) {
-                //   if (that.skuList[k].attrIds === attrIds) {
-                //     obj.skuId = that.skuList[k].id
-                //   }
-                // }
-                // obj.num = num
-                // skuAttr.push(obj)
               }
             }
             list[k].skuCode = skuCode
@@ -403,90 +392,21 @@ export default {
           this.cardList = list
         }
       }
+    },
+    // 定时器弹窗
+    mySetTimeout (msg) {
+      let that = this
+      that.wellMsgShow = true
+      that.msg = msg
+      setTimeout(function () {
+        that.wellMsgShow = false
+        that.msg = ''
+      }, 1000)
     }
   },
   async mounted () {
-    let that = this
-    that.sessionId = await wx.getStorageSync('sessionId')
-    const data = await API.getCardList()
-    if (data.code === 1) {
-      console.log('购物车列表', data)
-      let list = data.data
-      if (list.length === 0) {
-        that.kong = 1
-      } else {
-        that.kong = 0
-        for (let k = 0; k < list.length; k++) {
-          list[k].check = false
-          let skuList = list[k].skuList
-          let skuAttr = []
-          // 定义规格数组
-          for (let i = 0; i < skuList.length; i++) {
-            let sku = skuList[i]
-            let obj = {}
-            let attrIds = sku.attrIds.split(',')
-            let attrVal = sku.skuCode.split(',')
-            obj.color = attrIds[0]
-            obj.colorVal = attrVal[0]
-            let sizeArray = []
-            let sizeObj = {}
-            sizeObj.sizeId = attrIds[1]
-            sizeObj.sizeVal = attrVal[1]
-            sizeObj.sizeNum = sku.num
-            sizeObj.newNum = sku.num
-            sizeObj.editNum = 0
-            sizeArray.push(sizeObj)
-            obj.sizeArray = sizeArray
-            let isHas = false
-            for (let j = 0; j < skuAttr.length; j++) {
-              if (skuAttr[j].color === obj.color) {
-                // let skuSize = skuAttr[j]
-                skuAttr[j].sizeArray.push(sizeObj)
-                isHas = true
-                break
-              }
-            }
-            if (!isHas) {
-              skuAttr.push(obj)
-            }
-          }
-          list[k].skuAttr = skuAttr
-          // 处理规格数据
-          let skuCode = []
-          let totalNum = 0
-          for (let a = 0; a < skuAttr.length; a++) {
-            for (let b = 0; b < skuAttr[a].sizeArray.length; b++) {
-              let obj = {}
-              if (skuAttr[a].sizeArray[b].sizeNum === 0) {
-                continue
-              }
-              let colorVal = skuAttr[a].colorVal
-              let sizeVal = skuAttr[a].sizeArray[b].sizeVal
-              let num = skuAttr[a].sizeArray[b].sizeNum
-              totalNum += Number(num)
-              // 处理规格文字
-              let ishas = false
-              let skuVal = ''
-              for (let c = 0; c < skuCode.length; c++) {
-                let str = skuCode[c].substring(0, 1)
-                if (str === colorVal) {
-                  skuCode[c] += sizeVal + '/' + num + '件;'
-                  ishas = true
-                  break
-                }
-              }
-              if (!ishas) {
-                skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
-                skuCode.push(skuVal)
-              }
-            }
-          }
-          list[k].skuCode = skuCode
-          list[k].totalNum = totalNum
-        }
-        this.cardList = list
-      }
-    }
+    this.sessionId = await wx.getStorageSync('sessionId')
+    this.getCard()
   },
   watch: {
     // 全选数组监听
@@ -494,8 +414,12 @@ export default {
       handler () {
         let cardListlen = this.cardList.length
         let selectArrlen = this.selectArr.length
-        if (selectArrlen === cardListlen) {
-          this.checkAll = true
+        if (cardListlen > 0 && selectArrlen > 0) {
+          if (selectArrlen === cardListlen) {
+            this.checkAll = true
+          } else {
+            this.checkAll = false
+          }
         } else {
           this.checkAll = false
         }
@@ -681,7 +605,7 @@ export default {
         color: #fff
         position: absolute
         top: 15px
-        right: 30rpx
+        right: 30px
       .s_del
         background: #EE7527
         display: inline-block
@@ -693,7 +617,7 @@ export default {
         color: #fff
         position: absolute
         top: 15px
-        right: 30rpx
+        right: 30px
   .dian
     position: fixed
     display: inline-block
@@ -844,4 +768,19 @@ export default {
       color: #fff
       border-radius: 8px
       font-size: 32px
+  .wellMsg
+    position: absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
+    margin: auto
+    width: 305px
+    height: 114px
+    line-height: 114px
+    border-radius: 10px
+    background: rgba(0,0,0,.8)
+    color: #ffffff
+    font-size: 30px
+    text-align: center
 </style>

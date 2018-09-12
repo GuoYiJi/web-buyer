@@ -38,94 +38,6 @@
       </div>
     </div>
     <div class="content">
-      <!--<div class="home" v-if="tag === 2 || tag === 3 || tag === 5 || tag === 6">-->
-        <!--<div class="sort-select">-->
-          <!--<div class="top-nav">-->
-            <!--<ul>-->
-              <!--&lt;!&ndash; <li :class="[tag === 1 && 'nav-active']" @click="handleTag(1)">综合</li> &ndash;&gt;-->
-              <!--<li :class="[tag === 2 && 'nav-active']" @click="handleTag(2)">销量-->
-                <!--<div class="sort-box">-->
-                  <!--<i class="sort-top" :class="asceSale && 'sort-active'"></i>-->
-                  <!--<i :class="!asceSale && 'sort-active'" class="sort-bottom"></i>-->
-                <!--</div>-->
-              <!--</li>-->
-              <!--<li :class="[tag === 4 && 'nav-active']" @click="handleTag(4)">价格-->
-                <!--<div class="sort-box">-->
-                  <!--<i class="sort-top" :class="ascePrice && 'sort-active'"></i>-->
-                  <!--<i :class="!ascePrice  && 'sort-active'" class="sort-bottom"></i>-->
-                <!--</div>-->
-              <!--</li>-->
-              <!--<li :class="[tag === 5 && 'nav-active']" @click="handleTag(5)">筛选-->
-                <!--<div class="sort-box">-->
-                  <!--<i class="option-icon"></i>-->
-                <!--</div>-->
-              <!--</li>-->
-            <!--</ul>-->
-          <!--</div>-->
-          <!--<i-drawer mode="right" :visible="showRight1" @close="toggleRight1">-->
-            <!--<div class="demo-container">-->
-              <!--<div class="title">-->
-                <!--<i class="zuo"></i>-->
-                <!--<span class="screen">筛选</span>-->
-              <!--</div>-->
-              <!--<div class="item-box">-->
-                <!--<div class="item">-->
-                  <!--<p class="i_title">品类</p>-->
-                  <!--<ul class="s_item_box">-->
-                    <!--<li class="s_item">一级分类</li>-->
-                    <!--<li class="s_item">一级分类</li>-->
-                    <!--<li class="s_item">一级分类</li>-->
-                    <!--<li class="s_item">一级分类</li>-->
-                    <!--<li class="s_item">一级分类</li>-->
-                    <!--<li class="s_item">一级分类</li>-->
-                  <!--</ul>-->
-                  <!--&lt;!&ndash; <ul v-if="more1" class="s_item_box">-->
-                    <!--<li class="s_item">档口1</li>-->
-                    <!--<li class="s_item">档口2</li>-->
-                    <!--<li class="s_item">档口3</li>-->
-                  <!--</ul> &ndash;&gt;-->
-                  <!--<p class="more">-->
-                <!--<span @click="toOpen('more1')" v-if="!more1">查看更多-->
-                  <!--<i class="goback"></i>-->
-                <!--</span>-->
-                    <!--<span @click="toClose('more1')" v-else>点击收起</span>-->
-                  <!--</p>-->
-                <!--</div>-->
-                <!--<div class="item">-->
-                  <!--<p class="i_title">货期情况</p>-->
-                  <!--<ul class="s_item_box">-->
-                    <!--<li class="s_item">现货</li>-->
-                    <!--<li class="s_item">3-5天</li>-->
-                    <!--<li class="s_item">6-10天</li>-->
-                    <!--<li class="s_item">订货</li>-->
-                    <!--<li class="s_item">11-15天</li>-->
-                    <!--<li class="s_item">一个月内</li>-->
-                  <!--</ul>-->
-                <!--</div>-->
-                <!--<div class="item">-->
-                  <!--<p class="i_title">价格区间</p>-->
-                  <!--<ul class="s_item_box">-->
-                    <!--<li class="s_item">0-70</li>-->
-                    <!--<li class="s_item">3-5天</li>-->
-                    <!--<li class="s_item">6-10天</li>-->
-                    <!--<li class="s_item">-->
-                      <!--<input type="text" placeholder="最低价">-->
-                    <!--</li>-->
-                    <!--&#45;&#45;-->
-                    <!--<li class="s_item">-->
-                      <!--<input type="text" placeholder="最高价">-->
-                    <!--</li>-->
-                  <!--</ul>-->
-                <!--</div>-->
-              <!--</div>-->
-              <!--<div class="f_btn">-->
-                <!--<p class="reset">重置</p>-->
-                <!--<p class="confirm">确定</p>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</i-drawer>-->
-        <!--</div>-->
-      <!--</div>-->
       <div v-if="tag == 1">
         <colligate/>
         <Upnew/>
@@ -161,9 +73,9 @@
       </div>
     </div>
 
-    <div class="footer">
-      <footers :tag="1" />
-    </div>
+    <!--<div class="footer">-->
+      <!--<footers :tag="1" />-->
+    <!--</div>-->
   </div>
 </template>
 <script>
@@ -177,7 +89,7 @@ import collocation from '@/components/h_collocation'
 import Collage from '@/components/h_Collage'
 import discount from '@/components/h_discount'
 import screen from '@/components/h_screen'
-import footers from '@/commond/footer'
+// import footers from '@/commond/footer'
 export default {
   mixins: [mixin],
   components: {
@@ -187,8 +99,7 @@ export default {
     collocation,
     Collage,
     discount,
-    screen,
-    footers
+    screen
   },
   data () {
     return {

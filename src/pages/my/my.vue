@@ -70,19 +70,19 @@
         <i class="m-icon"></i>
       </li>
     </div>
-    <div class="footer">
-      <footers :tag="4" />
-    </div>
+    <!--<div class="footer">-->
+      <!--<footers :tag="4" />-->
+    <!--</div>-->
   </div>
 </template>
 <script>
 import wx from 'wx'
-import footers from '@/commond/footer.vue'
+// import footers from '@/commond/footer.vue'
 import mixin from '@/mixin'
 import API from '@/api/httpJchan'
 export default {
   mixins: [mixin],
-  components: { footers },
+  components: {},
   data () {
     return {
       prePayment: 0,
