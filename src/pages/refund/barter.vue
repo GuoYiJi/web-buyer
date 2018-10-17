@@ -4,7 +4,6 @@
     <div class="refundExplain">
       <p class="title">换货说明：<span>(最多可输入50个字)</span></p>
       <textarea v-model="explain"  class="explain" name="" id="" maxlength=50>
-
       </textarea>
     </div>
     <div class="refundVoucher">
@@ -190,6 +189,10 @@ export default {
   mounted () {
     this.orderId = this.$route.query.orderId
     this.type = this.$route.query.type
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>

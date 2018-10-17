@@ -1,53 +1,127 @@
 <template>
-  <div class="nav">
-    <div class="title">
+  <div class="home_opt_mod">
+    <screen @sort="handleSortChange" @filter="handleFilterChange" v-if="!hidenSort" @showtype="handleShowType" />
+    <div class="home_opt_mod__hd">
       <span class="title_1">NEW SHOW</span>
       <span class="title_2">今日上新，领先一步</span>
-      <span class="xian"></span>
-      <span class="xian_1"></span>
     </div>
-    <div class="content">
-      <div class="kuang" v-for="(item,index) in List" :key="index">
-        <div class="left">
-          <img v-if="item.image" class="img" :src="item.image">
-          <img v-else class="img" src="../assets/img/classify/goods.png">
-        </div>
-        <div class="right">
-          <p class="title">{{item.name}}</p>
-          <p class="Goods">期货:{{item.delivery}}</p>
-          <p class="volume">销量:{{item.sellCount}}</p>
-          <p class="money">￥{{item.sellPrice}}</p>
-          <span class="btn" @click="clickItem(item)">立即采购</span>
+    <div class="home_opt_mod__bd">
+      
+      <div class="goods-list__container goods-list__container--simple" v-if="showType === 0">
+        <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="clickItem(item)">
+          <div class="goods-list__item goods-list__item--list simple">
+            <div class="goods-list__thumb">
+              <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
+              <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
+            </div>
+            <div class="goods-list__info">
+              <p class="title zan-ellipsis--l2">{{item.name}}</p>
+              <div class="sale-info">
+                <p>期货:{{item.delivery}}</p>
+                <p>销量:{{item.sellCount}}</p>
+                <p class="price">￥{{item.sellPrice}}</p>
+              </div>
+            </div>
+            <span class="goods-list__btn">立即采购</span>
+          </div>
         </div>
       </div>
+      <div class="goods-list__container--small" v-if="showType === 1">
+        <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="clickItem(item)">
+          <div class="goods-list__item goods-list__item--small goods-list__item--btn4 card2">
+            <div class="goods-list__thumb">
+              <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
+              <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
+            </div>
+            <div class="goods-list__info has-title has-subtitle has-price has-btn">
+              <p class="title zan-ellipsis">{{item.name}}</p>
+              <div class="sub-title">
+                <p>期货:{{item.delivery}}</p>
+                <p>销量:{{item.sellCount}}</p>
+              </div>
+              <div class="sale-info">
+                <p class="price">￥{{item.sellPrice}}</p>
+              </div>
+            </div>
+            <div class="goods-list__buy-btn-wrapper">
+              <span class="goods-list__buy-btn-4">立即采购</span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <div v-if="!List.length && lastPage">
+        <div class="no_goods">
+          <div class="no_goods_img"></div>
+          <div class="no_goods_tip">没有相关的商品结果哦~~</div>
+        </div>
+      </div>
+      <div v-show="loading">
+        <zan-loading />
+      </div>
     </div>
-    <div class="More" v-if="!lastPage">
-      <span class="More_text" @click="getMore()">查看更多</span>
-      <i class="img"></i>
+    <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)" @click="getMore()">
+      <div class="loadmore">
+        <span>查看更多</span>
+        <i></i>
+      </div>
     </div>
+<!--     <div class="nav upnew">
+      <div class="More" v-if="!loading && (List.length && !lastPage)" @click="getMore()">
+        <span class="More_text">查看更多</span>
+        <i class="img"></i>
+      </div>
+    </div> -->
   </div>
 </template>
 <script>
 import wx from 'wx'
 import API from '@/api/httpShui'
+import screen from '@/components/h_screen'
 export default {
-  components: {},
+  props: {
+    hidenSort: {
+      type: Boolean,
+      default: false
+    }
+  },
+  components: {
+    screen
+  },
   data () {
     return {
       List: [],
+      showType: 0,
       page: 1,
       totalPage: 0,
-      lastPage: ''
+      ob: '',
+      lastPage: false,
+      goodsFilterOptions: {},
+      loading: false
     }
   },
   methods: {
-    async goodsList (page) {
+    handleShowType(e) {
+      this.showType = e;
+      // this.showType = e.detail;
+    },
+    async goodsList (page, payload) {
+      if (page === 1) {
+        this.List = [];
+        this.lastPage = false;
+      }
+      this.loading = true;
       const data = await API.getGoods({
         labelId: 1,
         state: 1,
-        pageSize: 5,
-        pageNumber: page
+        pageSize: 10,
+        pageNumber: page,
+        ob: this.ob,
+        ...this.goodsFilterOptions,
+        ...payload
       })
+      this.loading = false;
       this.lastPage = data.data.lastPage
       // console.log('每日上新', data)
       if (data.code === 1) {
@@ -68,13 +142,27 @@ export default {
         this.goodsList(this.page)
       }
     },
-    clickItem (obj) {
-      let objStr = JSON.stringify(obj)
-      this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
+    clickItem(obj) {
+      this.$router.push({path: '/pages/home/details/details', query: {goodsId: obj.id, toNew: true}});
+    },
+    handleSortChange(e) {
+      this.ob = e;
+      this.goodsList(1)
+    },
+    handleFilterChange(payload) {
+      this.goodsFilterOptions = Object.assign(this.goodsFilterOptions, payload);
+      this.goodsList(1);
+    },
+    handleFilterRest() {
+      this.goodsFilterOptions = {};
+      this.goodsList(1);
     }
   },
-  mounted () {
-    this.goodsList(this.page)
+  onReady() {
+    this.goodsList(this.page);
+  },
+  onUnload() {
+    console.log('unLoad')
   }
 }
 </script>
@@ -84,8 +172,7 @@ export default {
   background: #fff
   margin-top: 50px
   padding-bottom: 25px
-  border-bottom: 1px solid #ccc
-  .title
+  .nav__title
     position: relative
     top: 0
     left: 0

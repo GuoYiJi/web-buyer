@@ -1,0 +1,103 @@
+@import '~@/assets/css/mixin';
+.promo_module {
+
+  .wrap {
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #fff;
+    height: 200px;
+
+    .title_1 {
+
+      font-size: 32px;
+      color: #000000;
+    }
+    .title_2 {
+      position: relative;
+      font-size: 28px;
+      color: #000000;
+      &:before, &:after {
+
+        position: absolute;
+        top: 50%;
+        margin-top: -2px;
+        width: 98px;
+        height: 4px;
+        background-color: #000;
+        content: "";
+      }
+      &:before {
+        left: -(30px + 98px);
+      }
+      &:after {
+        right: -(30px + 98px);
+      }
+    }
+  }
+}
+
+.home_opt_mod {
+  border-top: 1px solid #eee;
+  &__hd {
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #fff;
+    height: 200px;
+    .title_1 {
+      font-size: 32px;
+      color: #000000;
+    }
+    .title_2 {
+
+      position: relative;
+      font-size: 28px;
+      color: #000000;
+      &:before, &:after {
+        position: absolute;
+        top: 50%;
+        margin-top: -2px;
+        width: 98px;
+        height: 4px;
+        background-color: #000;
+        content: "";
+      }
+      &:before {
+        left: -(30px + 98px);
+      }
+      &:after {
+        right: -(30px + 98px);
+      }
+    }
+  }
+  &__bd {
+    padding-bottom: 60px;
+  }
+  &__ft {
+    padding: 0 74px 60px;
+    .loadmore {
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      color: #999;
+      font-size: 30px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      & > i {
+        margin-left: 20px;
+        width: 34px;
+        height: 18px;
+        @include bg-img('home/xiala.png');
+      }
+    }
+  }
+}

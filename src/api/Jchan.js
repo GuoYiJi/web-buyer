@@ -10,7 +10,8 @@ import qs from 'qs'
 const vm = new Vue()
 export default {
   async post (url, params = {}) {
-    var value = await wx.getStorageSync('sessionId')
+    var value = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
+    console.log('value jchan', value);
     if (value) {
       params.sessionId = value
     }
@@ -41,9 +42,9 @@ export default {
                 icon: 'none',
                 duration: 2000
               })
-              wx.setStorageSync('sessionId', '')
+              wx.setStorageSync(`${process.env.NODE_ENV}_sessionId`, '');
               setTimeout(()=>{
-                wx.redirectTo({url: '/pages/login/wxLogin'})
+                wx.reLaunch({url: '/pages/home/login'})
               },2000)
             } else if (code === 0) {
               const msg = data.data.desc
@@ -52,6 +53,7 @@ export default {
                 icon: 'none',
                 duration: 2000
               })
+              reject();
             }
 
           }

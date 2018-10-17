@@ -1,0 +1,202 @@
+.sku {
+  width: 100vw;
+  background: #fff;
+}
+
+.sku-content {
+  .goods {
+
+    margin-left: 24px;
+    background-color: #fff;
+    &-img {
+      position: relative;
+      float: left;
+      width: 200px;
+      height: 200px;
+      margin-top: -28px;
+      padding: 7px;
+      background-color: #fff;
+      border: 1px solid #EAEAEA;
+      border-radius: 10px;
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+      }
+    }
+  }
+  .goods-cont {
+    position: relative;
+    overflow: hidden;
+    padding: 46px 24px 20px 29px;
+    box-sizing: border-box;
+    min-height: 200px;
+    &__price--default {
+      font-size: 28px;
+      color: #FF0000;
+      font-weight: 600;
+    }
+    &__price--group {
+      margin-left: 25px;
+      color: #999;
+      font-size: 22px;
+    }
+    .pop_title {
+      margin-top: 17px;
+      font-size: 30px;
+      color: #000;
+    }
+    .van-sku__close-icon {
+
+      position: absolute;
+      right: 24px;
+      top: 20px;
+
+      @include bg-img('home/gb.png');
+      width: 44px;
+      height: 44px;
+      position: absolute;
+    }
+  }
+
+  .counts {
+    $size: 34px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+    width: $size;
+    height: $size;
+    line-height: $size;
+    background-color: #FF0018;
+    border-radius: 50%;
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  .kuang_2 {
+    margin-top: 35px;
+    padding: 0 24px;
+    .k2_title {
+      font-size: 24px;
+      color: #000;
+      padding-bottom: 30px;
+    }
+    .k2_btnk {
+      .k2_btn {
+        display: inline-block;
+        position: relative;
+        width: 140px;
+        height: 60px;
+        background: #EAEAEA;
+        margin-right: 30px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        text-align: center;
+        line-height: 60px;
+        position: relative;
+      }
+      .k2_btn.active {
+        border: 1px solid #F67C2F;
+        color: #F67C2F;
+        background-color: #fff;
+      }
+      .k2_dian {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        background: red;
+        color: #fff;
+        border-radius: 50px;
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        font-size: 20px;
+        line-height: 34px;
+        text-align: center;
+      }
+    }
+  }
+  .kuang_3 {
+    // height: 230px
+    padding-bottom: 30px;
+    border-bottom: 1px solid #EAEAEA;
+    .s_item_box {
+      display: flex;
+      text-align: center;
+      line-height: 60px;
+      margin-top: 30px;
+    }
+    .box1 {
+      height: 60px;
+      background: #EAEAEA;
+    }
+    .s_item {
+      flex: 1;
+      .minus {
+        display: inline-block;
+        width: 30px;
+        height: 40px;
+        margin-top: 10px;
+        text-align: center;
+        background: url('~@/assets/img/shopping/minus.png') no-repeat center;
+        background-size: 30px 40px;
+      }
+      .count {
+        display: inline-block;
+        position: relative;
+        top: -10px;
+        width: 70px;
+        height: 38px;
+        margin: 0 10px;
+        text-align: center;
+        line-height: 38px;
+        border: 1px solid #ccc;
+      }
+      .add {
+        display: inline-block;
+        width: 30px;
+        height: 40px;
+        margin-top: 10px;
+        text-align: center;
+        background: url('~@/assets/img/shopping/add.png') no-repeat center;
+        background-size: 30px 40px;
+      }
+    }
+  }
+  .kuang_4 {
+    .k4_title {
+      padding: 29px 0 0 25px;
+      font-size: 28px;
+      color: #000;
+      margin-bottom: 20px;
+    }
+    .k4_text {
+      font-size: 26px;
+      color: #666;
+      padding: 19px 0 0 25px;
+    }
+  }
+}
+
+.sku-footer {
+  padding: 40px 0;
+  text-align: center;
+  &__btn {
+    display: inline-block;
+    width: 600px;
+    height: 90px;
+    text-align: center;
+    line-height: 90px;
+    background: #F67C2F;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 32px;
+  }
+}
+
+.sku-content--scroll {
+  max-height: 60vh;
+}

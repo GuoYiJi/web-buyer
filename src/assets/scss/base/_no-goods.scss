@@ -1,0 +1,15 @@
+.no_goods {
+  text-align: center;
+  &_img {
+    $size: 100px;
+    margin: 15px auto;
+    width: $size;
+    height: $size;
+    background: url(~@/assets/img/no-goods.png) no-repeat;
+    background-size: $size;
+  }
+  &_tip {
+    font-size: 22px;
+    color: #888;
+  }
+}

@@ -1,42 +1,60 @@
 <template>
   <div class="wrapper">
-    <div class="search-box">
-      <div class="input">
-        <p class="search-icon">
-          <i class="search"></i>
-        </p>
-        <input class="input-box" v-model="keyword" placeholder="请搜索商品"/>
+    <zan-popup type="right" :show="filterVisible" @close="handleToggleModal(false)">
+      <div class="sf_layer_con">
+        <div class="title" @click="handleToggleModal(false)">
+          <i class="zuo"></i>
+          <span class="screen">筛选</span>
+        </div>
+        <div class="item-box">
+          <mod-list :list="tabsList1" title="品类" @change="handleModChange(arguments, 0)" v-if="hasLabel"></mod-list>
+          <mod-list :list="tabsList2" title="货期情况" @change="handleModChange(arguments, 1)" ref="modList2Ref"></mod-list>
+          <mod-list ref="modListPriceRef" :list="tabsList3" title="价格区间" type="goods"></mod-list>
+        </div>
+        <div class="f_btn">
+          <p class="reset" @click="handleRest">重置</p>
+          <p class="confirm" @click="handleConfirm">确定</p>
+        </div>
       </div>
-      <span class="searchBtn" @click="search()">搜索</span>
+    </zan-popup>
+
+    <div class="search-bar">
+      <div class="search-bar__form">
+        <div class="search-bar__box">
+          <i class="icon-search"></i>
+          <input class="search-bar__input" v-model="keyword" type="text" placeholder="请搜索商品" confirm-type="search" @confirm="search()" />
+        </div>
+      </div>
+      <div class="search-bar__cancel-btn" @click="search()">搜索</div>
     </div>
     <ul class="sortTabs">
       <li class="sortItem" :class="{active : sortTabs==1, fx : sortStyle==0, fs : sortStyle ==1}" @click="sortFn(1,sortTime)">综合</li>
       <li class="sortItem" :class="{active : sortTabs==2, fx : sortStyle==2, fs : sortStyle ==3}" @click="sortFn(2,sortSales)">销量</li>
       <li class="sortItem" :class="{active : sortTabs==3, fx : sortStyle==4, fs : sortStyle ==5}" @click="sortFn(3,sortPrice)">价格</li>
-      <li class="sortItem sx">筛选</li>
+      <li class="sortItem sx" :class="{ 'active': hasFilter }" @click="handleFilterClick">筛选</li>
       <li class="sortItem menu" @click="showType = !showType"></li>
     </ul>
     <div class="goodsList clearfix">
-      <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType">
+      <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType" @click="clickItem(item)">
         <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
+          <img v-if="item.image" :src="item.image" alt="" mode="aspectFill">
           <img v-else src="../../assets/img/classify/goods.png" alt="">
         </div>
         <div class="text">
-          <p class="title" v-text="item.name"></p>
+          <p class="title zan-ellipsis--l2" v-text="item.name"></p>
           <p class="intro clearfix">
             <span class="qh">期货:{{item.delivery}}</span>
             <span class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</span>
           </p>
           <p class="price-btn">
             <span class="price">批货价:￥{{item.sellPrice}}</span>
-            <span class="btn" @click="clickItem(item)">立即采购</span>
+            <span class="btn">立即采购</span>
           </p>
         </div>
       </div>
-      <div class="line-item"  v-for="(item,index) in goodsList" :key="index" v-if="!showType">
+      <div class="line-item"  v-for="(item,index) in goodsList" :key="index" v-if="!showType" @click="clickItem(item)">
         <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
+          <img v-if="item.image" :src="item.image" alt="" mode="aspectFill">
           <img v-else src="../../assets/img/classify/goods.png" alt="">
         </div>
         <div class="text">
@@ -45,10 +63,20 @@
           <p class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</p>
           <p class="price-btn clearfix">
             <span class="price">批货价:￥{{item.sellPrice}}</span>
-            <span class="btn" @click="clickItem(item)">立即采购</span>
+            <span class="btn">立即采购</span>
           </p>
         </div>
       </div>
+    </div>
+
+    <div v-if="!(loading) && !goodsList.length && lastPage">
+      <div class="no_goods">
+        <div class="no_goods_img"></div>
+        <div class="no_goods_tip">没有相关的商品结果哦~~</div>
+      </div>
+    </div>
+    <div v-show="loading">
+      <zan-loading />
     </div>
     <div class="wellMsg" v-show="wellMsgShow">
       {{msg}}
@@ -56,11 +84,17 @@
   </div>
 </template>
 <script>
-  import wx from 'wx'
-  import API from '@/api/httpShui'
+  import wx from 'wx';
+  import API from '@/api/httpShui';
+  import modList from '@/components/mod_list/index';
   export default {
+    components: {
+      modList
+    },
     data () {
       return {
+        lastPage: false,
+        loading: false,
         showType: true,
         keyword: '',
         wellMsgShow: false,
@@ -74,13 +108,24 @@
         state: 1,
         pageSize: 10,
         pageNumber: 1,
-        totalPage: null
+        totalPage: null,
+        filterVisible: false,
+        hasFilter: false,
+        labelId: null,
+        deliveryId: null,
+        choice: {},
+        tabsList1: [], // 一级分类
+        tabsList2: [], // 货期情况
+        tabsList3: [{ name: '0-70' }, { name: '3-5天' }, { name: '6-10天' }]
       }
     },
-    components: {},
     methods: {
       // 排序
       sortFn (type, ob) {
+
+        // 综合不能排序
+        if (type === 1) return;
+        if (!this.goodsList.length) return
         this.sortTabs = type
         if (ob === 0) {
           this.sortTime = this.sortStyle = 1
@@ -100,11 +145,19 @@
         if (ob === 5) {
           this.sortPrice = this.sortStyle = 4
         }
-        this.setGoodsList(this.$route.query.id, this.state, ob, this.pageSize, this.pageNumber)
+        this.ob = ob;
+        this.pageNumber = 1;
+        this.getGoodsAsync();
+        // this.setGoodsList(this.$route.query.id, this.state, ob, this.pageSize, this.pageNumber)
       },
       clickItem (obj) {
-        let objStr = JSON.stringify(obj)
-        this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
+        console.log(obj)
+        this.$router.push({
+          path: '/pages/home/details/details',
+          query: {
+            goodsId: obj.id
+          }
+        })
       },
       // 搜索
       search () {
@@ -112,23 +165,6 @@
           this.$router.push({path: '/pages/search/search', query: {key: this.keyword}})
         } else {
           this.mySetTimeout('请输入关键词')
-        }
-      },
-      // 设置商品列表
-      async setGoodsList (labelId, state, ob, pageSize, pageNumber) {
-        const data = await API.getGoods({
-          labelId: labelId,
-          state: state,
-          ob: ob,
-          pageSize: pageSize,
-          pageNumber: pageNumber,
-        })
-        if (data.code === 1) {
-          // console.log('商品列表', data.data)
-          this.goodsList = data.data.list
-          this.pageSize = data.data.pageSize
-          this.pageNumber = data.data.pageNumber
-          this.totalPage = data.data.totalPage
         }
       },
       // 定时器弹窗
@@ -140,14 +176,104 @@
           that.wellMsgShow = false
           that.msg = ''
         }, 1000)
+      },
+
+      handleFilterClick() {
+        if (this.hasFilter || this.goodsList.length) {
+          this.handleToggleModal(true);
+        }
+        
+      },
+
+      handleToggleModal(visible) {
+        this.filterVisible = visible;
+      },
+      
+
+      handleConfirm() {
+        const { labelId, deliveryId } = this;
+        this.hasFilter = true;
+        this.handleToggleModal(false);
+        // console.log(this.$refs.modListPriceRef);
+        this.choice = this.$refs.modListPriceRef.choice;
+        this.pageNumber = 1;
+        this.getGoodsAsync({ labelId, deliveryId });
+      },
+      handleRest() {
+        this.hasFilter = false;
+        this.deliveryId = null;
+        this.pageNumber = 1;
+        this.choice = { min: null, max: null };
+        this.getGoodsAsync();
+        this.$refs.modList2Ref.current = -1;
+        this.$refs.modList3Ref.currentChoice = -1;
+      },
+      handleModChange(rest, type) {
+        const index = rest.length ? rest[0] : 0;
+        switch (type) {
+          case 0:
+            this.labelId = this.tabsList1[index].id;
+            break;
+          case 1:
+
+            this.deliveryId = this.tabsList2[index].id;
+            break;
+          case 2:
+            break;
+        }
+
+      },
+      async getGoodsAsync(payload) {
+        const { id: labelId } = this.$route.query;
+        const { state, ob, pageSize, pageNumber, deliveryId } = this;
+        const { min, max } = this.choice;
+        const params = {
+          labelId,
+          state,
+          ob,
+          pageSize,
+          pageNumber,
+          min,
+          max,
+          deliveryId
+        }
+        if (pageNumber === 1) {
+          this.lastPage = false;
+          this.goodsList = [];
+        }
+        this.loading = true;
+        const data = await API.getGoods(params);
+        this.loading = false;
+        if (data.code === 1) {
+          const { data: { list, lastPage } } = data;
+          // console.log('商品列表', data.data)
+          this.goodsList = this.goodsList.concat(list);
+          this.lastPage = lastPage;
+          this.pageNumber++;
+        }
       }
+    },
+    onReachBottom() {
+      if (!this.lastPage) {
+        this.getGoodsAsync();
+      }
+      
     },
     async mounted () {
       this.sortTabs = 1
       if (this.$route.query.id) {
         this.isSearch = false
-        this.setGoodsList(this.$route.query.id, this.state, this.sortTime, this.pageSize, this.pageNumber)
+        this.ob = this.sortTime;
+        this.getGoodsAsync();
+        // this.setGoodsList(this.$route.query.id, this.state, this.sortTime, this.pageSize, this.pageNumber)
       }
+      API.getTabs({types: '4'})
+        .then(res => {
+          this.tabsList2 = res.data;
+        })
+    },
+    onUnload() {
+      Object.assign(this, this.$options.data());
     }
   }
 </script>
@@ -163,38 +289,6 @@
   .clearfix
     /* 触发 hasLayout */
     zoom: 1
-
-  .search-box
-    padding: 30px 0
-    background: #fff
-    width: 100%
-    height: 60px
-    .input
-      float: left
-      display: inline-block
-      width: 616px
-      height: 60px
-      padding: 0 28px
-      .search
-        +bg-img('home/search.png')
-        +icon(38px)
-        margin-top: 20px
-      .search-icon
-        position: absolute
-        left: 60px
-      .input-box
-        background-color: #f5f5f5
-        border-radius: 4px
-        /*width: 100%*/
-        text-align: left
-        padding: 8px 85px
-        border: none
-        color: #999999
-    .searchBtn
-      float: left
-      display: inline-block
-      height: 60px
-      line-height: 60px
   .sortTabs
     width: 100%
     height: 80px
@@ -242,13 +336,14 @@
           width: 100%
           height: 100%
       .text
-        height: 200px
         padding: 0 10px
         .title
           color: #333333
           font-size: 28px
-          font-weight: 900
+          max-height: 28 * 2px
+          line-height: 28px;
           margin-top: 20px
+
         .intro
           color: #999999
           font-size: 24px

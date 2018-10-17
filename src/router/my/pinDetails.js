@@ -3,7 +3,7 @@ const pinDetails = [
     path: '/pages/my/pinDetails/pinDetails',
     config: {
       navigationBarTitleText: '订单详情',
-      navigationBarBackgroundColor: '#FA8134',
+      navigationBarBackgroundColor: '#ffffff',
       // navigationBarBackgroundColor: '#FFF',
       'usingComponents': {
         'i-input-number': '/iview/input-number/index',

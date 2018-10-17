@@ -1,74 +1,120 @@
 <template>
-  <div class="wrapper">
-    <div class="search-box">
+  <div class="wrapper" :class="{ 'no-keyword': !searchData }">
+    <div class="search-bar">
+      <div class="search-bar__form">
+        <div class="search-bar__box">
+          <i class="icon-search"></i>
+          <input class="search-bar__input" v-model="keyword" type="text" placeholder="请搜索商品" auto-focus confirm-type="search" @confirm="search()" />
+          <i class="icon-clear"></i>
+        </div>
+      </div>
+      <div class="search-bar__cancel-btn" @click="search()">搜索</div>
+    </div>
+<!--     <div class="search-box">
       <div class="input">
         <p class="search-icon">
           <i class="search"></i>
         </p>
-        <input class="input-box" v-model="keyword" placeholder="请搜索商品"/>
+        <input class="input-box" v-model="keyword" placeholder="请搜索商品" :focus="isFocus" />
       </div>
       <span class="searchBtn" @click="search()">搜索</span>
-    </div>
-    <ul class="sortTabs">
-      <li class="sortItem" :class="{active : sortTabs==1, fx : sortStyle==0, fs : sortStyle ==1}" @click="sortFn(1,sortTime)">综合</li>
-      <li class="sortItem" :class="{active : sortTabs==2, fx : sortStyle==2, fs : sortStyle ==3}" @click="sortFn(2,sortSales)">销量</li>
-      <li class="sortItem" :class="{active : sortTabs==3, fx : sortStyle==4, fs : sortStyle ==5}" @click="sortFn(3,sortPrice)">价格</li>
-      <li class="sortItem sx">筛选</li>
-      <li class="sortItem menu" @click='showType=!showType'></li>
-    </ul>
-    <div class="goodsList clearfix">
-      <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType">
-        <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
-          <img v-else src="../../assets/img/classify/goods.png" alt="">
+    </div> -->
+
+    <div class="history-container" v-show="!keyword.length">
+      <div class="history__hd">
+        <div class="history__title">
+          <i class="clock-icon"></i>
+          <span>历史搜索记录</span>
         </div>
-        <div class="text">
-          <p class="title" v-text="item.name"></p>
-          <p class="intro clearfix">
-            <span class="qh">期货:{{item.delivery}}</span>
-            <span class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</span>
-          </p>
-          <p class="price-btn">
-            <span class="price">批货价:￥{{item.sellPrice}}</span>
-            <span class="btn" @click="clickItem(item)">立即采购</span>
-          </p>
-        </div>
+        <i class="history-clear-icon" @click="handleHistoryClear"></i>
       </div>
-      <div class="line-item"  v-for="(item,index) in goodsList" :key="index" v-if="!showType">
-        <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
-          <img v-else src="../../assets/img/classify/goods.png" alt="">
-        </div>
-        <div class="text">
-          <p class="title">{{item.name}}</p>
-          <p class="qh">期货:{{item.delivery}}</p>
-          <p class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</p>
-          <p class="price-btn clearfix">
-            <span class="price">批货价:￥{{item.sellPrice}}</span>
-            <span class="btn" @click="clickItem(item)">立即采购</span>
-          </p>
-        </div>
+      <div class="history__list">
+        <span class="history__list-item">衬衫</span>
+        <span class="history__list-item">上衣</span>
+        <span class="history__list-item">牛仔长裤</span>
+        <span class="history__list-item">衬衫</span>
+        <span class="history__list-item">牛仔长裤</span>
+        <span class="history__list-item">衬衫</span>
       </div>
     </div>
-    <div class="msg" v-if="totalRow === 0">
+    <div class="msg" v-if="searchEmptyData">
       <p>换个搜索词试试！</p>
     </div>
+    <block v-if="searchData">
+      
+      <ul class="sortTabs">
+        <li class="sortItem" :class="{active : sortTabs==1, fx : sortStyle==0, fs : sortStyle ==1}" @click="sortFn(1,sortTime)">综合</li>
+        <li class="sortItem" :class="{active : sortTabs==2, fx : sortStyle==2, fs : sortStyle ==3}" @click="sortFn(2,sortSales)">销量</li>
+        <li class="sortItem" :class="{active : sortTabs==3, fx : sortStyle==4, fs : sortStyle ==5}" @click="sortFn(3,sortPrice)">价格</li>
+        <li class="sortItem sx" :class="{ 'active': hasFilter }" @click="handleFilterClick">筛选</li>
+        <li class="sortItem menu" @click='showType=!showType'></li>
+      </ul>
+      <div class="goodsList clearfix" v-if="goodsList.length" @click="clickItem(item)">
+        <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType">
+          <div class="img">
+            <img v-if="item.image" :src="item.image" alt="" mode="aspectFill">
+            <img v-else src="../../assets/img/classify/goods.png" alt="" mode="aspectFill">
+          </div>
+          <div class="text">
+            <p class="title zan-ellipsis" v-text="item.name"></p>
+            <p class="intro clearfix">
+              <span class="qh">期货:{{item.delivery}}</span>
+              <span class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</span>
+            </p>
+            <p class="price-btn">
+              <span class="price">批货价:￥{{item.sellPrice}}</span>
+              <span class="btn">立即采购</span>
+            </p>
+          </div>
+        </div>
+        <div class="line-item"  v-for="(item,index) in goodsList" :key="index" v-if="!showType" @click="clickItem(item)">
+          <div class="img">
+            <img v-if="item.image" :src="item.image" alt="" mode="aspectFill">
+            <img v-else src="../../assets/img/classify/goods.png" alt="" mode="aspectFill">
+          </div>
+          <div class="text">
+            <p class="title">{{item.name}}</p>
+            <p class="qh">期货:{{item.delivery}}</p>
+            <p class="xl">销量:{{item.sellCount==9999 ? '9999+' : item.sellCount }}</p>
+            <p class="price-btn clearfix">
+              <span class="price">批货价:￥{{item.sellPrice}}</span>
+              <span class="btn">立即采购</span>
+            </p>
+          </div>
+        </div>
+        <div v-if="loading">
+          <zan-loading></zan-loading>
+        </div>
+      </div>
+      <div v-if="nodata">
+        <div class="no_goods">
+          <div class="no_goods_img"></div>
+          <div class="no_goods_tip">没有相关的商品结果哦~~</div>
+        </div>
+      </div>
+    </block>
     <div class="wellMsg" v-show="wellMsgShow">
       {{msg}}
     </div>
+    <filter-goods-modal :show="visible" hasLabel @toggle="handleModalToggle" @confirm="handleConfirm" @rest="handleRest" ref="filterRef"></filter-goods-modal>
   </div>
 </template>
 <script>
-  import wx from 'wx'
-  import API from '@/api/httpShui'
+  import wx from 'wx';
+  import API from '@/api/httpShui';
+  import filterGoodsModal from '@/components/filter-goods-modal/index';
   export default {
     data () {
       return {
+        hasFilter: false,
+        searchStr: '',
+        visible: false,
         showType: true,
         keyword: '',
         wellMsgShow: '',
         msg: '',
         goodsList: [],
+        ob: 0,
         sortTabs: 0,
         sortTime: 0,
         sortSales: 2,
@@ -78,10 +124,28 @@
         pageSize: 10,
         pageNumber: 1,
         totalPage: null,
-        totalRow: 0
+        nodata: false,
+        totalRow: 0,
+        filterOptions: {},
+        isFocus: false,
+        searchEmptyData: false,
+        searchData: false
       }
     },
-    components: {},
+    components: {
+      'filter-goods-modal': filterGoodsModal
+    },
+    watch: {
+      keyword(val) {
+        if (this.searchEmptyData && !val) {
+          this.searchEmptyData = false;
+        }
+        if (!val && this.searchData) {
+          this.goodsList = [];
+          this.searchData = false;
+        }
+      }
+    },
     methods: {
       // 排序
       sortFn (type, ob) {
@@ -104,44 +168,112 @@
         if (ob === 5) {
           this.sortPrice = this.sortStyle = 4
         }
-        this.setGoodsList(this.state, ob, this.pageSize, this.pageNumber, this.keyword)
-      },
-      switch () {
-        if (this.showType ===1){
-
-        }
+        this.ob = ob;
+        this.pageNumber = 1;
+        this.setGoodsList()
       },
       // 去商品详情
       clickItem (obj) {
-        let objStr = JSON.stringify(obj)
-        this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
+        this.$router.push({path: '/pages/home/details/details', query: {goodsId: obj.id}});
       },
       // 搜索
-      search () {
+      async search () {
         if (this.keyword) {
-          this.sortTabs = 1
-          this.setGoodsList(this.state, this.sortTime, this.pageSize, this.pageNumber, this.keyword)
+          this.sortTabs = 1;
+          this.searchStr = this.keyword;
+          this.pageNumber = 1;
+          this.filterOptions = {};
+          this.hasFilter = false;
+          this.$refs.filterRef._reset();
+          this.nodata = false;
+          API.saveHistory({
+            message: this.keyword
+          })
+          // this.isFocus = false;
+          const list = await this.setGoodsList();
+          if (!list.length) {
+            this.searchEmptyData = true;
+          }
         } else {
-          this.mySetTimeout('请输入关键词')
+          wx.showToast({
+            title: '请输入关键字',
+            icon: 'none'
+          })
         }
       },
-      // 设置商品列表
-      async setGoodsList (state, ob, pageSize, pageNumber, keyword) {
-        const data = await API.getGoods({
-          state: state,
-          ob: ob,
-          pageSize: pageSize,
-          pageNumber: pageNumber,
-          keyword: keyword
-        })
-        if (data.code === 1) {
-          console.log('商品列表', data.data)
-          this.goodsList = data.data.list
-          this.pageSize = data.data.pageSize
-          this.pageNumber = data.data.pageNumber
-          this.totalPage = data.data.totalPage
-          this.totalRow = data.data.totalRow
+      handleFilterClick() {
+
+        if (this.hasFilter || this.goodsList.length) {
+          this.visible = true;
         }
+      },
+      handleHistoryClear() {
+        API.deleteHistory()
+      },
+      handleModalToggle(visible) {
+        this.visible = visible;
+      },
+      handleConfirm(e) {
+        const { labelId, deliveryId, min, max } = e;
+        this.handleModalToggle(false);
+        this.filterOptions = {
+          labelId,
+          deliveryId,
+          min,
+          max
+        };
+        this.hasFilter = true;
+        this.pageNumber = 1;
+        this.setGoodsList();
+      },
+      handleRest() {
+        this.filterOptions = {
+        };
+        this.pageNumber = 1;
+        this.hasFilter = false;
+        this.setGoodsList();
+      },
+      // 设置商品列表
+      // state, ob, pageSize, pageNumber, keyword
+      async setGoodsList () {
+        this.loading = true;
+        wx.showLoading({
+          title: '正在搜索'
+        })
+
+        const { state, ob, pageNumber, searchStr: keyword } = this;
+
+        // 校正删除 input 内容，然后直接操作排序的情况
+        if (this.keyword !== keyword) {
+          this.keyword = keyword;
+        }
+        if (pageNumber === 1) {
+          this.goodsList = [];
+          this.nodata = false;
+        }
+        const data = await API.getGoods({
+          state,
+          ob,
+          pageSize: 20,
+          pageNumber,
+          keyword,
+          ...this.filterOptions
+        })
+        wx.hideLoading();
+        this.loading = false;
+        const { data: { list, lastPage } } = data;
+        if (data.code === 1) {
+          if (pageNumber === 1 && !list.length) {
+            this.nodata = true;
+            return Promise.resolve([]);
+          }
+          if (list.length) {
+            this.searchData = true;
+          }
+          this.goodsList = this.goodsList.concat(list);
+          this.pageNumber++;
+        }
+        return Promise.resolve(list);
       },
       // 定时器弹窗
       mySetTimeout (msg) {
@@ -155,16 +287,30 @@
       }
     },
     async mounted () {
-      if (this.$route.query.key) {
-        this.sortTabs = 1
-        this.keyword = this.$route.query.key
-        this.setGoodsList(this.state, this.sortTime, this.pageSize, this.pageNumber, this.$route.query.key)
+      const { key } = this.$route.query;
+      if (key) {
+        this.sortTabs = 1;
+        this.keyword = key;
+        this.searchStr = key;
+        this.search();
+      } else {
+        API.selectHistoryPage({
+          pageNumber: 1,
+          pageSize: 10
+        })
       }
+
+    },
+    onUnload() {
+      Object.assign(this, this.$options.data());
     }
   }
 </script>
 <style type="text/sass" lang="sass" scoped>
   @import '~@/assets/css/mixin'
+  @import './index'
+  .no-keyword
+    background-color: #fff
   .clearfix:after
     content: ""
     display: block
@@ -338,18 +484,12 @@
             border-radius: 10px
   .msg
     position: absolute
-    left: 0
-    right: 0
-    top: 0
-    bottom: 0
-    margin: auto
-    width: 305px
-    height: 114px
-    line-height: 114px
-    color: #999
-    font-size: 30px
+    top: 524px
+    width: 100%
     text-align: center
-    z-index: 9999
+    color: #999
+    font-size: 28px
+    text-align: center
   .wellMsg
     position: absolute
     left: 0

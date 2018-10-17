@@ -2,96 +2,62 @@
   <div class="home">
     <div class="sort-select">
       <div class="top-nav">
-        <ul>
+        <ul class="pro_filter_items">
           <!-- <li :class="[tag === 1 && 'nav-active']" @click="handleTag(1)">综合</li> -->
-          <li :class="[tag === 2 && 'nav-active']" @click="handleTag(2)">销量
+          <li class="item" :class="[asceSale ? 'item--top' : 'item--bottom', { active: tag === 2 }]" @click="handleTag(2)">
+            <span>销量</span>
+            <i class="item__arrow">
+              <i class="item__arrow-wrapper"><span class="before"></span><span class="after"></span></i>
+            </i>
+          </li>
+          <li class="item" :class="[ascePrice ? 'item--top' : 'item--bottom', { active: tag === 4 }]" @click="handleTag(4)">
+            <span>价格</span>
+            <i class="item__arrow">
+              <i class="item__arrow-wrapper"><span class="before"></span><span class="after"></span></i>
+            </i>
+          </li>
+          <li class="item btn_sf" :class="{ 'active': hasFilter }" @click="handleFilterClick">
+            <span>筛选</span>
+            <div class="after"></div>
+          </li>
+          <li class="item menu" @click="handleShowTypeToggle">
+            <i></i>
+          </li>
+          <!-- <li class="item" :class="[tag === 2 && 'nav-active']" @click="handleTag(2)">销量
             <div class="sort-box">
               <i class="sort-top" :class="asceSale && 'sort-active'"></i>
               <i :class="!asceSale && 'sort-active'" class="sort-bottom"></i>
             </div>
+            <div class="after"></div>
           </li>
-          <li :class="[tag === 4 && 'nav-active']" @click="handleTag(4)">价格
+          <li class="item" :class="[tag === 4 && 'nav-active']" @click="handleTag(4)">价格
             <div class="sort-box">
               <i class="sort-top" :class="ascePrice && 'sort-active'"></i>
               <i :class="!ascePrice  && 'sort-active'" class="sort-bottom"></i>
             </div>
           </li>
-          <li :class="[tag === 5 && 'nav-active']" @click="handleTag(5)">筛选
+          <li class="item" :class="{ 'nav-active': hasFilter }" @click="handleFilterClick">筛选
             <div class="sort-box">
               <i class="option-icon"></i>
             </div>
-          </li>
+          </li> -->
         </ul>
       </div>
-      <i-drawer mode="right" :visible="showRight1" @close="toggleRight1">
-        <div class="demo-container">
-          <div class="title">
-            <i class="zuo"></i>
-            <span class="screen">筛选</span>
-          </div>
-          <div class="item-box">
-            <div class="item">
-              <p class="i_title">品类</p>
-              <ul class="s_item_box">
-                <li class="s_item">一级分类</li>
-                <li class="s_item">一级分类</li>
-                <li class="s_item">一级分类</li>
-                <li class="s_item">一级分类</li>
-                <li class="s_item">一级分类</li>
-                <li class="s_item">一级分类</li>
-              </ul>
-              <!-- <ul v-if="more1" class="s_item_box">
-                <li class="s_item">档口1</li>
-                <li class="s_item">档口2</li>
-                <li class="s_item">档口3</li>
-              </ul> -->
-              <p class="more">
-                <span @click="toOpen('more1')" v-if="!more1">查看更多
-                  <i class="goback"></i>
-                </span>
-                <span @click="toClose('more1')" v-else>点击收起</span>
-              </p>
-            </div>
-            <div class="item">
-              <p class="i_title">货期情况</p>
-              <ul class="s_item_box">
-                <li class="s_item">现货</li>
-                <li class="s_item">3-5天</li>
-                <li class="s_item">6-10天</li>
-                <li class="s_item">订货</li>
-                <li class="s_item">11-15天</li>
-                <li class="s_item">一个月内</li>
-              </ul>
-            </div>
-            <div class="item">
-              <p class="i_title">价格区间</p>
-              <ul class="s_item_box">
-                <li class="s_item">0-70</li>
-                <li class="s_item">3-5天</li>
-                <li class="s_item">6-10天</li>
-                <li class="s_item">
-                  <input type="text" placeholder="最低价">
-                </li>
-                --
-                <li class="s_item">
-                  <input type="text" placeholder="最高价">
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="f_btn">
-            <p class="reset">重置</p>
-            <p class="confirm">确定</p>
-          </div>
-        </div>
-      </i-drawer>
     </div>
+    <filter-goods-modal hasLabel :show="showRight1" @toggle="toggleRight1" @confirm="handleConfirm" @rest="handleRest"></filter-goods-modal>
   </div>
 </template>
 <script>
 import wx from "wx";
+import scard from "@/components/group_card";
+import modList from '@/components/mod_list/index';
+import filterGoodsModal from '@/components/filter-goods-modal/index';
+import API from '@/api/httpShui';
 export default {
-  components: {},
+  components: {
+    'mod-list': modList,
+    'filter-goods-modal': filterGoodsModal
+  },
   data () {
     return {
       asceSale: true,
@@ -100,7 +66,11 @@ export default {
       shopNum: 0,
       showRight1: false,
       allCheck: false,
-      more1: false
+      more1: false,
+      labelId: '',
+      deliveryId: '',
+      hasFilter: false,
+      showtype: 0
     }
   },
   methods: {
@@ -118,12 +88,13 @@ export default {
         type = this.ascePrice ? 4 : 5
       }
       if (tag === 5) {
-        this.toggleRight1()
+        this.toggleRight1(true)
       }
       this.type = type
+      this.$emit('sort', type)
     },
-    toggleRight1 () {
-      this.showRight1 = !this.showRight1
+    toggleRight1(visible = false) {
+      this.showRight1 = visible;
     },
     toOpen (name) {
       this[name] = true
@@ -134,9 +105,49 @@ export default {
     selectAll () {
       this.allCheck = !this.allCheck
       this.$refs.scard.selectAll(this.allCheck)
+    },
+    handleConfirm(e) {
+      const { labelId, deliveryId, min, max } = e;
+      this.toggleRight1();
+      this.$emit('filter', {
+        labelId,
+        deliveryId,
+        min,
+        max
+      });
+      this.hasFilter = true;
+    },
+    handleRest() {
+      this.$emit('rest');
+      this.$emit('filter', { labelId: '', deliveryId: '', min: '', max: '' });
+      this.hasFilter = false;
+    },
+    handleModChange(rest, type) {
+      const index = rest.length ? rest[0] : 0;
+      switch (type) {
+        case 0:
+          this.labelId = this.tabsList1[index].id;
+          break;
+        case 1:
+          this.deliveryId = this.tabsList2[index].id;
+          break;
+        case 2:
+          break;
+      }
+    },
+
+    handleFilterClick() {
+      this.toggleRight1(true);
+    },
+    handleShowTypeToggle() {
+      const type = this.showtype === 0 ? 1 : 0;
+      this.showtype = type;
+      this.$emit('showtype', type);
     }
   },
-  mounted () {}
+  async mounted() {
+    
+  }
 }
 </script>
 <style lang="sass" scoped>
@@ -161,13 +172,6 @@ export default {
     color: #999
     flex: 1
     border-top: 1px solid #E5E5E5
-.demo-container
-	width: 568px
-	height: 100px
-	background: #fff
-  font-size: 28px
-  box-shadow: 1px 0px 13px rgba(8,0,0,0.17)
-  position: relative
 .title
   // padding: 8px 30px
   background: #fff
@@ -206,8 +210,6 @@ export default {
     left: 340px;
 
 // 筛选
-
-
 .item-box
   color: #333
   height: 85%
@@ -233,7 +235,7 @@ export default {
 .home
   // position: relative
   height: 100%
-  border-bottom: 1px solid #999
+  border-bottom: 1px solid #eee
 .footer
   position: absolute
   bottom: 0
@@ -288,27 +290,29 @@ export default {
   text-align: center
   ul 
     display: flex
+    align-items: center
     font-size: 26px
-    height: 92px
-    line-height: 92px
+    height: 77px
     li
       flex: 1
       .sort-box
-        display: inline
+        display: flex
+        flex-direction: column
         position: relative
         padding-left: 10px
         .sort-bottom 
           +goback(1px)
-          position: absolute
-          top: -23px
           &:after
             transform: rotate(-45deg)
             border-color: #999
         .sort-top    
           +goback(1px)
-          position: absolute
-          bottom: -23px
           &:after
             transform: rotate(-225deg)
-            border-color: #999   
+            border-color: #999
+
+// 筛选
+.sf_layer_con
+  width: 600px
+  height: 100vh
 </style>

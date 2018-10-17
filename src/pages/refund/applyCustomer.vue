@@ -63,6 +63,9 @@ export default {
     this.type = this.$route.query.type
     this.price = this.$route.query.price
     this.freight = this.$route.query.freight
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>

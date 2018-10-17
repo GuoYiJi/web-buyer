@@ -29,6 +29,9 @@ class API {
   coupon = params => http.post('api/coupon/page', params)
   // 获取购物车
   getCardList = params => http.post('api/goods/card/selectGoodsCard', params)
+
+  // 更新购物车
+  addGoodsCard = params => http.post('api/goods/card/addGoodsCard', params, { 'content-type': 'application/json' })
   // 删除购物车
   deleteCard = params => http.post('api/goods/card/deleteGoodsCard', params)
   // 我的订单
@@ -39,8 +42,17 @@ class API {
   cancelOrder = params => http.post('api/order/cancelOrder', params)
   // 确认订单
   sureOrder = params => http.post('api/order/sureOrder', params)
+  // 获取邮费
+  calculateFreight = params => http.post('api/order/calculateFreight', params, { 'content-type': 'application/json' })
+
+  // 获取商品详情
+  selectGoodsDetail = params => http.post('api/goods/selectGoodsDetail', params)
   // 支付
   wxSign = params => http.post('api/order/wechatPay', params)
+
+  // 拼团下单
+  createPingOrder = params => http.post('api/order/createPingOrder', params)
+
   // 退款退货
   retreatGoods = params => http.post('api/order/doubleBack', params)
   // 售后列表
@@ -51,6 +63,16 @@ class API {
   sendLogisticsNum = params => http.post('api/order/perfectRefundLogistics',params)
   // 删除订单
   delOrderShow = params => http.post('api/order/closeShow', params)
+
+
+  // 查询历史搜索
+  selectHistoryPage = params => http.post('api/searchHistory/selectHistoryPage', params)
+  // 新增搜索历史
+  saveHistory = params => http.post('api/searchHistory/saveHistory', params)
+  deleteHistory = params => http.post('api/searchHistory/deleteHistory', params)
+  
+
+  copyGoods = params => http.post('api/goods/copy', params)
 }
 
 export default new API()

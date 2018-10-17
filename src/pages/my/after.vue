@@ -1,7 +1,7 @@
 <template>
   <!-- 售后 -->
-  <div class="home">
-    <div class="kuang" v-for="(item, index) in list" :key="index">
+  <div class="home order-items">
+    <div class="kuang order-item" v-for="(item, index) in list" :key="index">
       <div class="head">
         <span class="h-title">{{shopName}}</span>
         <span class="h-text">
@@ -14,7 +14,16 @@
         <i class="n-icon"></i>
       </div>
       <div class="below">
-        <div class="total">
+        <div class="van-cell">
+          <div class="van-cell__title">
+            <span class="goods-buy__info">共<span class="goods-buy__num">{{item.goodsList.length}}</span>个款  <span class="goods-buy__num">{{item.countGoodsNum}}</span>件商品  </span>
+          </div>
+          <div class="van-cell__value">
+            <span class="goods-buy__total">合计:</span>
+            <span class="goods-buy__price">￥{{item.price}}</span>
+          </div>
+        </div>
+        <div class="total" v-if="false">
           <p class="t-left">共
             <span class="piece">{{item.goodsList.length}}</span>个款</p>
           <p class="t-left">
@@ -24,10 +33,22 @@
             <span class="money">￥{{item.price}}</span>
           </p>
         </div>
-        <div class="btn">
-          <span class="b-xq" @click="refundDetails(item.id,item.refundType)">查看详情</span>
+        <div class="btn van-cell van-hairline">
+          <div class="van-cell__title"></div>
+          <div class="van-cell__value">
+            <span class="b-xq" @click="refundDetails(item.id,item.refundType)">查看详情</span>
+          </div>
         </div>
       </div>
+    </div>
+    <div v-if="loading">
+      <zan-loading></zan-loading>
+    </div>
+    <div v-if="!list.length && lastPage">
+      <zan-loadmore type="text" text="暂无数据" />
+    </div>
+    <div v-if="list.length && lastPage">
+      <zan-loadmore type="text" />
     </div>
   </div>
 </template>
@@ -38,14 +59,13 @@ export default {
   components: {},
   data () {
     return {
+      loading: false,
+      lastPage: false,
       shopName: '',
       state: ['退款', '退货', '换货'],
       stateName: ['等待商家处理', '已完成', '商家已拒绝', '商家已同意', '等待商家确认收货', '已撤销', '确认收货'],
       list: []
     }
-  },
-  onShow () {
-    this.getList()
   },
   methods: {
     refundDetails (id, type) {
@@ -66,10 +86,12 @@ export default {
 
     },
     async getList () {
+      this.loading = true;
       const data = await API.afterService()
-      console.log('售后列表', data)
+      this.loading = false;
       if (data.code === 1) {
-        this.list = data.data.list
+        this.list = this.list.concat(data.data.list)
+        this.lastPage = data.data.lastPage;
       }
       let that = this
       wx.getStorage({
@@ -80,6 +102,17 @@ export default {
       })
     }
   },
+  onReachBottom() {
+    if (!this.lastPage) {
+      this.getList();
+    }
+  },
+  mounted() {
+    this.getList();
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data())
+  }
   // async mounted () {
   //   this.getList()
   // }
@@ -87,10 +120,15 @@ export default {
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
+.order-item
+  border-top: 1px solid #E5E5E5
+  border-bottom: 1px solid #E5E5E5
+  margin-top: 20px
+  &:first-child
+    margin-top: 0
 .head
   display: flex
   font-size: 28px
-  margin-top: 20px
   padding: 0 34px
   background: #fff
   height: 82px
@@ -100,6 +138,7 @@ export default {
   .h-text
     flex: 1
     color: #F67C2F
+    font-size: 28px
     text-align: right
 .nav
   height: 202px
@@ -109,6 +148,8 @@ export default {
   .n-img
     width: 160px
     height: 160px
+    border-radius: 4px
+    overflow: hidden;
     margin-right: 20px
     vertical-align: middle
     display: inline-block
@@ -149,10 +190,7 @@ export default {
       font-size: 32px
       color: #FF0000
   .btn
-    height: 108px
-    line-height: 108px
     background: #fff
-    text-align: right
     .b-xq
       display: inline-block
       width: 160px
@@ -161,6 +199,6 @@ export default {
       vertical-align: middle
       line-height: 60px
       text-align: center
-      margin-right: 34px
+      border-radius: 4px
       color: #fff
 </style>

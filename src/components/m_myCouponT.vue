@@ -1,10 +1,6 @@
 <template>
   <div class="nav">
-    <div class="head" v-if="(title == 0)">
-      <p class="title">~空空如也~</p>
-      <i class="t_img"></i>
-    </div>
-    <div class="coupon" v-for="(item, index) in myCouponList" :key="index" v-if="(title != 0)">
+    <div class="coupon" v-for="(item, index) in myCouponList" :key="index">
       <!-- <i class="bg hasCoupon"></i> -->
       <img class="bg hasCoupon" src="../assets/img/marketingMgt/yhq.png">
       <div class="left">
@@ -17,6 +13,10 @@
       </div>
       <div class="right">已使用</div>
     </div>
+    <div class="head" v-if="!loading && !myCouponList.length && lastPage">
+      <p class="title">~空空如也~</p>
+      <i class="t_img"></i>
+    </div>
   </div>
 </template>
 
@@ -24,6 +24,20 @@
 import wx from "wx";
 import API from "@/api/httpJchan";
 export default {
+  props: {
+    myCouponList: {
+      type: Array,
+      default: () => []
+    },
+    lastPage: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {},
   data() {
     return {
@@ -34,24 +48,6 @@ export default {
       endTime: []
     };
   },
-  methods: {},
-  async mounted() {
-    const myCoupon = await API.myCoupon({
-      isExchange: 2,
-      pageSize: 10,
-      pageNumber: 1,
-      state: 1
-    });
-    this.myCouponList = myCoupon.data.list;
-    this.title = myCoupon.data.list.length;
-    console.log(this.title);
-    for (var i = 0; i < myCoupon.data.list.length; i++) {
-      console.log(myCoupon.data.list[i].startTime.substring(0, 10));
-      console.log(myCoupon.data.list[i].endTime.substring(0, 10));
-      this.startTime = myCoupon.data.list[i].startTime.split(" ")[0].toString();
-      this.endTime = myCoupon.data.list[i].endTime.split(" ")[0].toString();
-    }
-  }
 };
 </script>
 

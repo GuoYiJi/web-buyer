@@ -4,30 +4,35 @@
       <div class="h-bg">
         <open-data class="h-img" type="userAvatarUrl"></open-data>
       </div>
+      <div class="h-nickname">
+        <div class="nickname">
+          <open-data class="h-name" type="userNickName"></open-data>
+        </div>
+        <div class="h-id">ID：{{no}}</div>
+        <div class="user-integral">0积分</div>
+      </div>
       <!-- <span class="h-name">来年陌生的某某</span> -->
-      <open-data class="h-name" type="userNickName"></open-data>
-      <span class="h-id">ID：{{no}}</span>
       <!-- <span class="h-integral">657积分</span> -->
     </div>
     <div class="nav">
-      <p class="title" @click="order(1)">我的订单</p>
+      <p class="title" @click="handleOrderClick('all')">我的订单</p>
       <div class="n-box">
-        <li class="box-item" @click="order(2)">
+        <li class="box-item" @click="handleOrderClick('pay')">
           <i class="will-pay"></i>
           <span class="num" v-show="prePayment > 0">{{prePayment > 99 ? '99+' : prePayment}}</span>
           <p>待付款</p>
         </li>
-        <li class="box-item" @click="order(3)">
+        <li class="box-item" @click="handleOrderClick('tosend')">
           <i class="will-send"></i>
           <span class="num" v-show="delivery > 0">{{delivery > 99 ? '99+' : delivery}}</span>
           <p>待发货</p>
         </li>
-        <li class="box-item" @click="order(4)">
+        <li class="box-item" @click="handleOrderClick('sign')">
           <i class="will-receive"></i>
           <span class="num" v-show="receive > 0">{{receive > 99 ? '99+' : receive}}</span>
-          <p>已发货</p>
+          <p>待收货</p>
         </li>
-        <li class="box-item" @click="order(5)">
+        <li class="box-item" @click="handleOrderClick('done')">
           <i class="will-reply"></i>
           <!-- <span class="num" v-show="commented > 0">{{commented > 99 ? '99+' : commented}}</span> -->
           <p>已完成</p>
@@ -62,11 +67,11 @@
         <span class="yhq">我的优惠券</span>
         <i class="m-icon"></i>
       </li>
-      <li class="m-item">
+      <li class="m-item" @click="tuig()">
         <!-- <li class="m-item" @click="tuig()"> -->
         <i class="m-sz"></i>
-        <!-- <span class="msz">邀请推广</span> -->
-        <button class="msz" open-type="share">邀请推广</button>
+        <span class="msz">邀请推广</span>
+        <!-- <button class="msz" open-type="share">邀请推广</button> -->
         <i class="m-icon"></i>
       </li>
     </div>
@@ -90,10 +95,10 @@ export default {
     }
   },
   methods: {
-    order (tag) {
+    handleOrderClick(selectedId) {
       this.$router.push({
         path: '/pages/my/order/myorder',
-        query: { tag: tag }
+        query: { selectedId }
       })
     },
     toRouteMyget () {
@@ -107,26 +112,13 @@ export default {
     },
     like() {
       this.$router.push('/pages/my/like')
-    }
-    // tuig() {
-    //   this.$router.push("/pages/my/procedures");
-    // }
-  },
-  onShareAppMessage: function (res) {
-    if (res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
-    return {
-      title: '申请小程序',
-      path: '/pages/my/procedures',
-      imageUrl:
-        'http://img0.ph.126.net/AE8LWDjxdZzUWfgWnuqJmQ==/141300438409203738.jpg'
-      // path: "/pages/my/invate/invateDetail/user?id=123"
+    },
+    tuig() {
+      this.$router.push("/pages/my/procedures");
     }
   },
-  async mounted () {
-    var that = this
+  async onShow() {
+
     const prePayment = await API.myorder({ isPing: 0, state: 1 })
     const delivery = await API.myorder({ isPing: 0, state: 5 })
     const receive = await API.myorder({ isPing: 0, state: 6 })
@@ -134,6 +126,9 @@ export default {
     this.prePayment = prePayment.data.totalRow
     this.delivery = delivery.data.totalRow
     this.receive = receive.data.totalRow
+  },
+  async mounted () {
+    var that = this
     wx.setStorage({
       key: 'qwe',
       data: 123
@@ -145,6 +140,9 @@ export default {
         that.no = res.data
       }
     })
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data())
   }
 }
 </script>
@@ -157,59 +155,56 @@ export default {
   width: 100%
   height: 100%
   .head
-    height: 184px
+    display: flex
+    
+    padding: 32px
     position: relative
     background: #fff
     border-top: 1px solid #E5E5E5
     border-bottom: 1px solid #E5E5E5
     margin-bottom: 20px
     .h-bg
-      display: inline-block
       width: 120px
       height: 120px
-      position: absolute
       border-radius: 50%
+      margin-right: 17px
       overflow: hidden
-      top: 32px
-      left: 32px
       .h-img
         display: inline-block
         width: 100%
         height: 100%
     .h-name
-      position: absolute
       font-size: 34px
       color: #333
-      top: 49px
-      left: 169px
-    .h-id
-      position: absolute
-      font-size: 28px
-      color: #999
-      top: 87px
-      left: 170px
-    .h-integral
-      position: absolute
+    .nickname
+      padding-top: 9px
+    .user-integral
       font-size: 22px
       color: #EE7527
-      top: 133px
-      left: 169px
+    .h-nickname
+      flex: 1
+    .h-id
+      font-size: 22px
+      color: #999
+    .h-integral
+      font-size: 22px
+      color: #EE7527
   .nav
     line-height: 60px
     background: #fff
-    padding-bottom: 40px
     margin-bottom: 20px
     .title
+      padding: 32px 0
       font-size: 28px
+      line-height: 26px
       color: #000
       margin-left: 33px
-      vertical-align: middle
       border-bottom: 1px solid #eee
-      padding-bottom: 20px
     .n-box
       display: flex
       text-align: center
-      margin-top: 41px
+      padding-top: 41px
+      padding-bottom: 48px
       .box-item
         flex: 1
         position: relative

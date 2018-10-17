@@ -25,14 +25,13 @@ export default {
   },
   methods: {
     async prosave() {
-      console.log(this);
       if (
         this.name != "" &&
         this.phone != "" &&
         this.identity != "" &&
         this.referrer != ""
       ) {
-        var prosave = await this.$API.prosave({
+        var prosave = await API.prosave({
           name: this.name,
           mobile: this.phone,
           formMetaId: this.identity,
@@ -59,9 +58,16 @@ export default {
       // this.prosaveList = prosave.data.list;
     }
   },
+
+  onShareAppMessage: function (res) {
+    return {
+      title: '申请小程序',
+      path: '/pages/my/procedures',
+      imageUrl: 'http://brpublic.beautifulreading.com/a56f119ae3490f104eae3a237edec4f7'
+    }
+  },
   async mounted() {
     const prometaList = await API.prometaList({ type: 2 });
-    console.log(prometaList);
   }
 };
 </script>

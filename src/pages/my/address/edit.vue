@@ -1,27 +1,26 @@
 <template>
   <div class="nav">
-    <block v-for="(item, index) in pageaddresList" :key="index" v-if="(item.id == tid)">
+    <block>
       <div class="item">
-        <input v-model="name" class="name" type="text" :placeholder="item.name">
+        <input placeholder-class="placeholder-input" v-model="name" class="name" type="text" placeholder="收货人">
       </div>
       <div class="item">
-        <input v-model="phone" class="phone" maxlength="11" type="text" :placeholder="item.mobile">
+        <input placeholder-class="placeholder-input" v-model="phone" class="phone" maxlength="11" type="number" placeholder="手机号码">
       </div>
       <div class="item">
-        <picker class="region" mode="region" @change="bindRegionChange" :value="region" :custom-item="customItem">
+        <picker class="region" mode="region" @change="bindRegionChange" :value="region">
           <view class="picker">
             {{region.length > 0 ? region[0] + '-' + region[1] + '-' + region[2] : '所在地址:' }}
           </view>
         </picker>
       </div>
       <div class="item">
-        <input class="address" v-model="address" type="text" :placeholder="item.address">
-        <i class="img"></i>
+        <input placeholder-class="placeholder-input" class="address" v-model="address" type="text" placeholder="详细地址">
       </div>
       <div class="tacitly">
         <p class="tacitlyDz">设为默认地址</p>
-        <i class="kgk" v-if="(item.isChoice == 1)" @click="kgk()"></i>
-        <i class="kgg" v-if="(item.isChoice == 0)" @click="kgk()"></i>
+        <i class="kgk" v-if="(isChoice == 1)" @click="kgk()"></i>
+        <i class="kgg" v-if="(isChoice == 0)" @click="kgk()"></i>
       </div>
     </block>
     <span class="btn" @click="btn()">保存地址</span>
@@ -30,8 +29,10 @@
 <script>
 import wx from "wx";
 import API from "@/api/httpJchan";
+import mixins from './mixins';
 export default {
   components: {},
+  mixins: [mixins],
   data() {
     return {
       region: [],
@@ -41,6 +42,7 @@ export default {
       postcode: "",
       recode: "",
       isChoice: 0,
+      hasChoice: false,
       tid: "",
       name: "",
       phone: "",
@@ -55,6 +57,16 @@ export default {
       this.recode = e.mp.detail.code;
     },
     kgk() {
+
+      // 如果修改的地址是默认地址
+      if (this.hasChoice) {
+        wx.showToast({
+          title: '需设定一个默认地址',
+          icon: 'none',
+          duration: 1500
+        })
+        return;
+      }
       if (this.isChoice == 1) {
         this.isChoice = 0;
       } else if (this.isChoice == 0) {
@@ -69,16 +81,10 @@ export default {
       } else if (this.recode.length == 3) {
         this.recode = this.recode[2];
       }
-      console.log(this.recode);
       this.editddres();
-      setTimeout(() => {
-        wx.navigateBack({ data: 1 });
-      }, 200);
     },
     async editddres() {
-      // console.log(this);
-      // return;
-      const editddres = await API.editddres({
+      const data = {
         name: this.name,
         mobile: this.phone,
         address: this.address,
@@ -86,31 +92,78 @@ export default {
         isChoice: this.isChoice,
         areaId: this.recode,
         addressId: this.tid
-      });
-      this.editddres = editddres.data.list;
-      console.log(addres.data);
-      console.log(this.address);
+      }
+      this.validate(data)
+        .then(res => {
+          wx.showLoading({
+            title: '正在保存...'
+          })
+          API.editddres(data)
+            .then(res => {
+              wx.showToast({
+                title: '更新成功',
+                icon: 'none'
+              })
+
+              wx.setStorageSync('address_store', {
+                type: 'update',
+                payload: data
+              })
+              setTimeout(() => {
+                this.$router.back();
+              }, 1500)
+              
+            })
+            .finally(() => {
+              wx.hideLoading();
+            });
+        })
     }
   },
   async mounted() {
     // console.log(this.$mp.query.id);
     this.tid = this.$mp.query.id;
+    wx.showLoading({
+      title: '加载中'
+    })
     const pageaddres = await API.pageaddres({ pageNumber: 1, pageSize: 99 });
-    this.pageaddresList = pageaddres.data.list;
-    for (var i = 0; i < this.pageaddresList.length; i++) {
-      if (this.tid == this.pageaddresList[i].id) {
-        console.log(this.pageaddresList[i]);
-        this.name = this.pageaddresList[i].name;
-        this.phone = this.pageaddresList[i].mobile;
-        this.address = this.pageaddresList[i].address;
-        this.region = this.pageaddresList[i].value.split(",");
+    wx.hideLoading();
+    pageaddres.data.list.some(item => {
+      if (this.tid === item.id) {
+        this.name = item.name;
+        this.phone = item.mobile;
+        this.address = item.address;
+        this.region = item.value.split(",");
+        this.isChoice = item.isChoice;
+
+        if (item.isChoice === 1) {
+          this.hasChoice = true;
+        }
+        return true;
       }
-    }
+    })
+    // this.pageaddresList = pageaddres.data.list;
+
+    // for (var i = 0; i < this.pageaddresList.length; i++) {
+    //   if (this.tid == this.pageaddresList[i].id) {
+    //     this.name = this.pageaddresList[i].name;
+    //     this.phone = this.pageaddresList[i].mobile;
+    //     this.address = this.pageaddresList[i].address;
+    //     this.region = this.pageaddresList[i].value.split(",");
+    //   }
+    // }
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data())
   }
 };
 </script>
 <style lang="sass" scoped>
 @import '~@/assets/css/mixin'
+
+.placeholder-input, .region
+  color: #999
 .nav
   .item
     height: 107px
@@ -118,6 +171,8 @@ export default {
     background: #fff
     line-height: 107px
     padding: 0 23px
+    input
+      color: #999
     .name
       width: 100%
       display: inline-block

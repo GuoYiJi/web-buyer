@@ -1,0 +1,49 @@
+
+.history {
+  &-container {
+    padding: 0 32px;
+    background-color: #fff;
+  }
+  &__hd {
+    padding: 35px 0;
+    font-size: 28px;
+    color: #666;
+    overflow: hidden;
+    line-height: 30px;
+    .history__title {
+      display: inline-block;
+      .clock-icon {
+        $size: 30px;
+        margin-top: -1px;
+        margin-right: 19px;
+        display: inline-block;
+        vertical-align: middle;
+        width: $size;
+        height: $size;
+        background: url(./ls@2x.png) no-repeat;
+        background-size: $size;
+      }
+    }
+    .history-clear-icon {
+      $w: 30px;
+      $h: 30px;
+      float: right;
+      width: $w;
+      height: $h;
+      background: url(./sc4@2x.png) no-repeat;
+      background-size: $w $h;
+    }
+  }
+  &__list {
+    font-size: 24px;
+    color: #666;
+    &-item {
+      display: inline-block;
+      margin-right: 24px;
+      margin-bottom: 24px;
+      padding: 0 20px;
+      line-height: 48px;
+      background-color: #F2F2F2;
+    }
+  }
+}

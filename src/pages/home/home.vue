@@ -1,10 +1,9 @@
 <template>
-  <div class="home">
+  <div class="home" v-if="isInitFetch">
     <div class="head">
-      <img v-if="coverImg" :src="coverImg" alt="">
-      <img v-else class="bg" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-      <img class="tx" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-      <p class="text">遇见不一样的自己</p>
+      <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
+      <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
+      <p class="text">{{ Warehouse.name }}</p>
     </div>
     <div class="search-box">
       <div class="input">
@@ -14,56 +13,64 @@
         <p class="input-box" @click="toSearch()">请搜索商品</p>
       </div>
     </div>
-    <div class="coupon-box">
-      <swiper class="swiper" :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval" :duration="duration">
+    <div class="coupon-box" v-if="coupon.length">
+      <scroll-view scroll-x>
         <block v-for="(item,index) in coupon" :key="index">
-          <swiper-item class="coupon-img">
-            <div class="yhqk">
+          <div class="coupon-img">
+            <div class="yhqk" @click="btn(item)">
               <p class="money">￥<span class="money1">{{item.price}}</span></p>
               <p class="whole">全程满 <br/>
                 <span class="whole1">{{item.limitCount}}</span>使用
               </p>
-              <span class="btn" @click="btn(item.id)">立即领取</span>
+              <div>
+                <span class="btn">立即领取</span>
+              </div>
+              <div class="mask-checked" v-if="item.isReceived === 'true'">已领取</div>
+              
             </div>
-          </swiper-item>
+          </div>
         </block>
-      </swiper>
+      </scroll-view>
     </div>
-    <div class="nav">
-      <div class="list">
-        <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">
-          <img class="img" :src="item.img">
-          <p class="text">{{item.text}}</p>
-        </span>
-      </div>
-    </div>
-    <div class="content">
-      <div v-if="tag == 1">
-        <colligate/>
-        <Upnew/>
-        <selling/>
-        <collocation/>
-        <Collage/>
-        <discount/>
-      </div>
-      <div v-else-if="tag == 2">
-        <screen/>
-        <Upnew/>
-      </div>
-      <div v-else-if="tag == 3">
-        <screen/>
-        <selling/>
-      </div>
-      <div v-else-if="tag == 4">
-        <collocation/>
-      </div>
-      <div v-else-if="tag == 5">
-        <screen/>
-        <Collage/>
-      </div>
-      <div v-else-if="tag == 6">
-        <screen/>
-        <discount/>
+    <div>
+      <block v-if="isFetch">
+        <div class="nav">
+          <scroll-view class="list" scroll-x>
+            <div v-for="(item, idx) in navData" :key="idx" class="item" :class="[tag == item.id && 'active']" @click="handleNav(item.id)">
+              <img class="img" :src="item.img">
+              <p class="text">{{item.text}}</p>
+            </div>
+          </scroll-view>
+        </div>
+        <div class="content" v-if="isFetch">
+          <div v-if="tag == 1">
+            <colligate/>
+            <Upnew :hidenSort="true" />
+            <selling :hidenSort="true" />
+            <collocation :hidenSort="true" />
+            <Collage :hidenSort="true" />
+            <discount :hidenSort="true" />
+          </div>
+          <div v-else-if="tag == 2">
+            <Upnew/>
+          </div>
+          <div v-else-if="tag == 3">
+            
+            <selling/>
+          </div>
+          <div v-else-if="tag == 4">
+            <collocation/>
+          </div>
+          <div v-else-if="tag == 5">
+            <Collage/>
+          </div>
+          <div v-else-if="tag == 6">
+            <discount/>
+          </div>
+        </div>
+      </block>
+      <div v-if="loading">
+        <zan-loading />
       </div>
     </div>
     <div class="toTop" v-show="top">
@@ -77,6 +84,7 @@
 <script>
 import wx from 'wx'
 import API from '@/api/httpJchan'
+import APIShui from '@/api/httpShui';
 import mixin from '@/mixin'
 import colligate from '@/components/h_colligate'
 import Upnew from '@/components/h_Upnew'
@@ -98,6 +106,8 @@ export default {
   },
   data () {
     return {
+      isInitFetch: false,
+      Warehouse: {},
       top: false,
       coverImg: '',
       indicatorDots: false,
@@ -105,6 +115,9 @@ export default {
       interval: 5000,
       duration: 1000,
       tag: 1,
+      isFetch: false,
+      tabs: [
+      ],
       navData: [
         {
           id: 1,
@@ -161,27 +174,89 @@ export default {
     handleNav (tag) {
       this.tag = tag
     },
-    async btn (id) {
-      const getCoupon = await API.getCoupon({ couponId: id })
-      console.log(getCoupon)
+    async btn(item) {
+      if (item.isReceived === 'true') {
+        return;
+      }
+      wx.showLoading({
+        title: '领取中'
+      })
+      API.getCoupon({ couponId: item.id })
+        .then(res => {
+          this.coupon = this.coupon.map(_ => {
+            if (_.id === item.id) {
+              _.isReceived = 'true';
+            }
+            return _;
+          })
+        })
+        .finally(() => {
+          wx.hideLoading()
+        });
+    },
+    handleSortChange(event) {
+      console.log(event);
+    }
+  },
+  onShareAppMessage() {
+    return {
+      title: '发现一家好店，与你分享！'
     }
   },
   async mounted () {
     // 首页封面图
-    const cover = await API.getImg({type: 5})
-    if (cover.code === 1) {
-      this.coverImg = cover.data[0].image
-    }
-    const shopInfo = await API.getShopInfo()
+    // const cover = await API.getImg({type: 5})
+    // if (cover.code === 1) {
+    //   this.coverImg = cover.data[0].image
+    // }
+    wx.showLoading({
+      title: '加载中'
+    })
+    const shopInfo = await API.getShopInfo();
+    this.isInitFetch = true;
+    wx.hideLoading();
     if (shopInfo.code === 1) {
       wx.setStorage({
         key: 'shopName',
         data: shopInfo.data.name
       })
+      wx.setNavigationBarTitle({
+        title: shopInfo.data.name
+      })
+      this.coverImg = shopInfo.data.wall;
+      this.Warehouse = shopInfo.data;
     }
     const pageByCreate = await API.pageByCreate({state: 1})
-    console.log('优惠券', pageByCreate)
     this.coupon = pageByCreate.data.list
+    try {
+
+      const { code, data } = await APIShui.getTabs({types: '0,1'});
+      if (code === 1) {
+        const images_default = [
+          require('../../assets/img/home/zonghe.png'),
+          require('../../assets/img/home/shangxin.png'),
+          require('../../assets/img/home/baokuan.png'),
+          require('../../assets/img/home/dapei.png'),
+          require('../../assets/img/home/pintuan.png'),
+          require('../../assets/img/home/tejia.png')
+        ]
+        this.tabs = data.map(item => {
+          return {
+            id: item.id,
+            text: item.name,
+            img: item.image || images_default[item.id - 1]
+          }
+        })
+      }
+      this.isFetch = true;
+      console.log(this.tabs);
+    } catch (err) {
+      console.log(err)
+    }
+    this.loading = false;
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>
@@ -264,82 +339,102 @@ export default {
         border: none
         color: #999999
   .coupon-box
+
     width: 100%
     height: 126px
     padding-bottom: 30px
     overflow: hidden
     background: #fff
-    .swiper
-      height: 126px
-      .coupon-img
-        width: 210px !important
+    scroll-view
+      width: 100%
+      white-space: nowrap;
+    .coupon-img
+      position: relative
+      display: inline-block
+      margin: 0 5px
+      &:first-child
+        margin-left: 24px
+      &:last-child
+        margin-right: 24px
+      .mask-checked
+        position: absolute
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: flex
+        align-items: center
+        justify-content: center
+        z-index: 5
+        background-color: rgba(0, 0, 0, .3)
+      .yhqk
+        box-sizing: border-box
+        +bg-img('home/yhq.png')
         height: 126px
-        .yhqk
-          box-sizing: border-box
-          +bg-img('home/yhq.png')
-          width: 210px !important
-          height: 126px
-          color: #fff
-          margin: 0 10px
-          padding-top: 5px
-          position: relative
-          .money
-            display: inline-block
-            width: 90px
-            padding-left: 10px
-            font-size: 24px
-            text-align: center
-            .money1
-              font-size: 48px
-          .whole
-            display: inline-block
-            position: absolute
-            width: 110px
-            font-size: 20px
-            left: 90px
-            text-align: center
-          .btn
-            position: absolute
-            font-size: 20px
-            width: 150px
-            height: 35px
-            display: inline-block
-            color: #ff7272
-            background: #fff
-            border-radius: 10px
-            text-align: center
-            line-height: 35px
-            top: 80px
-            left: 35px
-        .yhqk.active
-          background: rgba(0,0,0,.8)
+        color: #fff
+        margin: 0 10px
+        padding: 5px 10px 0
+        position: relative
+        .money
+          display: inline-block
+          padding-left: 10px
+          font-size: 24px
+          text-align: center
+          .money1
+            font-size: 48px
+        .whole
+          margin-left: 10px
+          display: inline-block
+          font-size: 20px
+          text-align: center
+        .btn
+          margin: 0 auto;
+          font-size: 20px
+          width: 150px
+          height: 35px
+          display: block
+          color: #ff7272
+          background: #fff
+          border-radius: 10px
+          text-align: center
+          line-height: 35px
+          top: 80px
+          left: 35px
+      .yhqk.active
+        background: rgba(0,0,0,.8)
   .active
     color: #F67C2F
   .nav
     width: 100%
-    padding: 30px 0
+    padding: 34px 0
     font-size: 26px
     color: #999
     overflow: hidden
-    text-align: center
     background: #f5f5f5
     .list
       font-size: 26px
       color: #000
       background: #f5f5f5
-      overflow-y: hidden
-      overflow-x: auto
       position: relative
-      display: flex
       width: 100%
+      white-space: nowrap
       .item
-        flex: 1
-        box-sizing: border-box
+        display: inline-block
+        margin: 0 10px
+        text-align: center
+        &:first-child
+          margin-left: 20px
+        &:last-child
+          margin-right: 20px
         .img
           width: 90px
           height: 90px
         .text
           font-size: 26px
+          color: #999
+      .item.active
+        .text
+          color: #EE7527
   .content
     position: relative
     height: 100%

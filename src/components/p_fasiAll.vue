@@ -4,14 +4,34 @@
     <!-- 1 -->
     <div class="kuang" v-for="(item, index) in ordersValueList" :key="item.id">
       <div class="head">
-        <span class="h-title">菲斯的小店</span>
+        <span class="h-title">{{shopName}}</span>
         <span class="h-text">{{item.state === 1 ? '未支付' : item.state === 2 ? '取消交易' : item.state === 5 ? '拼单成功，待发货' : item.state === 6 ? '拼单成功，待收货 ' : item.state === 7 ? '拼单成功，已完成' : item.state === 8 ? '交易关闭' : item.state === 9 ? '拼单中' : item.state === 10 ? '审核中' : '未知状态'}}</span>
       </div>
       <!-- 商品图片展示 -->
-      <div class="nav" v-if="item.layer === 1">
+      <block v-if="item.layer === 1">
+        <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(item.goodsList)" v-if="item.state !== 5">
+          <div class="van-cell__title">
+            <span class="goods-thumb-item" v-for="(goods, j) in item.goodsList" :key="j">
+              <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image" mode="aspectFill">
+              <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+            </span>
+          </div>
+          <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
+        </div>
+        <div class="van-cell goods-thumb__list" v-else>
+          <div class="van-cell__title">
+            <span class="goods-thumb-item" v-for="(goods, j) in item.goodsList" :key="j">
+              <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image" mode="aspectFill">
+              <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+            </span>
+          </div>
+        </div>
+
+      </block>
+<!--       <div class="nav">
         <img class="n-img" v-for="(list, num) in item.goodsList" :key="list.goodsId" :src="list.image" v-if="num < 3">
         <i class="n-icon"></i>
-      </div>
+      </div> -->
       <!-- 商品详情展示 -->
       <div class="nav" v-else-if="item.layer === 2">
         <img class="n-img" v-for="(list, num) in item.goodsList" :key="list.goodsId" :src="list.image" v-if="num < 1">
@@ -24,7 +44,17 @@
       </div>
       <!-- 商品信息展示 -->
       <div class="below">
-        <div class="total">
+        <div class="van-cell">
+          <div class="van-cell__title">
+            <span class="goods-buy__info">共<span class="goods-buy__num">{{item.goodsList[0].skuList.length}}</span>个款  <span class="goods-buy__num">{{item.goodsList.length}}</span>件商品  </span>
+          </div>
+          <div class="van-cell__value">
+            <span class="goods-buy__total">合计:</span>
+            <span class="goods-buy__price">￥{{item.paid}}</span>
+            <span class="cap-express__fee">（含运费￥{{item.freight}}）</span>
+          </div>
+        </div>
+        <div class="total" v-if="false">
           <span class="t-left">共
             <p class="size">{{item.goodsList[0].skuList.length}}</p>个款式&emsp;
             <p class="piece">{{item.goodsList.length}}</p>件商品</span>
@@ -37,7 +67,7 @@
         </div>
       </div>
 
-      <table class="skuCode" v-if="item.state === 5 && item.children">
+      <table class="skuCode" v-if="item.state === 5 && item.children.length">
         <tr>
           <th></th>
           <th>颜色</th>
@@ -53,82 +83,141 @@
           <td></td>
         </tr>
       </table>
-      <ul class="itemOrder" v-if="item.children">
-        <li v-for="(childrenOrder, childrenNum) in item.children" :key="childrenNum">子订单编号({{childrenOrder.state === 6 ? '已发货' : childrenOrder.state === 7 ? '交易成功' : childrenOrder.state === 8 ? '交易关闭' : childrenOrder.state === 10 ? '售后中' : '未知状态'}}): {{childrenOrder.orderNo}}</li>
-      </ul>
 
-      <!-- 代付款 -->
-      <div class="btn" v-if="item.state === 1">
-        <span class="button">确认付款</span>
-        <span class="button" @click="toOpen('visible2')">取消订单</span>
-        <span class="button" @click="toPinDetails">查看详情</span>
-      </div>
-      <!-- 关闭交易 -->
-      <div class="btn" v-else-if="item.state === 2">
-        <span class="button">删除订单</span>
-        <span class="button" @click="toPinDetails">查看详情</span>
-      </div>
-      <!-- 待发货 -->
-      <div class="btn" v-else-if="item.state === 5">
-        <span class="button" @click="toPinDetails">查看详情</span>
-        <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
-        </span>
-      </div>
-      <!-- 待收货 -->
-      <div class="btn" v-else-if="item.state === 6">
-        <span class="button" @click="toPinDetails">查看详情</span>
-        <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
-        </span>
-      </div>
-      <!-- 待收货已拆单 -->
-      <div v-else-if="item.state === 6 && item.layer ===2">
-        <div class="btn">
-          <span>
-            <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="userId" :style="{background: 'url(' + user.head + ')'}"></i>
-          </span>
+      <div class="van-cell van-hairline" v-for="(childrenOrder, childrenNum) in item.children" :key="childrenNum" @click="handleChildClick(childrenOrder)">
+        <div class="van-cell__title">
+          <span>子订单编号({{childrenOrder.state === 6 ? '已发货' : childrenOrder.state === 7 ? '交易成功' : childrenOrder.state === 8 ? '交易关闭' : childrenOrder.state === 10 ? '售后中' : '未知状态'}}): {{childrenOrder.orderNo}}</span>
         </div>
-        <div class="btn">
-          <span class="button" @click="toPinDetails">确认收货</span>
-          <span class="button" @click="toPinDetails">查看物流</span>
-          <span class="button" @click="toPinDetails">申请售后</span>
-          <span class="button" @click="toPinDetails">查看详情</span>
+        <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+      </div>
+      <div class="below">
+        <div class="below__bottom van-cell van-hairline">
+          
+          <!-- 代付款 -->
+          <div class="van-cell__value" v-if="item.state === 1">
+            <div class="btn__cell">
+              <span class="below__btn" @click="handleBtnClick(item.id, 0)">取消订单</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn below__btn--primary" @click="toPinDetails(item.id)">确认付款</span>
+            </div>
+          </div>
+          <!-- 关闭交易 -->
+          <div class="van-cell__value" v-else-if="item.state === 2">
+            <div class="btn__cell">
+              <span class="below__btn" @click="handleBtnClick(item.id, 1)">删除订单</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+            </div>
+          </div>
+          <!-- 待发货 -->
+          <block v-else-if="item.state === 5">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="userId" :style="{'background-image': 'url(' + user.head +')'}" v-if="userId < 3"></i>
+            </div>
+            <div class="van-cell__value">
+              <div class="btn__cell">
+                
+                <span class="below__btn below__btn--primary" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+          </block>
+          <!-- 待收货 -->
+          <block v-else-if="item.state === 6">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="userId" :style="{'background-image': 'url(' + user.head +')'}" v-if="userId < 3"></i>
+            </div>
+            <div class="van-cell__value">
+              <div class="btn__cell">
+                <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+          </block>
+          <!-- 待收货已拆单 -->
+          <block v-else-if="item.state === 6 && item.layer ===2">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="userId" :style="{'background-image': 'url(' + user.head + ')'}"></i>
+            </div>
+            <div class="van-cell__value">
+              <div class="btn__cell">
+                <span class="below__btn" @click="handleBtnClick(item.id, 2)">确认收货</span>
+              </div>
+              <div class="btn__cell">
+                <span class="below__btn" @click="handleLogistics(item.id)">查看物流</span>
+              </div>
+              <div class="btn__cell">
+                <span class="below__btn" @click="handleOrderAfterSale(item.id, item.paid, item.freight, 1)">申请售后</span>
+              </div>
+              <div class="btn__cell">
+                <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+          </block>
+          <!-- 交易成功 -->
+          <block v-else-if="item.state === 7">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="userId" :style="{'background-image': 'url(' + user.head +')'}" v-if="userId < 3"></i>
+            </div>
+            <div class="van-cell__value">
+              
+              <div class="btn__cell">
+                <span class="below__btn" @click="handleBtnClick(item.id, 1)">删除订单</span>
+              </div>
+              <div class="btn__cell">
+                <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+            
+            
+          </block>
+          <!-- 交易成功已拆单 -->
+          <block v-else-if="item.state === 7 && item.layer === 2">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="userId" :style="{'background-image': 'url(' + user.head +')'}" v-if="userId < 3"></i>
+            </div>
+            <div class="van-cell__value">
+              <div class="btn__cell">
+                <span class="below__btn" @click="handleBtnClick(item.id, 1)">删除订单</span>
+              </div>
+              <div class="btn__cell">
+                <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+          </block>
+          <!-- 拼单中 -->
+          <block v-else-if="item.state === 9">
+            <div class="avatars">
+              <i class="avatar" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{'background-image': 'url(' + user.head +')'}" v-if="userId < 3"></i>
+              <i class="avatar avatar--default"></i>
+            </div>
+            <div class="van-cell__value">
+              <div class="btn__cell">
+                <span class="below__btn" @click="toPinDetails(item.id)">查看详情</span>
+              </div>
+            </div>
+          </block>
         </div>
       </div>
-      <!-- 交易成功 -->
-      <div class="btn" v-else-if="item.state === 7">
-        <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
-        </span>
-        <span class="button">删除订单</span>
-        <span class="button" @click="toPinDetails">查看详情</span>
-      </div>
-      <!-- 交易成功已拆单 -->
-      <div class="btn" v-else-if="item.state === 7 && item.layer === 2">
-        <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
-        </span>
-        <span class="button">删除订单</span>
-        <span class="button" @click="toPinDetails">查看详情</span>
-      </div>
-      <!-- 拼单中 -->
-      <div class="btn" v-else-if="item.state === 9">
-        <span class="button">取消订单</span>
-        <span>
-          <i class="userHeader" v-for="(user, userId) in item.pingUser" :key="user.id" :style="{background: 'url(' + user.head +')'}" v-if="userId < 3"></i>
-        </span>
-      </div>
+
     </div>
   </div>
 </template>
 <script>
-import wx from 'wx'
+import wx from 'wx';
+import API from '@/api/httpShui';
+import orderMixins from '@/orderMixins.js'
 export default {
+  mixins: [orderMixins],
   name: 'orderList',
   components: {},
   data () {
-    return {}
+    return {
+      shopName: ''
+    }
   },
   props: {
     ordersValueList: {
@@ -152,12 +241,43 @@ export default {
     toClose () {
       // this[name] = false;
     },
-    toPinDetails () {
-      this.$router.push('/pages/my/pinDetails/pinDetails')
+    toPinDetails (id) {
+      this.$router.push({
+        path: '/pages/my/orderDetails/obligation',
+        query: { id }
+      })
+    },
+    /**
+     * 按钮操作
+     * @param  {[type]} id   [description]
+     * @param  {[Number]} type [操作类型]
+     * 0: 取消订单
+     * 1: 删除
+     * 2: 确认收货
+     */
+    handleBtnClick(id, type) {
+      switch (type) {
+        case 0:
+          this.handleOrderCancel(id)
+            .then(res => {
+              wx.startPullDownRefresh();
+            })
+          break;
+        case 1:
+          this.handleOrderDelete(id)
+            .then(res => {
+              wx.startPullDownRefresh();
+            })
+          break;
+        case 2:
+          this.handleOrderDone(id)
+            .then(res => {
+              wx.startPullDownRefresh();
+            })
+      }
     }
   },
   created () {
-    console.log(this.ordersValueList)
     this.ordersValueList.forEach((Pitem, Pindex) => {
       this.skuCodeList[Pindex] = []
       Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
@@ -168,7 +288,9 @@ export default {
         this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
       })
     })
-    console.log(this.skuCodeList)
+  },
+  mounted() {
+    this.shopName = wx.getStorageSync('shopName');
   }
 }
 </script>

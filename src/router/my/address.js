@@ -16,6 +16,8 @@ const address = [{
       navigationBarTitleText: '地址管理',
       'enablePullDownRefresh': true,
       'usingComponents': {
+        'zan-loading': '/zan-weapp/dist/loading/index',
+        'zan-loadmore': '/zan-weapp/dist/loadmore/index',
         'i-modal': '/iview/modal/index',
       }
     }
@@ -24,7 +26,10 @@ const address = [{
     path: '/pages/my/like',
     config: {
       navigationBarTitleText: '我的喜欢',
+      backgroundColor: '#ffffff',
       'usingComponents': {
+        'zan-loadmore': '/zan-weapp/dist/loadmore/index',
+        'zan-loading': '/zan-weapp/dist/loading/index',
         'i-modal': '/iview/modal/index',
       }
     }

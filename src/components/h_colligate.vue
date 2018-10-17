@@ -1,27 +1,38 @@
 <template>
-  <div class="nav">
+  <div class="nav" v-if="data" @click="handleBuyClick">
     <div class="left">
-      <img class="img" :src="img">
+      <img class="img" :src="data.image" mode="aspectFill">
     </div>
     <div class="right">
       <p class="title">邮费差价</p>
-      <p class="money">￥1</p>
-      <p class="volume">销量：123</p>
+      <p class="money">￥{{ data.sellPrice }}</p>
+      <p class="volume">销量：{{ data.sellCount }}</p>
       <span class="btn">立即采购</span>
     </div>
   </div>
 </template>
 <script>
 import wx from "wx";
+import API from '@/api/httpJchan';
 export default {
   components: {},
   data() {
     return {
+      data: null,
       img: "http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg"
     };
   },
-  methods: {},
-  mounted() {}
+  methods: {
+    handleBuyClick() {
+      this.$router.push({path: '/pages/home/details/details', query: {goodsId: this.data.id}});
+    }
+  },
+  mounted() {
+    API.selectTopGoods()
+      .then(res => {
+        this.data = res.data;
+      })
+  }
 };
 </script>
 <style lang="sass" scoped>
@@ -29,7 +40,6 @@ export default {
 .nav
   display: flex
   padding: 29px 22px
-  border-bottom: 1px solid #ccc
   .left
     flex: 1
     .img

@@ -1,0 +1,69 @@
+
+.search-bar {
+  position: relative;
+  display: flex;
+  padding: 16px 34px 0;
+  border-top: 1px solid #E5E5E5;
+  box-sizing: border-box;
+  background-color: #fff;
+  &__form {
+    position: relative;
+    flex: 1;
+    &:after {
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: "";
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: 0 0;
+      box-sizing: border-box;
+      background-color: #F5F5F5;
+      border-radius: 10px;
+    }
+  }
+  &__cancel-btn {
+    margin-left: 21px;
+    font-size: 28px;
+    line-height: 56px;
+    color: #333;
+  }
+  &__box {
+    position: relative;
+    padding: 0 85px;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    box-sizing: border-box;
+    .icon-search {
+      $w: 36px;
+      position: absolute;
+      left: 26px;
+      top: 0;
+      width: $w;
+      height: 100%;
+      @include bg-img('home/search.png');
+      background-size: $w;
+    }
+    .icon-clear {
+      right: 26px;
+      top: 0;
+      width: 20px;
+      height: 100%;
+      &:after {
+        content: "";
+      }
+    }
+  }
+  &__box &__input {
+    padding: 4px 0;
+    width: 100%;
+    height: 56px;
+    border: 0;
+    font-size: 28px;
+    line-height: 56px;
+    box-sizing: border-box;
+    background: transparent;
+  }
+}

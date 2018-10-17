@@ -1,0 +1,106 @@
+.coupon {
+  position: relative;
+  // padding: 20px 34px 0 27px;
+  margin: 0 auto 10px;
+  position: relative;
+  width: 668px;
+  height: 223px;
+  .bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  &__content {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    display: flex;
+    padding-left: 47px;
+    padding-right: 47px;
+    align-items: center;
+    justify-content: space-between;
+    &-inner {
+      flex: 1;
+      .money {
+        margin-right: 37px;
+        display: inline-block;
+      }
+    }
+    .left {
+      color: #fff;
+      .money {
+        color: #fff;
+        discount: inline-block;
+        .money1 {
+          font-size: 60px;
+        }
+      }
+      .discount {
+        discount: inline-block;
+        font-size: 35px;
+      }
+      .purchases {
+        discount: inline-block;
+        color: #FECF8F;
+        font-size: 26px;
+      }
+    }
+    .right {
+      color: #fff;
+      font-size: 40px;
+    }
+  }
+  &__time {
+    margin-top: 10px;
+    font-size: 22px;
+    margin-left: 43px;
+    color: #EE7527;
+  }
+  &__desc {
+    display: inline-block;
+  }
+}
+
+.coupon-empty {
+  padding-top: 352px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  .title {
+    margin-top: 48px;
+    font-size: 28px;
+    color: #666;
+  }
+  .t_img {
+    width: 213px;
+    height: 187px;
+    @include bg-img('marketingMgt/kk.png');
+  }
+}
+
+
+.Invalid {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: inline-block;
+  .Invalid_img {
+    display: inline-block;
+    position: absolute;
+    width: 689px;
+    height: 220px;
+    top: 0px;
+    left: 0px;
+  }
+  .Invalid_text {
+    display: inline-block;
+    position: absolute;
+    left: 150px;
+    top: 80px;
+    font-size: 36px;
+    color: #fff;
+  }
+}

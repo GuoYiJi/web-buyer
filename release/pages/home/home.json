@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "首页",
+  "navigationBarBackgroundColor": "#ffffff",
+  "usingComponents": {
+    "i-drawer": "/iview/drawer/index",
+    "zan-popup": "/zan-weapp/dist/popup/index",
+    "zan-loading": "/zan-weapp/dist/loading/index",
+    "i-modal": "/iview/modal/index"
+  }
+}

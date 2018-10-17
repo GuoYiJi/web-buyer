@@ -1,46 +1,78 @@
 <template>
   <div class="home">
-    <div class="head">
+    <div class="van-cell order-header">
+      <div class="van-cell__title">
+        <span>{{shopName}}</span>
+      </div>
+      <div class="van-cell__value">
+        <span class="state">{{stateName[item.state]}}</span>
+      </div>
+    </div>
+<!--     <div class="head">
         <span class="h-title">{{shopName}}</span>
         <span class="h-text">{{stateName[item.state]}}</span>
-      </div>
+      </div> -->
       <div v-if="item.state != 5">
-          <!-- 其他 -->
-          <div class="nav" >
-            <div  v-for="(goods,j) in item.goodsList" :key="j">
-              <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image">
+        <!-- 其他 -->
+
+        <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(item.goodsList)">
+          <div class="van-cell__title">
+            <span class="goods-thumb-item" v-for="(goods, j) in item.goodsList" :key="j">
+              <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image" mode="aspectFill">
               <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+            </span>
+          </div>
+          <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
+        </div>
+        <div class="below">
+          <div class="van-cell">
+            <div class="van-cell__title">
+              <span class="goods-buy__info">共<span class="goods-buy__num">{{ item.goodsListSize }}</span>个款  <span class="goods-buy__num">{{item.num}}</span>件商品  </span>
+            </div>
+            <div class="van-cell__value">
+              <span class="goods-buy__total">合计:</span>
+              <span class="goods-buy__price">￥{{item.count}}</span>
+              <span class="cap-express__fee">（含运费￥{{item.freight}}）</span>
             </div>
           </div>
-          <div class="below">
-            <div class="total">
-              <p class="t-left">共
-                <span class="piece">{{item.goodsListSize}}</span>个款，合计<span class="piece">{{item.num}}</span>件</p>
-              <p class="t-freight">（含运费￥{{item.freight}}）</p>
-              <p class="t-right">合计:
-                <span class="money">￥{{item.paid}}</span>
-              </p>
-            </div>
+          <div class="total" v-if="false">
+            <p class="t-left">共
+              <span class="piece">{{item.goodsListSize}}</span>个款，合计<span class="piece">{{item.num}}</span>件</p>
+            <p class="t-freight">（含运费￥{{item.freight}}）</p>
+            <p class="t-right">合计:
+              <span class="money">￥{{item.paid}}</span>
+            </p>
           </div>
+        </div>
       </div>
       <div v-else>
         <!-- 待发货 -->
         <div v-for="(goods,j) in item.goodsList" :key="j">
-          <div class="nav">
-            <img v-if="goods.image" class="n-img" :src="goods.image">
-            <img v-else class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-            <div class="n-right">
-              <p class="n-title">{{goods.name}}</p>
-              <p class="yardage" v-for="(ite,i) in goods.sizeTextArray" :key="i" v-if="i<=2">{{ite.text}}</p>
+          <div class="van-cell goods-thumb__list">
+            <div class="van-cell__title">
+              <span class="goods-thumb-item" v-for="(goods, listIndex) in item.goodsList" :key="listIndex">
+                <img v-if="goods.image && listIndex < 3" class="n-img" :src="goods.image" mode="aspectFill">
+                <img v-else-if="listIndex < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+              </span>
             </div>
           </div>
-          <div class="below">
+          <div class="van-cell">
+            <div class="van-cell__title">
+              <span class="goods-buy__info">共<span class="goods-buy__num">{{ item.goodsListSize }}</span>个款  <span class="goods-buy__num">{{goods.countNum}}</span>件商品  </span>
+            </div>
+            <div class="van-cell__value">
+              <span class="goods-buy__total">合计:</span>
+              <span class="goods-buy__price">￥{{item.count}}</span>
+              <span class="cap-express__fee" v-if="item.expressWay > 0">（含运费￥{{item.expressWay}}）</span>
+            </div>
+          </div>
+<!--           <div class="below">
             <div class="total">
               <p class="t-right">
                 共<span class="piece">{{goods.countNum}}</span>件商品, 合计:<span class="money">￥{{item.paid}}</span>
               </p>
             </div>
-          </div>
+          </div> -->
           <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
             <tr>
               <th>颜色</th>
@@ -56,43 +88,75 @@
         </div>
       </div>
       <div class="below">
-        <div class="total" v-for="(cOder,idx) in item.children" :key="idx" >
+       <!--  <div class="total" v-for="(cOder,idx) in item.children" :key="idx" >
           <span class="t-left" @click="bxq(cOder.id, cOder.state)">子订单编号({{stateName[cOder.state]}}): {{cOder.orderNo}}</span>
           <span class="t-right">></span>
+        </div> -->
+        <div class="van-cell van-hairline" v-for="(cOder,idx) in item.children" :key="idx" @click="bxq(cOder.id, cOder.state)">
+          <div class="van-cell__title">
+            <span>子订单编号({{stateName[cOder.state]}}): {{cOder.orderNo}}</span>
+          </div>
+          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
         </div>
-        <div class="btn" >
-          <span class="b-xq" v-if="item.state==1" @click="toOpen('visible1')">确认付款</span>
-          <span class="b-xq" v-if="item.state==2" @click="toOpen('visible3')">删除订单</span>
-          <span class="b-sc" v-if="item.state==1" @click="toOpen('visible2')">取消订单</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==5"  class="b-xq" @click="afterSale(item.id, item.paid, item.freight, 0)">申请退款</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-xq" @click="toOpen('visible5')">确认收货</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-sc" @click="logistics(item.id)">查看物流</span>
-          <span v-if="item.isHasChildren == 0 && item.isPing == 0 && item.state==6" class="b-sc" @click="afterSale(item.id, item.paid, item.freight, 1)">申请售后</span>
-          <span class="b-sc" @click="bxq(item.id,item.state)">查看详情</span>
+        
+        <div class="below__bottom van-cell van-hairline">
+          
+          <div class="van-cell__value" v-if="item.state === 1">
+            <div class="btn__cell">
+              <span class="below__btn" @click="handleOrderConfirmClick({ id: item.id, type: 'cancel' })">取消订单</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn" @click="bxq(item.id,item.state)">查看详情</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn below__btn--primary" @click="bxq(item.id,item.state)">确认付款</span>
+            </div>
+          </div>
+          <div class="van-cell__value" v-if="item.state === 2 || item.state === 7">
+            <div class="btn__cell">
+              <span class="below__btn below__btn--primary" @click="bxq(item.id,item.state)">查看详情</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn" @click="handleOrderConfirmClick({ id: item.id, type: 'delete' })">删除订单</span>
+            </div>
+          </div>
+          <div class="van-cell__value" v-if="item.state === 5">
+            <div class="btn__cell">
+              <span class="below__btn" v-if="!item.isHasChildren" @click="afterSale(item.id, item.paid, item.freight, 0)">退款</span>
+            </div>
+            <div class="btn__cell">
+              <span class="below__btn below__btn--primary" @click="bxq(item.id,item.state)">查看详情</span>
+            </div>
+          </div>
+          <div class="van-cell__value" v-if="item.state === 6">
+            <div class="btn__cell">
+              <span class="below__btn" @click="bxq(item.id,item.state)">查看详情</span>
+            </div>
+            <div class="btn__cell" v-if="!item.isHasChildren">
+              <span class="below__btn" @click="afterSale(item.id, item.paid, item.freight, 1)">申请售后</span>
+            </div>
+            <div class="btn__cell" v-if="!item.isHasChildren">
+              <span class="below__btn" @click="logistics(item.id)">查看物流</span>
+            </div>
+            <div class="btn__cell" v-if="!item.isHasChildren">
+              <span class="below__btn below__btn--primary" @click="sureOrder(item.id)">确认收货</span>
+            </div>
+          </div>
+          <!-- <span class="b-sc btn" v-if="item.state==1" @click="handleOrderConfirmClick({ id: item.id, type: 'cancel' })">取消订单</span> -->
         </div>
-        <i-modal :visible="visible1" @ok="bxq(item.id,item.state)" @cancel="toClose('visible1')">
-          <div class="m_tips">确认付款</div>
-        </i-modal>
-        <i-modal :visible="visible2" @ok="cancelOrder(item.id)" @cancel="toClose('visible2')">
-          <div class="m_tips">确定取消订单</div>
-        </i-modal>
-        <i-modal :visible="visible3" @ok="delOrder(item.id)" @cancel="toClose('visible3')">
-          <div class="m_tips">确定删除订单</div>
-        </i-modal>
-        <i-modal :visible="visible4" @ok="retreat(item.id,0,item.paid,item.freight)" @cancel="toClose('visible4')">
-          <div class="m_tips">确定申请退款！</div>
-        </i-modal>
-        <i-modal :visible="visible5" @ok="sureOrder(item.id)" @cancel="toClose('visible5')">
+        <!-- <i-modal :visible="visible5" @ok="sureOrder(item.id)" @cancel="toClose('visible5')">
           <div class="m_tips">请确认已经收到宝贝！</div>
-        </i-modal>
+        </i-modal> -->
       </div>
   </div>
 </template>
 <script>
 // import wx from 'wx'
-import API from '@/api/httpShui'
+import API from '@/api/httpShui';
+import orderMixins from '@/orderMixins';
 export default {
   components: {},
+  mixins: [orderMixins],
   props: {
     item: {},
     shopName: ''
@@ -104,7 +168,7 @@ export default {
       visible3: false,
       visible4: false,
       visible5: false,
-      stateName: ['', '待付款', '交易取消', '已支付', '支付失败', '待发货', '待收货', '已完成', '交易关闭', '拼单中'],
+      stateName: ['', '待付款', '交易取消', '已支付', '支付失败', '待发货', '待收货', '已完成', '交易关闭', '拼单中', '售后中'],
       id: '',
       skuCodeList: []
     }
@@ -141,33 +205,49 @@ export default {
     toClose (name) {
       this[name] = false
     },
-    // 取消订单
-    async cancelOrder (id) {
-      const data = await API.cancelOrder({orderId: id})
-      console.log('取消订单', data)
-      if (data.code === 1) {
-        this.visible2 = false
-        // this.$router.back();
-        this.$emit('refreshOrder')
-      }
-    },
-    // 删除订单
-    async delOrder (id) {
-      const data = await API.delOrderShow({orderId: id})
-      if (data.code === 1) {
-        this.visible3 = false
-        // this.$router.back();
-        this.$emit('refreshOrder')
+    async handleOrderConfirmClick(payload) {
+      try {
+        const { id } = payload;
+        switch (payload.type) {
+          case 'delete':
+            this.handleOrderDelete(id)
+              .then(res => {
+                this.$emit('confirm', { delete: true, id })
+              })
+            break;
+          case 'cancel':
+            this.handleOrderCancel(id)
+              .then(res => {
+                this.$emit('confirm', { cancel: true, id })
+              })
+            break;
+          case 'pay':
+            wx.showModal({
+              title: '付款提示',
+              content: '确认付款',
+              success: res => {
+                if (res.confirm) {
+                  this.$router.push({
+                    path: '/pages/my/orderDetails/obligation',
+                    query: {
+                      id: payload.id
+                    }
+                  })
+                }
+              }
+            })
+            break;
+        }
+      } catch (err) {
+        console.log(err);
       }
     },
     // 确认收货
     async sureOrder (orderId) {
-      const data = await API.sureOrder({orderId: orderId})
-      console.log('确认收货', data)
-      if (data.code === 1) {
-        this.visible5 = false
-        this.$emit('refreshOrder')
-      }
+      this.handleOrderDone(orderId)
+        .then(res => {
+          wx.startPullDownRefresh();
+        })
     }
   },
   async mounted () {
@@ -192,7 +272,6 @@ export default {
 </script>
 <style type="text/sass" lang="sass" scoped>
 @import '~@/assets/css/mixin'
-
 table.skuCode
   width: 100%
   border: none
@@ -211,6 +290,12 @@ table.skuCode
       color: #999999
     td
       color: #666666
+.order-header
+  margin-top: 20px
+  padding: 33px 28px
+  font-size: 28px
+  .state
+    color: #F67C2F
 .head
   display: flex
   font-size: 28px
@@ -247,75 +332,5 @@ table.skuCode
       height: 60px
     .yardage
       font-size: 24px
-      color: #999
-.below
-  background: #fff
-  .total
-    height: 82px
-    line-height: 82px
-    padding: 0 32px
-    overflow: hidden
-    border-bottom: 1px solid #E5E5E5
-    p
-      font-size: 24px
-      color: #000
-    span 
-      font-size: 24px
-      color: #000
-    .t-left
-      float: left
-      // padding-top: 20px
-    .t-right
-      float: right
-      // padding-top: 15px
-      // padding-right: 10px
-    .t-freight
-      float: right
-      // padding-top: 20px
-      font-size: 24px
-      color: #666
-    .piece
-      font-size: 28px
-      color: #F67C2F
-    .money
-      font-size: 32px
-      color: #FF0000
-  .btn
-    height: 108px
-    padding: 24px 33px
-    background: #fff
-    box-sizing: border-box
-    .b-xq
-      float: right
-      display: inline-block
-      width: 160px
-      height: 60px
-      background: #F67C2F
-      font-size: 24px
-      vertical-align: middle
-      line-height: 60px
-      text-align: center
-      margin-left: 20px
-      color: #fff
-    .b-sc
-      float: right
-      display: inline-block
-      width: 140px
-      height: 58px
-      background: #EEEEEE
-      font-size: 24px
-      vertical-align: middle
-      line-height: 60px
-      text-align: center
-      margin-left: 20px
-    .b-qr
-      float: right
-      display: inline-block
-      width: 160px
-      height: 58px
-      border: 1px solid #BFBFBF
-      vertical-align: middle
-      line-height: 60px
-      text-align: center
-      margin-left: 20px
+      color: #999   
 </style>

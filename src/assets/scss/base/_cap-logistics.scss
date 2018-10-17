@@ -1,0 +1,43 @@
+@import '~@/assets/css/mixin';
+.cap-logistics {
+  position: relative;
+  background-color: #F9F9F9;
+  &__address {
+    padding: 28px 32px;
+    .van-icon-location {
+      float: left;
+      margin-top: 6px;
+      margin-right: 25px;
+      width: 26px;
+      height: 32px;
+      @include bg-img("my/dz.png")
+    }
+    &-name {
+      float: left;
+      width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+    &-tel {
+      float: right;
+    }
+    &-content {
+      overflow: hidden;
+      color: #000;
+      & > div {
+        overflow: hidden;
+        font-size: 28px;
+      }
+    }
+    &-detail {
+      margin-top: 16px;
+      font-size: 24px;
+      line-height: 32px;
+      color: #666;
+      word-break: break-all;
+    }
+  }
+}

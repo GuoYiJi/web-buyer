@@ -1,14 +1,33 @@
 <template>
 <!-- 我的拼团  首页 -->
 <div class="home">
-  <div class="nav">
+
+  <zan-tab
+    :list="navData"
+    :selected-id="selectedId"
+    @tabchange="handleZanTabChange"
+  />
+  <!-- <div class="nav">
     <div class="list">
-      <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">{{item.text}}</span>
+      <span v-for="(item,idx) in navData" :key="idx" class="item" :class="{ 'active': tag === idx }" @click="handleNav(idx)">{{item.text}}</span>
       <div class="line" :style="{left: (tag-1)*16.6 + '%'}"></div>
     </div>
-  </div>
+  </div> -->
   <div class="content">
-    <div v-if="tag == 1">
+    <div v-for="(item, index) in navData" v-if="(selectedId === item.id)" :key="index">
+      <fasiAll :ordersValueList="item.list" :skuCodeList="item.skuCodeList"/>
+      <div v-show="loading">
+        <zan-loading />
+      </div>
+      <div v-if="!item.list.length && item.lastPage">
+        <zan-loadmore type="text" text="暂无数据" />
+      </div>
+      <div v-if="item.list.length && item.lastPage">
+        <zan-loadmore type="text" />
+      </div>
+      
+    </div>
+   <!--  <div v-if="tag == 1">
       <fasiAll :ordersValueList="ordersValueList" :skuCodeList="skuCodeList"/>
     </div>
     <div v-else-if="tag == 2">
@@ -25,87 +44,150 @@
     </div>
     <div v-else-if="tag == 6">
       <fasiAll :ordersValueList="ordersValueList" />
-    </div>
+    </div> -->
   </div>
 </div>
 </template>
 <script>
-import wx from 'wx'
-import fasiAll from '@/components/p_fasiAll'
-import api from '@/api/httpJchan'
+import wx from 'wx';
+import fasiAll from '@/components/p_fasiAll';
+import api from '@/api/httpJchan';
+import cloneDeep from '@/assets/js/cloneDeep';
 export default {
   components: {
     fasiAll
   },
   data () {
     return {
-      tag: 1,
+      tag: 0,
       skuCodeList: [],
-      navData: [{
-        id: 1,
-        state: null,
-        text: '全部'
-      },
-      {
-        id: 2,
-        state: 1,
-        text: '待付款'
-      },
-      {
-        id: 3,
-        state: 9,
-        text: '拼团中'
-      },
-      {
-        id: 4,
-        state: 5,
-        text: '待发货'
-      },
-      {
-        id: 5,
-        state: 6,
-        text: '待收货'
-      },
-      {
-        id: 6,
-        state: 7,
-        text: '已完成'
-      }
+      loading: false,
+      navData: [
+        {
+          id: 'all',
+          pageNumber: 1,
+          state: null,
+          title: '全部',
+          list: []
+        },
+        {
+          id: 'topay',
+          pageNumber: 1,
+          state: 1,
+          title: '待付款',
+          list: []
+        },
+        {
+          id: 'ping',
+          pageNumber: 1,
+          state: 9,
+          title: '拼团中',
+          list: []
+        },
+        {
+          id: 'tosend',
+          pageNumber: 1,
+          state: 5,
+          title: '待发货',
+          list: []
+        },
+        {
+          id: 'sign',
+          pageNumber: 1,
+          state: 6,
+          title: '待收货',
+          list: []
+        },
+        {
+          id: 'done',
+          pageNumber: 1,
+          state: 7,
+          title: '已完成',
+          list: []
+        }
       ],
+      selectedId: '',
       ordersValueList: []
     }
   },
   methods: {
-    handleNav (tag) {
-      console.log(tag)
-      if (tag) {
-        this.tag = tag
-      }
-      this.getOrderList(this.navData[this.tag - 1].state)
+    handleZanTabChange(e) {
+      let { detail: selectedId } = e.mp;
+      if (selectedId === this.selectedId) return;
+      this._initFetch(selectedId);
+      this.selectedId = selectedId;
+      this.fetch();
     },
     // 获取相应拼单订单
-    async getOrderList (state) {
-      const response = await api.myorder({
-        pageNumber: 1,
-        pageSize: 20,
-        state: state,
-        isPing: 1
-      })
-      this.ordersValueList = response.data.list
-      console.log(this.ordersValueList)
-      this.ordersValueList.forEach((Pitem, Pindex) => {
-        this.skuCodeList[Pindex] = []
-        Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
-          let color = Citem.skuCode.split(',')[0]
-          let size = Citem.skuCode.split(',')[1]
-          this.skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
+    async fetch() {
+      return new Promise(async (resolve, reject) => {
+        
+        const currentIndex = this.navData.findIndex(item => item.id === this.selectedId);
+        const current = this.navData[currentIndex];
+        const { state } = current;
+        if (this.loading || current.lastPage) return;
+        this.loading = true;
+        const { code, data: { list, lastPage } } = await api.myorder({
+          pageNumber: current.pageNumber,
+          pageSize: 20,
+          state,
+          isPing: 1
         })
+        this.loading = false;
+        if (code === 1) {
+
+          let skuCodeList = [];
+          list.forEach((Pitem, Pindex) => {
+            skuCodeList[Pindex] = []
+            Pitem.goodsList[0].skuList.forEach((Citem, Cindex) => {
+              let color = Citem.skuCode.split(',')[0]
+              let size = Citem.skuCode.split(',')[1]
+              skuCodeList[Pindex][Cindex] = [color, size, Citem.num, Citem.num - Citem.remainNum, Citem.remainNum]
+            })
+          })
+          console.log(list)
+          // this.navData = newVal;
+          this.navData.splice(currentIndex, 1, {
+            ...current,
+            lastPage,
+            skuCodeList,
+            list: current.list.concat(list),
+            pageNumber: current.pageNumber + 1
+          })
+          resolve();
+        } else {
+          reject();
+        }
       })
-      // console.log(this.skuCodeList)
+    },
+    _initFetch(selectedId) {
+      const index = this.navData.findIndex(item => item.id === selectedId);
+      this.navData.splice(index, 1, {
+        ...this.navData[index],
+        list: [],
+        skuCodeList: [],
+        lastPage: false,
+        pageNumber: 1
+      })
     }
   },
+  onPullDownRefresh() {
+    this._initFetch(this.selectedId);
+    this.fetch()
+      .finally(() => {
+        wx.stopPullDownRefresh();
+      })
+  },
+  onReachBottom() {
+    this.fetch();
+  },
+
   mounted () {
-    this.getOrderList(null)
+    this.selectedId = this.navData[this.tag].id;
+    this.fetch()
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data())
   }
 }
 </script>

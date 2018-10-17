@@ -3,7 +3,7 @@ const barter = [{
   name: 'barter',
   config: {
     navigationBarTitleText: '换货申请',
-    navigationBarBackgroundColor: '#FA8134'
+    navigationBarBackgroundColor: '#ffffff'
   }
 }, ]
 module.exports = barter

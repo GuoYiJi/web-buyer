@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" v-if="isFetch">
     <div class="refundInfo">
       <p class="refundState">
         {{state[details.refundType] + ',' + stateName[details.state]}}
@@ -38,7 +38,7 @@
     <div class="btnGroup clearfix">
       <div class="revise" v-if="details.state == 0 || details.state == 2" @click="revise">修改申请</div>
       <div class="cancel" v-if="details.state == 0" @click="revokes">撤销申请</div>
-      <div class="cancel">联系客服</div>
+      <div class="cancel contact">联系客服 <button open-type="contact">联系客服</button></div>
     </div>
     <div class="wellMsg" v-show="wellMsgShow">
       {{msg}}
@@ -59,7 +59,8 @@ export default {
       shopName: '',
       details: {},
       goods: [],
-      logisticsNum: ''
+      logisticsNum: '',
+      isFetch: false
     }
   },
   components: {
@@ -78,10 +79,26 @@ export default {
       }
     },
     revise () {
-      this.$router.back()
+      const { details } = this;
+      console.log(details.refundType)
+      if (details.refundType == 2) {
+        this.$router.push({
+          path: '/pages/refund/refund',
+          query: {
+            orderId: details.id,
+            type: 1,
+            price: details.price
+          }
+        })
+      } else {
+        this.$router.push({
+          path: '/pages/refund/refundDetails',
+          query: {id: details.id}
+        })
+      }
     },
     revokes () {
-      this.$router.back()
+      // this.$router.back()
     },
     // 定时器弹窗
     mySetTimeout (msg) {
@@ -102,7 +119,12 @@ export default {
         that.shopName = res.data
       }
     })
+    wx.showLoading({
+      title: '加载中'
+    })
     const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
+    wx.hideLoading();
+    this.isFetch = true;
     if (data.code === 1) {
       console.log(data)
       this.details = data.data
@@ -123,6 +145,10 @@ export default {
         }
       }
     }
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>
@@ -262,6 +288,17 @@ export default {
       text-align: center
     .cancel
       color: #999999
+      &.contact
+        position: relative
+        z-index: 1
+        button
+          position: absolute
+          left: 0
+          top: 0
+          display: block
+          width: 100%
+          height: 100%
+          opacity: 0
     .revise
       color: #ffffff
       background: #EE7527

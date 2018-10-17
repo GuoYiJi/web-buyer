@@ -7,6 +7,9 @@ import http from './Jchan'
 class API {
   // 获取店铺信息
   getShopInfo = params => http.post('api/warehouse/selectWarehouse', params)
+
+  // 获取置顶商品
+  selectTopGoods = params => http.post('api/goods/selectTopGoods', params)
   // 售后列表
   after = params => http.post('api/order/refund/selectOrderRefund', params)
   // 运费规则

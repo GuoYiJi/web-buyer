@@ -14,11 +14,6 @@
         <img class="img" v-else :src="img">
       </div>
     </div>
-    <div class="kuang" v-else>
-      <div class="kong">
-        <p class="k-text">无物流状态</p>
-      </div>
-    </div>
   </div>
 </template>
 <script>
@@ -36,10 +31,13 @@ export default {
   methods: {
     // 获取订单详情
     async getOrderDeatil() {
+      wx.showLoading({
+        title: '加载中...'
+      });
       let res = await api.obligation({
         orderId: this.$route.query.orderId
       })
-      console.log(res);
+      wx.hideLoading();
       this.order = res.data;
         
     }
@@ -47,6 +45,10 @@ export default {
   mounted() {
     // let orderId = this.$route.query.orderId;
     this.getOrderDeatil();
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 };
 </script>

@@ -40,7 +40,7 @@ export default {
         this.handleError('需要同意授权才可以使用噢！')
         // console.log()
       } else {
-        const val = await wx.getStorageSync('sessionId')
+        const val = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
         if (val) {
           return this.toRoute('home/home')
         }
@@ -68,15 +68,14 @@ export default {
         encryptedData: this.userInfo.encryptedData,
         iv: this.userInfo.iv
       })
-      console.log(data.data)
       wx.setStorage({
         key: 'no',
         data: data.data.no
       })
-      await wx.setStorageSync('sessionId', data.data.sessionId)
-      wx.switchTab({
+      await wx.setStorageSync(`${process.env.NODE_ENV}_sessionId`, data.data.sessionId);
+      wx.reLaunch({
         url: '/pages/home/home'
-      })
+      });
     }
   },
   async mounted () {

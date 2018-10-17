@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" v-if="isFetch">
     <div class="refundInfo">
       <!-- 售后状态 -->
       <p class="refundState">
@@ -47,7 +47,7 @@
     <div class="btnGroup clearfix">
       <div class="revise" v-if="details.state == 0 || details.state == 2" @click="revise">修改申请</div>
       <div class="cancel" v-if="details.state == 0" @click="revokes">撤销申请</div>
-      <div class="cancel">联系客服</div>
+      <div class="cancel contact">联系客服 <button open-type="contact">联系客服</button></div>
     </div>
     <div class="wellMsg" v-show="wellMsgShow">
       {{msg}}
@@ -70,7 +70,8 @@ export default {
       goods: [],
       stateIndex: '',
       refundTypeIndex: '',
-      logisticsNum: ''
+      logisticsNum: '',
+      isFetch: false
     }
   },
   methods: {
@@ -83,8 +84,40 @@ export default {
         this.mySetTimeout('请输入物流单号！')
       }
     },
-    revise () {
-      this.$router.back()
+    revise() {
+      const { details: { refundType: type } } = this;
+      let path;
+      switch (type) {
+        case 0:
+        case 1:
+          path = '/pages/refund/refund';
+          break;
+        case 2:
+          path = '/pages/refund/barter';
+          break;
+      }
+      if (type != 3) {
+        this.$router.push({
+          path,
+          query: {
+            orderId: this.details.orderId,
+            type,
+            price: this.details.price,
+            freight: this.details.freight,
+            data: JSON.stringify({
+              result: this.details.result,
+              img1: this.details.img1,
+              img2: this.details.img2,
+              img3: this.details.img3
+            })
+          }
+        })
+      } else {
+        this.$router.push({
+        path: path,
+        query: {orderId: this.orderId, type: type}
+        })
+      }
     },
     revokes () {
       this.$router.back()
@@ -110,9 +143,13 @@ export default {
     })
   },
   async mounted () {
+    wx.showLoading({
+      title: '加载中'
+    })
     const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
+    this.isFetch = true;
+    wx.hideLoading();
     if (data.code === 1) {
-      console.log(data)
       this.details = data.data
       this.goods = data.data.goodsList
       this.stateIndex = data.data.state
@@ -130,6 +167,10 @@ export default {
         }
       }
     }
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>
@@ -269,6 +310,17 @@ export default {
       text-align: center
     .cancel
       color: #999999
+      &.contact
+        position: relative
+        z-index: 1
+        button
+          position: absolute
+          left: 0
+          top: 0
+          display: block
+          width: 100%
+          height: 100%
+          opacity: 0
     .revise
       color: #ffffff
       background: #EE7527

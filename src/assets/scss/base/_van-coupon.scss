@@ -1,0 +1,11 @@
+.van-coupon {
+  &-list__list {
+    position: relative;
+    z-index: 1;
+    padding-top: 8px;
+  }
+  &-item {
+    margin: 0 38px 8px 43px;
+    background-color: #fff;
+  }
+}

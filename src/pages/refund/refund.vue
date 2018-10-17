@@ -23,7 +23,7 @@
 
           <img v-else src="../../assets/img/my/upimg.png" alt="">
 
-          <span v-if="img1" class="close" @click="closeImg('img1',event)"></span>
+          <span v-if="img1" class="close" @click.stop="closeImg('img1',event)"></span>
 
         </div>
         <div v-if="img1" class="img" @click="chooseImg(2)">
@@ -31,7 +31,7 @@
 
           <img v-else src="../../assets/img/my/upimg.png" alt="">
 
-          <span v-if="img2" class="close" @click="closeImg('img2',event)"></span>
+          <span v-if="img2" class="close" @click.stop="closeImg('img2',event)"></span>
 
         </div>
         <div v-if="img2" class="img" @click="chooseImg(3)">
@@ -39,7 +39,7 @@
 
           <img v-else src="../../assets/img/my/upimg.png" alt="">
 
-          <span v-if="img3" class="close" @click="closeImg('img3',event)"></span>
+          <span v-if="img3" class="close" @click.stop="closeImg('img3',event)"></span>
 
         </div>
       </div>
@@ -160,7 +160,6 @@ export default {
     },
     // 清除选择的图片
     closeImg (name, event) {
-      event.stopPropagation()
       this[name] = ''
     },
     // 提交按钮
@@ -202,6 +201,13 @@ export default {
     this.type = this.$route.query.type
     this.price = Number(this.$route.query.price)
     this.freight = Number(this.$route.query.freight)
+    if (this.$route.query.data) {
+      const data = JSON.parse(this.$route.query.data);
+      this.explain = data.result;
+      this.img1 = data.img1;
+      this.img2 = data.img2;
+      this.img3 = data.img3;
+    }
     if (this.type === 1) {
       this.price -= this.freight
       this.isRefund = false
@@ -210,6 +216,10 @@ export default {
     // console.log(this.type)
     // console.log(this.price)
     // console.log(this.freight)
+  },
+  
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 }
 </script>

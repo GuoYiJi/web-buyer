@@ -3,9 +3,11 @@ const home = [{
   name: 'home',
   config: {
     navigationBarTitleText: '首页',
-    navigationBarBackgroundColor: '#FA8134',
+    navigationBarBackgroundColor: '#ffffff',
     'usingComponents': {
       'i-drawer': '/iview/drawer/index',
+      'zan-popup': '/zan-weapp/dist/popup/index',
+      'zan-loading': '/zan-weapp/dist/loading/index',
       'i-modal': '/iview/modal/index'
     }
   }
@@ -19,7 +21,8 @@ const home = [{
       'i-message': '/iview/message/index'
     }
   }
-}, ]
+}
+]
 const details = require('./home/details')
 const homes = [].concat(home, details)
 module.exports = homes

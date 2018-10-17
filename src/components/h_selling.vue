@@ -1,217 +1,212 @@
 <template>
-  <div class="nav">
-    <div class="title">
-      <span class="title_1">NEW SHOW</span>
-      <span class="title_2"> 火爆热卖，源于一派 </span>
-      <span class="xian"></span>
-      <span class="xian_1"></span>
+
+  <div class="home_opt_mod">
+    <screen @sort="handleSortChange" @filter="handleFilterChange" v-if="!hidenSort" @showtype="handleShowType" />
+    <div class="home_opt_mod__hd">
+      <div class="title_1">NEW SHOW</div>
+      <div class="title_2"> 火爆热卖，源于一派 </div>
     </div>
-    <div class="content">
-      <div class="kuang">
-        <div :class="{left : index == 0, right : index > 0}" v-for="(item, index) in List" :key="index">
-          <img v-if="item.image" class="img" :src="item.image">
-          <img v-else class="img" src="../assets/img/classify/goods.png">
-          <p class="title">{{item.name}}</p>
-          <p class="volume">货期:{{item.delivery}}丨销量:{{item.sellCount}}</p>
-          <p class="money">批发价:{{item.sellPrice}}</p>
-          <span class="btn" @click="clickItem(item)">立即采购</span>
+    <div class="home_opt_mod__bd">
+      <div class="home_opt_mod__goods" v-if="showType === 0">
+        <div class="home_opt_mod__goods-item">
+          <div class="goods-list__wrapper" v-for="(item, index) in waterfallLeft" :key="index" @click="clickItem(item)">
+            <div class="goods-list__item goods-list__item--big goods-list__item--btn3 card2">
+              <div class="goods-list__thumb">
+                <img class="goods-thumb-h190" :src="item.image" mode="aspectFill">
+              </div>
+              <div class="goods-list__info has-title has-subtitle has-price has-btn">
+                <p class="title">{{item.name}}</p>
+                <p class="sub-title">货期:{{item.delivery}}丨销量:{{item.sellCount}}</p>
+                <p class="sale-info">
+                  <span class="sale-price">批发价:{{item.sellPrice}}</span>
+                </p>
+              </div>
+              <div class="goods-list__buy-btn-wrapper">
+                <span class="goods-list__buy-btn-3 button">立即采购</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="home_opt_mod__goods-item">
+          <div class="goods-list__wrapper" v-for="(item, index) in waterfallRight" :key="index" @click="clickItem(item)">
+            <div class="goods-list__item goods-list__item--big goods-list__item--btn3 card2">
+              <div class="goods-list__thumb">
+                <img class="goods-thumb-h229" :src="item.image" mode="aspectFill">
+              </div>
+              <div class="goods-list__info has-title has-subtitle has-price has-btn">
+                <p class="title">{{item.name}}</p>
+                <p class="sub-title">货期:{{item.delivery}}丨销量:{{item.sellCount}}</p>
+                <p class="sale-info">
+                  <span class="sale-price">批发价:{{item.sellPrice}}</span>
+                </p>
+              </div>
+              <div class="goods-list__buy-btn-wrapper">
+                <span class="goods-list__buy-btn-3 button">立即采购</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="goods-list__container goods-list__container--simple" v-if="showType === 1">
+        <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="clickItem(item)">
+          <div class="goods-list__item goods-list__item--list simple">
+            <div class="goods-list__thumb">
+              <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
+              <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
+            </div>
+            <div class="goods-list__info">
+              <p class="title zan-ellipsis--l2">{{item.name}}</p>
+              <div class="sale-info">
+                <p>期货:{{item.delivery}}</p>
+                <p>销量:{{item.sellCount}}</p>
+                <p class="price">批发价:{{item.sellPrice}}</p>
+              </div>
+            </div>
+            <span class="goods-list__btn">立即采购</span>
+          </div>
+        </div>
+      </div>
+      <div v-show="loading">
+        <zan-loading />
+      </div>
+      <div v-if="nodata">
+        <div class="no_goods">
+          <div class="no_goods_img"></div>
+          <div class="no_goods_tip">没有相关的商品结果哦~~</div>
         </div>
       </div>
     </div>
-    <div class="More" v-if="!lastPage">
-      <span class="More_text" @click="getMore()">查看更多</span>
-      <i class="img"></i>
+    <div class="home_opt_mod__ft" v-show="!loading && (List.length && !lastPage)" @click="getMore()">
+      <div class="loadmore">
+        <span>查看更多</span>
+        <i></i>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import wx from 'wx'
 import API from '@/api/httpShui'
+import isOdd from 'is-odd';
+import screen from '@/components/h_screen'
 export default {
-  components: {},
+  props: {
+    hidenSort: {
+      type: Boolean,
+      default: false
+    }
+  },
+  components: {
+    screen
+  },
   data () {
     return {
+      loading: false,
       List: [],
+      waterfallLeft: [],
+      waterfallRight: [],
       page: 1,
       totalPage: 0,
-      lastPage: ''
+      lastPage: false,
+      goodsFilterOptions: {},
+      ob: '',
+      nodata: false,
+      showType: 0
     }
   },
   methods: {
+    handleShowType(e) {
+      this.showType = e;
+    },
     async goodsList (page) {
+
+      if (page === 1) {
+        this.page = 1;
+        this.List = [];
+        this.waterfallLeft = [];
+        this.waterfallRight = [];
+        this.nodata = false;
+        this.lastPage = false;
+      }
+      this.loading = true;
       const data = await API.getGoods({
         labelId: 2,
         state: 1,
-        pageSize: 5,
-        pageNumber: page
+        pageSize: 10,
+        pageNumber: page,
+        ob: this.ob,
+        ...this.goodsFilterOptions,
       })
+      this.loading = false;
       this.lastPage = data.data.lastPage
-      console.log('火爆热卖', data)
       if (data.code === 1) {
-        if (this.List.length !== 0) {
-          this.List.push.apply(this.List, data.data.list)
-        } else {
-          this.List = data.data.list
+        const { data: { list, pageNumber, lastPage } } = data;
+        if (page == 1 && !list.length && lastPage) {
+          this.nodata = true;
+          return;
         }
-        this.page = data.data.pageNumber
-        this.totalPage = data.data.totalPage
+        this.List = this.List.concat(list);
+        this.waterfallLeft = this.List.filter((item, index) => isOdd(index + 1));
+        this.waterfallRight = this.List.filter((item, index) => !isOdd(index + 1));
+        // console.error(this.List, this.waterfallLeft, this.waterfallRight)
+        // if (this.List.length !== 0) {
+        //   this.List.push.apply(this.List, data.data.list)
+        // } else {
+        //   this.waterfallLeft = data.data.list.filter((item, index) => isOdd(index + 1));
+        //   this.waterfallRight = data.data.list.filter((item, index) => !isOdd(index + 1));
+        //   this.List = data.data.list
+        // }
+        this.page++;
         // console.log(this.List)
       }
     },
     getMore () {
-      this.page++
-      // console.log(this.page)
-      if (this.page <= this.totalPage) {
-        this.goodsList(this.page)
-      }
+      this.goodsList(this.page);
     },
     clickItem (obj) {
-      let objStr = JSON.stringify(obj)
-      this.$router.push({path: '/pages/home/details/details', query: {obj: objStr}})
+      this.$router.push({path: '/pages/home/details/details', query: {goodsId: obj.id}})
+    },
+    handleSortChange(e) {
+      this.ob = e;
+      this.goodsList(1);
+    },
+    handleFilterChange(payload) {
+      this.goodsFilterOptions = Object.assign(this.goodsFilterOptions, payload);
+      this.goodsList(1);
+    },
+
+    handleFilterRest() {
+      this.goodsFilterOptions = {};
+      this.goodsList(1);
     }
   },
-  mounted () {
+  onReady () {
     this.goodsList(this.page)
   }
 }
 </script>
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
-.nav
-  margin-top: 50px
-  padding-bottom: 25px
-  border-bottom: 1px solid #ccc
-  background: #EAEAEA
-  .title
-    position: relative
-    top: 0
-    left: 0
-    height: 120px
-    margin-bottom: 50px
-    background: #fff
-    .title_1
-      position: absolute
-      font-size: 32px
-      color: #000000
-      left: 37%
-    .title_2
-      position: absolute
-      font-size: 28px
-      color: #000000
-      top: 75px
-      left: 33%
-    .xian
-      position: absolute
-      width: 98px
-      height: 4px
-      background: #999
-      top: 95px
-      left: 18%
-    .xian_1
-      position: absolute
-      width: 98px
-      height: 4px
-      background: #999
-      top: 95px
-      left: 68%
-  .content
-    margin-top: 20px
-    padding: 10px 22px
-    .kuang
-      column-count: 2
-      overflow: hidden
-      .left
-        width: 344px
-        height: 568px
-        display: inline-block
-        margin-top: 20px
-        position: relative
-        border-radius: 8px
-        background: #fff
-        .img
-          width: 344px
-          height: 380px
-          border-radius: 8px 8px 0 0
-        .title
-          +moreLine(1)
-          font-size: 30px
-          color: #000
-          margin-bottom: -40px
-          padding-left: 15px
-        .volume
-          font-size: 26px
-          color: #999
-          padding-left: 15px
-        .money
-          font-size: 28px
-          color: #EE3E27
-          margin-top: 25px
-          padding-left: 15px
-        .btn
-          position: absolute
-          bottom: 15px
-          right: 20px
-          display: inline-block
-          background: #EE7527
-          border-radius: 30px
-          font-size: 22px
-          color: #fff
-          padding: 10px
-      .right
-        width: 344px
-        height: 646px
-        display: inline-block
-        margin-top: 20px
-        position: relative
-        border-radius: 8px
-        background: #fff
-        float: right
-        .img
-          width: 344px
-          height: 458px
-          border-radius: 8px 8px 0 0
-        .title
-          +moreLine(1)
-          font-size: 30px
-          color: #000
-          margin-bottom: -40px
-          padding-left: 15px
-        .volume
-          font-size: 26px
-          color: #999
-          padding-left: 15px
-        .money
-          font-size: 28px
-          color: #EE3E27
-          margin-top: 25px
-          padding-left: 15px
-        .btn
-          position: absolute
-          bottom: 15px
-          right: 20px
-          display: inline-block
-          background: #EE7527
-          border-radius: 30px
-          font-size: 22px
-          color: #fff
-          padding: 10px
-  .More
-    width: 600px
-    height: 70px
-    border-radius: 4px
-    display: flex
-    border: 1px solid #999
-    margin: 0 auto
-    .More_text
-      padding-left: 240px
-      padding-top: 8px
-    .img
-      +bg-img('home/xiala.png')
-      width: 34px
-      height: 18px
-      margin-top: 25px
-      margin-left: 20px
-
-
-
+.wrapper
+  padding-bottom: 60px
+  background-color: #EAEAEA
+.goods-list__wrapper
+.goods-thumb-h190
+  height: 380px
+.goods-thumb-h229
+  height: 229px * 2
+.home_opt_mod
+  &__bd
+    background-color: #EAEAEA
+  &__ft
+    background-color: #EAEAEA
+  &__goods
+    margin-bottom: -30px;
+    display: flex;
+    padding-top: 24px
+    padding-left: 17px
+    padding-right: 17px
+    &-item
+      flex: 1;
+      padding: 0 7px
 </style>

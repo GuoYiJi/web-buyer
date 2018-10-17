@@ -1,27 +1,96 @@
 <template>
   <div class="home">
-    <div class="nav">
-      <div class="list">
-        <span v-for="(item,idx) in navData" :key="idx" class="item" :class="[tag === item.id && 'active']" @click="handleNav(item.id)">{{item.text}}</span>
-        <div class="line" :style="{left: (tag-1)*33 + '%'}"></div>
-      </div>
-    </div>
+    <zan-tab
+      :list="navData"
+      :selected-id="selectedId"
+      @tabchange="handleZanTabChange"
+    />
     <div class="content">
-      <div v-if="tag == 1">
-        <p>
-          <myCoupon />
-        </p>
+      <div v-show="selectedId == 'unused'">
+        <!-- <myCoupon /> -->
+
+        <div class="coupon" v-for="(item, index) in navData[0].list" :key="index">
+          <!-- <i class="bg hasCoupon"></i> -->
+          <img class="bg hasCoupon" src="../../../assets/img/marketingMgt/yhq.png" mode="aspectFill" />
+          <div class="coupon__content">
+            <div class="left coupon__content-inner">
+              <p class="money">￥
+                <span class="money1">{{item.count}}</span>
+              </p>
+              <div class="coupon__desc">
+                <p class="discount">{{item.name}}</p>
+                <p class="purchases">购满{{item.limitCount}}可使用</p>
+              </div>
+            </div>
+            <div class="right">未使用</div>
+          </div>
+          <p class="coupon__time">有效期 {{item.startTime}}-{{item.endTime}}</p>
+        </div>
+        <div class="coupon-empty" v-if="!navData[0].list.length && navData[0].lastPage">
+          <i class="t_img"></i>
+          <p class="title">~空空如也~</p>
+        </div>
+        <div v-if="loading">
+          <zan-loading> </zan-loading>
+        </div>
+        
       </div>
-      <div v-else-if="tag == 2">
-        <p>
-          <myCouponT />
-        </p>
+      <div v-show="selectedId == 'use'">
+
+
+        <div class="coupon" v-for="(item, index) in navData[1].list" :key="index">
+          <!-- <i class="bg hasCoupon"></i> -->
+          <img class="bg hasCoupon" src="../../../assets/img/marketingMgt/yhq.png" mode="aspectFill" />
+          <div class="coupon__content">
+            <div class="left coupon__content-inner">
+              <p class="money">￥
+                <span class="money1">{{item.count}}</span>
+              </p>
+              <div class="coupon__desc">
+                <p class="discount">{{item.name}}</p>
+                <p class="purchases">购满{{item.limitCount}}可使用</p>
+              </div>
+            </div>
+            <div class="right">已使用</div>
+          </div>
+          <p class="coupon__time">有效期 {{item.startTime}}-{{item.endTime}}</p>
+        </div>
+        <div class="coupon-empty" v-if="!navData[1].list.length && navData[1].lastPage">
+          <i class="t_img"></i>
+          <p class="title">~空空如也~</p>
+        </div>
+        <div v-if="loading">
+          <zan-loading> </zan-loading>
+        </div>
       </div>
-      <div v-else-if="tag == 3">
-        <p>
-          <myCoupon />
-          <myCouponT />
-        </p>
+      <div v-show="selectedId == 'disable'">
+
+
+        <div class="coupon" v-for="(item, index) in navData[2].list" :key="index">
+          <!-- <i class="bg hasCoupon"></i> -->
+          <img class="bg hasCoupon" src="../../../assets/img/marketingMgt/yhq.png" mode="aspectFill" />
+          <div class="coupon__content">
+            <div class="left coupon__content-inner">
+              <p class="money">￥
+                <span class="money1">{{item.count}}</span>
+              </p>
+              <div class="coupon__desc">
+                <p class="discount">{{item.name}}</p>
+                <p class="purchases">购满{{item.limitCount}}可使用</p>
+              </div>
+            </div>
+            <div class="right">已失效</div>
+          </div>
+          <p class="coupon__time">有效期 {{item.startTime}}-{{item.endTime}}</p>
+        </div>
+
+        <div class="coupon-empty" v-if="!navData[2].list.length && navData[2].lastPage">
+          <i class="t_img"></i>
+          <p class="title">~空空如也~</p>
+        </div>
+        <div v-if="loading">
+          <zan-loading> </zan-loading>
+        </div>
       </div>
     </div>
   </div>
@@ -40,18 +109,29 @@ export default {
     return {
       tag: 1,
       qwe: "",
+      selectedId: 'unused',
+      loading: false,
       navData: [
         {
-          id: 1,
-          text: "未使用"
+          isExchange: 0,
+          id: 'unused',
+          list: [],
+          lastPage: false,
+          title: "未使用"
         },
         {
-          id: 2,
-          text: "已使用"
+          isExchange: 1,
+          id: 'use',
+          list: [],
+          lastPage: false,
+          title: "已使用"
         },
         {
-          id: 3,
-          text: "已失效"
+          state: 2,
+          id: 'disable',
+          list: [],
+          lastPage: false,
+          title: "已失效"
         }
       ]
     };
@@ -59,7 +139,59 @@ export default {
   methods: {
     handleNav(tag) {
       this.tag = tag;
+    },
+    handleZanTabChange(e) {
+
+      let { detail: selectedId } = e.mp;
+      this.selectedId = selectedId;
+
+      const currentIndex = this.navData.findIndex(item => item.id === selectedId);
+      this.navData.splice(currentIndex, 1, {
+        ...this.navData[currentIndex],
+        lastPage: false,
+        pageNumber: 1,
+        list: []
+      });
+      this.fetch();
+    },
+
+    async fetch() {
+      const currentIndex = this.navData.findIndex(item => item.id === this.selectedId);
+      const current = this.navData[currentIndex];
+      const { isExchange, state, pageNumber } = current;
+      if (current.lastPage || this.loading) {
+        return;
+      }
+      this.loading = true;
+      let { data: { list, lastPage } } = await API.myCoupon({
+        isExchange,
+        pageSize: 10,
+        pageNumber,
+        state
+      });
+      this.loading = false;
+      list = list.map(item => ({
+        ...item,
+        startTime: item.startTime.split(" ")[0].toString(),
+        endTime: item.endTime.split(" ")[0].toString(),
+      }))
+
+      this.navData.splice(currentIndex, 1, {
+        ...current,
+        lastPage,
+        list: current.list.concat(list),
+        pageNumber: current.pageNumber + 1
+      })
+      // this.navData[currentIndex] = {
+      //   ...current,
+      //   lastPage,
+      //   list: current.list.concat(list),
+      //   pageNumber: current.pageNumber + 1
+      // };
     }
+  },
+  onReachBottom() {
+    this.fetch();
   },
   mounted() {
     // wx.getStorage({
@@ -68,6 +200,10 @@ export default {
     //     console.log(res.data);
     //   }
     // });
+    this.fetch();
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data())
   }
 };
 </script>
@@ -111,6 +247,7 @@ export default {
         // margin: 0 6%
         transition: left .3s ease-in
   .content
+    padding-top: 10px
     .text
       margin: 0 auto
   .foot

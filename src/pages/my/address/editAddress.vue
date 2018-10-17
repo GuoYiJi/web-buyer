@@ -1,13 +1,11 @@
 <template>
   <div class="nav">
-    <div class="kuang" v-for="(item, index) in pageaddresList" :key="index">
+    <div class="kuang" v-for="(item, index) in pageaddresList" :key="item.id">
       <p class="name">{{item.name}} {{item.mobile}}</p>
       <p class="diZhi">{{item.address}}</p>
-      <i class="xian"></i>
       <div class="k2">
-        <p @click="dian(item.id)">
-          <i class="m_img" v-if="(isChoice == item.id || isChoice == 1)"></i>
-          <i class="m_wimg" v-if="(isChoice !=  item.id)"></i>
+        <p @click="dian(item, index)">
+          <i :class="{ m_img: item.isChoice, m_wimg: !item.isChoice }"></i>
           <span class="m_text">默认地址</span>
         </p>
         <span class="kong"></span>
@@ -21,7 +19,15 @@
         </p>
       </div>
     </div>
-    <div class="kongt"></div>
+    <div v-if="loading">
+      <zan-loading />
+    </div>
+    <div v-if="!pageaddresList.length && lastPage">
+      <zan-loadmore type="text" text="暂无数据" />
+    </div>
+    <div v-if="pageaddresList.length && lastPage">
+      <zan-loadmore type="text" />
+    </div>
     <span class="btn" @click="toRoute()">新增收货地址</span>
   </div>
 </template>
@@ -40,21 +46,30 @@ export default {
       pageaddresList: [],
       pageNumber: 1,
       pageSize: 10,
-      totalPage: ""
+      totalPage: "",
+      lastPage: false,
+      loading: false
     };
   },
   methods: {
-    async dian(id) {
-      this.isChoice = id;
-      this.xz = id;
-      if (this.xz != "") {
-        this.xz = 1;
-        console.log(this.xz);
-        const editddres = await API.editddres({
-          isChoice: this.xz,
-          addressId: id
+    async dian(item, index) {
+      if (item.isChoice) return;
+
+      const { code } = await API.editddres({
+        isChoice: 1,
+        addressId: item.id
+      });
+      if (code === 1) {
+        const oldVal = this.pageaddresList.splice(1, 1);
+        this.pageaddresList = oldVal.concat(this.pageaddresList).map((item, index) => {
+          if (index === 0) {
+            item.isChoice = 1;
+          } else {
+            item.isChoice = 0;
+          }
+          return item;
         });
-        this.onShow();
+
       }
     },
     async toOpen(id) {
@@ -64,8 +79,6 @@ export default {
         content: "是否删除？",
         success: function(res) {
           if (res.confirm) {
-            console.log("用户点击确定");
-            console.log(id);
             that.del(id);
           } else if (res.cancel) {
             console.log("用户点击取消");
@@ -73,10 +86,18 @@ export default {
         }
       });
     },
-    async del(id) {
-      console.log(id);
-      const deleteddres = await API.deleteddres({ addressId: id });
-      this.addrd();
+    async del(addressId) {
+      const { code } = await API.deleteddres({ addressId });
+      if (code === 1) {
+        wx.showToast({
+          title: '删除成功',
+          icon: 'none',
+          duration: 1500
+        })
+        setTimeout(() => {
+          wx.startPullDownRefresh();
+        }, 1500)
+      }
     },
     async bj(id) {
       this.$router.push({
@@ -85,7 +106,12 @@ export default {
       });
     },
     toRoute() {
-      this.$router.push("/pages/my/address/new");
+      this.$router.push({
+        path: '/pages/my/address/new',
+        query: {
+          count: this.pageaddresList.length
+        }
+      });
     },
     async addrd() {
       const pageaddres = await API.pageaddres({
@@ -93,43 +119,46 @@ export default {
         pageSize: this.pageSize
       });
       this.pageaddresList = pageaddres.data.list;
-    }
-  },
-  async onPullDownRefresh() {
-    const pnumber = 1;
-    const pageaddres = await API.pageaddres({
-      pageNumber: pnumber,
-      pageSize: this.pageSize
-    });
-    this.pageaddresList = pageaddres.data.list;
-  },
-  async onReachBottom() {
-    this.pageNumber = this.pageNumber + 1;
-    console.log(this.pageNumber);
-    if (this.pageNumber <= this.totalPage) {
-      console.log(this.totalPage);
-      const pageaddres = await API.pageaddres({
+    },
+    async fetch() {
+      if (this.loading || this.lastPage) return;
+      this.loading = true;
+      const { data: { list, lastPage } } = await API.pageaddres({
         pageNumber: this.pageNumber,
         pageSize: this.pageSize
       });
-      this.pageaddresList.push(pageaddres.data.list);
+      this.loading = false;
+      this.pageNumber++;
+      this.lastPage = lastPage;
+      this.pageaddresList = this.pageaddresList.concat(list);
+      return Promise.resolve();
     }
+  },
+  async onPullDownRefresh() {
+    this.pageNumber = 1;
+    this.lastPage = false;
+    this.pageaddresList = [];
+    await this.fetch()
+    wx.stopPullDownRefresh();
+  },
+  async onReachBottom() {
+    this.fetch();
   },
   onShow() {
-    // `this` 指向 vm 实例
-    console.log("a is: " + this.a, "小程序触发的 onshow");
-    this.addrd();
+    const address_store = wx.getStorageSync('address_store');
+    if (address_store) {
+      wx.removeStorageSync('address_store');
+      this.pageaddresList = [];
+      this.lastPage = false;
+      this.pageNumber = 1;
+      this.fetch();
+    }
   },
   async mounted() {
-    const pageaddres = await API.pageaddres({
-      pageNumber: this.pageNumber,
-      pageSize: this.pageSize
-    });
-    this.pageaddresList = pageaddres.data.list;
-    this.totalPage = pageaddres.data.totalPage;
-    if (this.pageaddresList[0].isChoice == 1) {
-      this.isChoice = this.pageaddresList[0].id;
-    }
+    await this.fetch();
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data())
   }
 };
 </script>
@@ -156,10 +185,9 @@ export default {
       color: #666
       padding-left: 31px
       margin-bottom: 10px
-    .xian
-      width: 100%
-      border: 1px solid #EAEAEA
     .k2
+
+      border-top: 1px solid #EAEAEA
       height: 80px
       line-height: 80px
       p

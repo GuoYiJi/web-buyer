@@ -1,0 +1,2 @@
+@import "/static/css/vendor.wxss";
+.wx_btn.data-v-52f9708e{position:absolute;bottom:218rpx;width:266rpx;height:74rpx;left:242rpx;border-radius:40rpx;background:#ff9036;line-height:74rpx;color:#fff}.user_btn.data-v-52f9708e{bottom:320rpx!important}.login.data-v-52f9708e{padding-top:226rpx;padding-left:285rpx;width:180rpx}.login .icon_wx.data-v-52f9708e{display:inline-block;width:180rpx;height:180rpx;vertical-align:middle;border-radius:180rpx}.login ._p.data-v-52f9708e{color:#333;font-size:28rpx;padding-top:34rpx;text-align:center}

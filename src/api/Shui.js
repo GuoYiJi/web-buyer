@@ -9,8 +9,9 @@ import wx from 'wx'
 import qs from 'qs'
 const vm = new Vue()
 export default {
-  async post (url, params = {}) {
-    var value = await wx.getStorageSync('sessionId')
+  async post (url, params = {}, headers = {}) {
+    var value = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
+    console.log('shui', value)
     if (value) {
       params.sessionId = value
     }
@@ -19,11 +20,24 @@ export default {
       try {
         wx.request({
           url: URL + '/' + url,
-          data: qs.stringify(params),
-          header: {'content-type': 'application/x-www-form-urlencoded'},
+          data: headers['content-type'] === 'application/json' ? JSON.stringify(params) : qs.stringify(params),
+          header: {
+            'content-type': 'application/x-www-form-urlencoded',
+            ...headers
+          },
           method: 'POST',
           // dataType: 'json',
-          success: function (data) {
+          success: (data) => {
+            console.log('data', data);
+            if (data.statusCode === 500) {
+              wx.showToast({
+                title: '请求出错',
+                icon: 'none',
+                duration: 1500
+              })
+              reject();
+              return;
+            }
             // return data
             // console.log(data.data.desc)
             const code = Number(data.data.code)
@@ -40,9 +54,9 @@ export default {
                 icon: 'none',
                 duration: 2000
               })
-              wx.setStorageSync('sessionId', '')
+              wx.setStorageSync(`${process.env.NODE_ENV}_sessionId`, '')
               setTimeout(() => {
-                wx.redirectTo({url: '/pages/login/wxLogin'})
+                wx.reLaunch({url: '/pages/home/login'})
               }, 2000)
             } else if (code === 0) {
               const msg = data.data.desc
@@ -53,11 +67,17 @@ export default {
               })
             }
 
+          },
+
+          fail: res => {
+            reject();
+          },
+          complete: () => {
           }
         })
 
       } catch (err) {
-        console.log(err)
+        reject();
       }
     })
   }

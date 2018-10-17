@@ -5,17 +5,23 @@
       <p class="k_text">你的购物车还没有商品~</p>
       <span class="k_btn" @click="toHome()">去首页逛逛吧</span>
     </div>
-    <div class="content" v-if="!kong">
+    <div class="content" v-else>
       <div class="head">
-        <i class="xz" :class="{active : checkAll}" @click="clickCheckAll()"></i>
-        <span class="h1_text" @click="clickCheckAll()">全选</span>
-        <i class="sc" @click="delBtn()"></i>
+        <div class="head__hd">
+          <i class="xz" :class="{active : checkAll}" @click="clickCheckAll()"></i>
+          <span class="h1_text" @click="clickCheckAll()">全选</span>
+        </div>
+        <div class="head__bd">
+          <i class="sc" @click="deleteBtn()" v-if="showBtn"></i>
+          <span  @click="delBtn()" v-else>完成</span>
+        </div>
+        
       </div>
       <div class="kuang">
         <div class="k_head">
           <!--<i class="kh_img" v-if="(xz == 0)"></i>-->
           <!--<i class="kh_wimg" v-if="(xz == 1)"></i>-->
-          <div class="kh_text" style="color: #EE7527;">店铺名称</div>
+          <div class="kh_text">{{shopName}}</div>
           <!--<i class="kh_img1"></i>-->
         </div>
         <div class="k_content" v-for="(item,index) in cardList" :key="index">
@@ -23,7 +29,7 @@
             <i class="kc_xz" :class="{active : item.check}"></i>
           </div>
           <div class="item_2">
-            <img v-if="item.image" class="kc_img" :src="item.image">
+            <img v-if="item.image" class="kc_img" :src="item.image" mode="aspectFill">
             <img v-else class="kc_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
           </div>
           <div class="item_3">
@@ -35,72 +41,41 @@
           </div>
         </div>
       </div>
-      <div class="settlement">
-        <span class="s_btn" v-if="showBtn" @click="Buy()">结算({{count}})</span>
-        <span class="s_del" v-if="!showBtn" @click="deleteBtn()">删除({{count}})</span>
+      <div class="settlement-fixed">
+        <div class="settlement">
+          <span class="s_btn" v-if="showBtn" @click="Buy()">结算({{selectArr.length}})</span>
+          <span class="s_del" v-if="!showBtn" @click="deleteBtn()">删除({{selectArr.length}})</span>
+        </div>
       </div>
       <i-modal :visible="visible2" @ok="delCard()" @cancel="visible2 = false">
         <div class="m_tips">确定删除商品</div>
       </i-modal>
     </div>
-    <!-- 弹窗 -->
-    <div class="popup" v-if="popup">
-      <div class="kuang_1">
-        <img v-if="cardList[orderIndex].image" class="pop_img" src="cardList[orderIndex].image">
-        <img v-else class="pop_img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
-        <p class="pop_money">￥{{cardList[orderIndex].sellPrice}}</p>
-        <p class="pop_title">{{cardList[orderIndex].name}}</p>
-        <i class="gb" @click="popup=false"></i>
-      </div>
-      <div class="kuang_2">
-        <p class="k2_title">选择颜色和尺码</p>
-        <div class="k2_btnk">
-          <span class="k2_btn" :class="{active : index === colorIndex }" v-for="(color,index) in cardList[orderIndex].skuAttr" :key="index" @click="selectColorSpec(index,color.colorVal)">{{color.colorVal}}
-          </span>
-        </div>
-      </div>
-      <div class="kuang_3">
-        <ul class="s_item_box box1">
-          <li class="s_item">尺码</li>
-          <li class="s_item">购买数量</li>
-        </ul>
-        <ul class="s_item_box" v-for="(size, index) in cardList[orderIndex].skuAttr[colorIndex].sizeArray" :key="index">
-          <li class="s_item">{{size.sizeVal}}</li>
-          <li class="s_item">
-            <span class="minus" @click="minus(colorIndex, index, orderIndex)"></span>
-            <span class="count">{{size.newNum}}</span>
-            <span class="add" @click="add(colorIndex, index, orderIndex)"></span>
-          </li>
-        </ul>
-      </div>
-      <div class="kuang_4">
-        <p class="k4_title">已选</p>
-        <p class="k4_text" v-for="(item,index) in cardList[orderIndex].skuAttr" :key="index">{{item.colorVal}}：<span v-for="(ite,i) in item.sizeArray" :key="i">{{ite.sizeVal}}/{{ite.newNum}}件;</span></p>
-      </div>
-      <span class="btn" @click="confirmEdit(orderIndex)">确定</span>
-    </div>
+
+    <sku :goods="sku.goods" :sku="sku.sku" :visible="visible" @value="handleToggle" @confirm="handleUpdate"></sku>
     <!-- <span class="dian">3</span> -->
     <!--<div class="footer">-->
       <!--<footers :tag="3" />-->
     <!--</div>-->
-    <!-- 提示语 -->
-    <div class="wellMsg" v-show="wellMsgShow">
-      {{msg}}
-    </div>
   </div>
 </template>
 <script>
-import wx from 'wx'
-import API from '@/api/httpShui'
-import config from '@/config.js'
+import wx from 'wx';
+import API from '@/api/httpShui';
+import config from '@/config.js';
+import sku from '@/components/sku';
+import EventBus from '@/assets/js/EventBus';
 export default {
-  components: {},
+  components: {
+    sku
+  },
   data () {
     return {
+      shopName: '',
+      visible: false,
       sessionId: '',
-      kong: false,
+      kong: true,
       showBtn: true,
-      wellMsgShow: false,
       msg: '',
       count: 0,
       popup: false,
@@ -115,10 +90,17 @@ export default {
       selectArr: [],
       skuAttr: [],
       colorIndex: 0,
-      orderIndex: 0
+      orderIndex: 0,
+      sku: {
+        goods: {},
+        sku: {}
+      }
     }
   },
   methods: {
+    handleToggle(visible) {
+      this.visible = visible;
+    },
     toOpen (name) {
       this[name] = true
     },
@@ -132,96 +114,122 @@ export default {
       })
     },
     // 编辑(保存当前编辑商品的下标)
-    editOrder (index) {
-      this.popup = true
+    editOrder(index) {
       this.orderIndex = index
-    },
-    // 选择规格(保存颜色下标)
-    selectColorSpec (index) {
-      this.colorIndex = index
-    },
-    // 减
-    minus (colorIndex, sizeIndex, orderIndex) {
-      let that = this
-      let num = that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum
-      if (num === 0) {
-        return false
-      } else {
-        that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum--
-        that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].editNum--
-      }
-    },
-    // 加
-    add (colorIndex, sizeIndex, orderIndex) {
-      let that = this
-      let num = that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum
-      if (num === 100) {
-        return false
-      } else {
-        that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].newNum++
-        that.cardList[orderIndex].skuAttr[colorIndex].sizeArray[sizeIndex].editNum++
-      }
-    },
-    // 确认编辑(更新购物车)
-    confirmEdit (orderIndex) {
-      const TEST_URL = config.url
-      const BASE_URL = config.url
-      const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
-      let appId = config.appId
-      let that = this
-      let skuAttr = that.cardList[orderIndex].skuAttr
-      let skuList = that.cardList[orderIndex].skuList
-      let goodsCard = []
-      for (let i = 0; i < skuAttr.length; i++) {
-        let sizeArray = skuAttr[i].sizeArray
-        for (let k = 0; k < sizeArray.length; k++) {
-          console.log(sizeArray[k])
-          // let editNum = sizeArray[k].editNum
-          let newNum = sizeArray[k].newNum
-          let sizeNum = sizeArray[k].sizeNum
-          let editNum = newNum - sizeNum
-          let obj = {}
-          let colorId = skuAttr[i].color
-          let sizeId = sizeArray[k].sizeId
-          let attrIds = colorId + ',' + sizeId
-          for (let g = 0; g < skuList.length; g++) {
-            if (skuList[g].attrIds === attrIds) {
-              obj.skuId = skuList[g].skuId
-            }
-          }
-          obj.num = editNum
-          goodsCard.push(obj)
-        }
-      }
-      let data = {
-        sessionId: this.sessionId,
-        appId: appId,
-        goodsCard: goodsCard
-      }
-      wx.request({
-        method: 'POST',
-        url: URL + '/api/goods/card/addGoodsCard',
-        data: JSON.stringify(data),
-        header: {
-          'content-type': 'application/json' // 默认值
+      // this.popup = true;
+      const current = this.cardList[index];
+      this.sku = {
+        goods: {
+          image: current.image,
+          name: current.name,
+          sellPrice: current.sellPrice
         },
-        success: function (res) {
-          console.log(res)
-          if (res.data.code === 1) {
-            that.getCard()
-            that.popup = false
-          }
-        }
+        sku: current.skuAttr,
+        skuList: current.skuList
+      }
+      this.handleToggle(true);
+    },
+    async handleUpdate(newSkuVal, oldSkuVal) {
+
+      let skuList = this.sku.skuList;
+      let goodsCard = [];
+      newSkuVal.forEach((newSku, index) => {
+        let oldSku = oldSkuVal[index];
+        newSku.sizeArray.forEach((skuItem, skuIndex) => {
+
+          let obj = {
+            num: skuItem.sizeNum - oldSku.sizeArray[skuIndex].sizeNum
+          };
+          let colorId = newSku.color;
+          let sizeId = skuItem.sizeId;
+          let attrIds = colorId + ',' + sizeId;
+          skuList.forEach(item => {
+            if (item.attrIds === attrIds) {
+              obj.skuId = item.skuId;
+            }
+          })
+          goodsCard.push(obj);
+        })
       })
+      // skuAttr.forEach((skuItem, skuIndex) => {
+      //   let sizeArray = skuItem.sizeArray;
+      //   sizeArray.forEach((sizeItem, sizeIndex) => {
+      //     let newNum = sizeArray.sizeNum;
+      //     let sizeNum = oldSku[skuIndex].sizeArray[sizeIndex].sizeNum;
+      //     let editNum = newNum - sizeNum;
+      //     let obj = {};
+      //     let colorId = skuItem.color;
+      //     let sizeId = sizeItem.sizeId;
+      //     let attrIds = colorId + ',' + sizeId;
+      //     skuList.forEach(item => {
+      //       if (item.attrIds === attrIds) {
+      //         obj.skuId = item.skuId;
+      //       }
+      //     })
+      //     goodsCard.push(obj);
+      //     // obj.num = editNum
+      //     // goodsCard.push(obj);
+      //     // for (let g = 0; g < skuList.length; g++) {
+      //     //   if (skuList[g].attrIds === attrIds) {
+      //     //     obj.skuId = skuList[g].skuId
+      //     //   }
+      //     // }
+      //     // obj.num = editNum
+      //     // goodsCard.push(obj);
+      //   })
+      // })
+      // for (let i = 0; i < skuAttr.length; i++) {
+      //   let sizeArray = skuAttr[i].sizeArray
+      //   for (let k = 0; k < sizeArray.length; k++) {
+      //     console.log(sizeArray[k])
+      //     // let editNum = sizeArray[k].editNum
+      //     let newNum = sizeArray[k].newNum
+      //     let sizeNum = sizeArray[k].sizeNum
+      //     let editNum = newNum - sizeNum
+      //     let obj = {}
+      //     let colorId = skuAttr[i].color
+      //     let sizeId = sizeArray[k].sizeId
+      //     let attrIds = colorId + ',' + sizeId
+      //     for (let g = 0; g < skuList.length; g++) {
+      //       if (skuList[g].attrIds === attrIds) {
+      //         obj.skuId = skuList[g].skuId
+      //       }
+      //     }
+      //     obj.num = editNum
+      //     goodsCard.push(obj)
+      //   }
+      // }
+      wx.showLoading({
+        title: '更新中'
+      })
+      const { code, data, desc } = await API.addGoodsCard({
+        goodsCard
+      })
+      wx.hideLoading();
+      if (code === 1) {
+        wx.showToast({
+          title: '修改成功',
+          icon: 'none',
+          duration: 3000
+        })
+        setTimeout(() => {
+          this.getCard();
+        }, 3000);
+      } else {
+        wx.showToast({
+          title: desc,
+          icon: 'none'
+        })
+      }
     },
     // 删除按钮切换
     delBtn () {
-      this.count = this.selectArr.length
-      if (this.showBtn) {
-        this.showBtn = false
-      } else {
-        this.showBtn = true
-      }
+      // this.count = this.selectArr.length
+      // if (this.showBtn) {
+      //   this.showBtn = false
+      // } else {
+      //   this.showBtn = true
+      // }
     },
     // 单选
     clickCheck (id, index) {
@@ -262,9 +270,17 @@ export default {
     deleteBtn () {
       let that = this
       if (that.selectArr.length > 0) {
-        that.visible2 = true
+        wx.showModal({
+          title: '删除商品',
+          content: '确定要删除该商品么？',
+          success: res => {
+            if (res.confirm) {
+              this.delCard();
+            }
+          }
+        })
       } else {
-        this.mySetTimeout('请选择要删除的商品')
+        this.showToast('请选择要删除的商品')
       }
     },
     // 删除购物车
@@ -274,11 +290,11 @@ export default {
       that.selectArr.forEach(function (item) {
         idStr.push(item.id)
       })
+      wx.showLoading();
       const data = await API.deleteCard({ids: idStr.join(',')})
-      console.log('删除购物车', data)
+      wx.hideLoading();
       if (data.code === 1) {
-        this.mySetTimeout('删除成功')
-        this.visible2 = false
+        this.showToast('删除成功')
         for (let i = 0; i < idStr.length; i++) {
           for (let k = 0; k < that.selectArr.length; k++) {
             if (idStr[i] === that.selectArr[k].id) {
@@ -286,7 +302,15 @@ export default {
             }
           }
         }
-        that.getCard()
+        idStr.forEach(id => {
+          const index = this.cardList.findIndex(item => item.id === id);
+          this.cardList.splice(index, 1);
+        })
+        if (!this.cardList.length) {
+          this.kong = true;
+        }
+      } else {
+        this.showToast(data.data);
       }
     },
     // 去支付
@@ -300,41 +324,45 @@ export default {
         for (let i = 0; i < this.selectArr.length; i++) {
           for (let j = 0; j < this.cardList.length; j++) {
             if (this.selectArr[i].id === this.cardList[j].id) {
-              let price = this.cardList[j].sellPrice
+              let price = this.cardList[j].disPrice || this.cardList[j].sellPrice
               let num = this.cardList[j].totalNum
               totalPrice += Math.floor((price * num) * 100) / 100
               totalNum += num
-              for (let k = 0; k < this.cardList[j].skuList.length; k++) {
-                let id = this.cardList[j].skuList[k].id
-                cardIds.push({id: id})
-              }
+              this.cardList[j].skuList.forEach(item => {
+                cardIds.push({ id: item.id });
+              })
+              // for (let k = 0; k < this.cardList[j].skuList.length; k++) {
+              //   let id = this.cardList[j].skuList[k].id
+              //   cardIds.push({id: this.cardList[j].id})
+              // }
               goods.push(this.cardList[j])
             }
           }
         }
-        console.log(goods)
         let dataObj = {
           goods: goods,
           skuList: cardIds,
-          totalPrice: totalPrice,
+          totalPrice: totalPrice.toFixed(2),
           totalNum: totalNum
         }
-        console.log(dataObj)
-        this.$router.push({path: '/pages/shopping/order/order', query: {cart: JSON.stringify(dataObj)}})
+        wx.setStorageSync('cart', dataObj);
+        this.$router.push({path: '/pages/shopping/order/order'});
       } else {
-        this.mySetTimeout('请选择商品')
+        this.showToast('请选择商品')
       }
     },
     // 获取购物车列表
     async getCard () {
       let that = this
-      const data = await API.getCardList()
+      wx.showLoading({ title: '努力加载中' });
+      const data = await API.getCardList();
+      wx.hideLoading();
       if (data.code === 1) {
         // console.log('购物车列表', data)
-        let list = data.data
-        if (list === null) {
-          that.kong = true
-        } else {
+        let { data: list } = data;
+        if (list && list.length) {
+
+          that.kong = false;
           for (let k = 0; k < list.length; k++) {
             list[k].check = false
             let skuList = list[k].skuList
@@ -373,6 +401,7 @@ export default {
             let skuCode = []
             let totalNum = 0
             for (let a = 0; a < skuAttr.length; a++) {
+              let sizeNums = 0;
               for (let b = 0; b < skuAttr[a].sizeArray.length; b++) {
                 let obj = {}
                 if (skuAttr[a].sizeArray[b].sizeNum === 0) {
@@ -385,6 +414,7 @@ export default {
                 let num = skuAttr[a].sizeArray[b].sizeNum
                 // let attrIds = colorId + ',' + sizeId
                 totalNum += Number(num)
+                sizeNums += Number(num)
                 // 处理规格文字
                 let ishas = false
                 let skuVal = ''
@@ -401,28 +431,48 @@ export default {
                   skuCode.push(skuVal)
                 }
               }
+              skuAttr[a].sizeNums = sizeNums;
             }
             list[k].skuCode = skuCode
-            list[k].totalNum = totalNum
+            list[k].totalNum = totalNum;
           }
+
+          this.selectArr.forEach(selected => {
+            list = list.map(item => {
+              if (item.id === selected.id) {
+                item.check = true;
+              }
+              return item;
+            })
+          })
           this.cardList = list
+        } else {
+          this.cardList = [];
+          this.selectArr = [];
         }
       }
     },
     // 定时器弹窗
-    mySetTimeout (msg) {
-      let that = this
-      that.wellMsgShow = true
-      that.msg = msg
-      setTimeout(function () {
-        that.wellMsgShow = false
-        that.msg = ''
-      }, 1000)
+    showToast(title) {
+      wx.showToast({
+        title,
+        icon: 'none',
+        duration: 1500
+      })
     }
   },
-  async mounted () {
-    this.sessionId = await wx.getStorageSync('sessionId')
+  onShow() {
     this.getCard()
+  },
+  async mounted () {
+    this.shopName = await wx.getStorageSync('shopName');
+    EventBus.$on('pay-success', () => {
+      this.selectArr = [];
+    });
+  },
+
+  onUnload() {
+    EventBus.$off('pay-success');
   },
   watch: {
     // 全选数组监听
@@ -484,46 +534,50 @@ export default {
       line-height: 60px
       border: 1px solid #EE7527
   .content
+    padding-bottom: 98px
     margin: 0 20px
     .head
       position: relative
-      height: 92px
+      padding: 33px 0
       width: 711px
+      display: flex
+      align-items: center
+      font-size: 28px
+      line-height: 44px
+      color: #999
+      &__hd
+        flex: 1
+      &__bd
+        font-size: 28px
+        color: #999
+        span
+          display: inline-block
+          height: 44px
       .xz
-        position: absolute
         display: inline-block
         width: 44px
         height: 44px
+        vertical-align: middle
         +bg-img('shopping/wxz.png')
-        top: 24px
-        left: 20px
       .xz.active
         +bg-img('shopping/xz.png')
         width: 44px
         height: 44px
       .h1_text
-        position: absolute
-        font-size: 28px
-        color: #999
+        margin-left: 9px
         display: inline-block
-        top: 24px
-        left: 75px
       .sc
-        position: absolute
         +bg-img('shopping/sc.png')
+        display: block
         width: 38px
         height: 42px
-        top: 24px
-        right: 20px
     .kuang
       width: 711px
       border-radius: 10px
       background: #fff
       .k_head
-        height: 82px
-        line-height: 82px
-        margin-bottom: 20px
         background: #fff
+        color: #999
         .kh_img
           display: inline-block
           width: 44px
@@ -567,21 +621,22 @@ export default {
             height: 44px
             +bg-img('shopping/xz.png')
         .item_2
-          flex: 1
+          $size: 200px
+          width: $size
+          height: $size
         .item_3
+          padding-left: 37px
           flex: 2
           position: relative
           .i_title
-            padding-left: 20px
+            padding-right: 53px
             font-size: 26px
             color: #333
             +moreLine(2)
           .uniform
-            padding-left: 20px
             font-size: 24px
             color: #999
           .money
-            padding-left: 20px
             font-size: 32px
             color: #FF3434
           .quantity
@@ -604,12 +659,17 @@ export default {
             text-align: center
             line-height: 40px
     .settlement
-      width: 711px
+      &-fixed
+        position: fixed
+        left: 0
+        bottom: 0
+        padding: 0 20px
+        width: 100%
+        background-color: #F5F5F5
+        box-sizing: border-box
       height: 98px
       background: #fff
-      position: relative
       border-radius: 10px
-      margin-top: 31px
       .s_btn
         background: #EE7527
         display: inline-block

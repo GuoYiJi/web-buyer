@@ -1,0 +1,50 @@
+.order-detail--fixed-bottom {
+  padding-bottom: 168px;
+}
+.order-status {
+  height: 82px;
+  line-height: 82px;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+  &.is-success {
+    color: #06BF04;
+  }
+}
+.goods-pay {
+  margin-top: 20px;
+  &__cell {
+    display: table;
+    margin-top: 27px;
+    width: 100%;
+    font-size: 28px;
+    color: #666;
+    &:first-child {
+      margin-top: 0;
+    }
+    &-title {
+      display: table-cell;
+      color: #000;
+    }
+    &-value {
+      display: table-cell;
+      text-align: right;
+    }
+  }
+}
+.cap-order__inner {
+  font-size: 24px;
+  color: #999;
+  p {
+    margin-top: 23px;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+.cap-express {
+  &__fee {
+    margin-left: 24px;
+    font-size: 24px;
+    color: #666;
+  }
+}
