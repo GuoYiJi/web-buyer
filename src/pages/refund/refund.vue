@@ -10,8 +10,8 @@
     <!--<p v-if="type == '0'" class="refundMsg">含邮费￥{{freight}}</p>-->
     <!--<p v-else class="refundMsg">不含邮费￥{{freight}}</p>-->
     <div class="refundExplain">
-      <p class="title">{{type == 0 ? '退款说明' : '退货说明'}}：<span>(最多可输入50个字)</span></p>
-      <textarea v-model="explain" class="explain" name="" id="" maxlength=50>
+      <p class="title">{{type == 0 ? '退款说明' : '退货说明'}}：</p>
+      <textarea v-model="explain" class="explain" name="" id="" maxlength=50 placeholder="(最多可输入50个字)">
 
       </textarea>
     </div>
@@ -77,10 +77,10 @@ export default {
       price: '',
       isCheck: 0,
       reasonList: [
-        {id: 1, text: '原因一'},
-        {id: 2, text: '原因二'},
-        {id: 3, text: '原因三'},
-        {id: 4, text: '原因四'}
+        {id: 1, text: '不喜欢/不想要'},
+        {id: 2, text: '未按约定时间发货'},
+        {id: 3, text: '空包裹'},
+        {id: 4, text: '快递/物流未送达'}
       ],
       img1: '',
       img2: '',
@@ -201,6 +201,13 @@ export default {
     this.type = this.$route.query.type
     this.price = Number(this.$route.query.price)
     this.freight = Number(this.$route.query.freight)
+    switch (this.type) {
+      case 0:
+        wx.setNavigationBarTitle({
+          title: '仅退款'
+        })
+        break;
+    }
     if (this.$route.query.data) {
       const data = JSON.parse(this.$route.query.data);
       this.explain = data.result;

@@ -17,7 +17,8 @@
 import wx from 'wx'
 import mixin from '@/mixin'
 import config from '@/config'
-import API from '@/api/httpJsong'
+import API from '@/api/httpJsong';
+import { clearUser } from '@/api/httpJsong';
 export default {
   mixins: [mixin],
   components: {},
@@ -53,11 +54,13 @@ export default {
       } else {
         this.userInfoBool = true
         this.userInfo = e.mp.detail
+        wx.setStorageSync(`${process.env.NODE_ENV}_scopeUserInfo`, true);
         this.login()
       }
     },
     async login (encryptedData) {
-      const data = await API.authLogin({
+      clearUser();
+      await API.authLogin({
         code: this.code,
         avatar: this.userInfo.userInfo.avatarUrl,
         nick: this.userInfo.userInfo.nickName,
@@ -68,14 +71,12 @@ export default {
         encryptedData: this.userInfo.encryptedData,
         iv: this.userInfo.iv
       })
-      wx.setStorage({
-        key: 'no',
-        data: data.data.no
-      })
-      await wx.setStorageSync(`${process.env.NODE_ENV}_sessionId`, data.data.sessionId);
-      wx.reLaunch({
-        url: '/pages/home/home'
-      });
+        .then(res => {
+          console.log('ssfsdf');
+          wx.reLaunch({
+            url: '/pages/home/home'
+          });
+        })
     }
   },
   async mounted () {

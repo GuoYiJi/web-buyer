@@ -48,16 +48,20 @@
         </div>
       </div> -->
   </div>
-
-    <div class="con">
-      <div class="below">
-        <div class="total">
-          <p class="t-right">共
-            <span class="money">{{ goodsList.length }}</span>件
-          </p>
+  <div class="footer">
+    <div class="van-cell">
+      <div class="van-cell__title">
+        <div class="goods-buy__info">
+          共<span class="goods-buy__num">{{ goodsList.length }}</span>个款
+          <span class="goods-buy__num">{{ goodsTotal }}</span>件商品
         </div>
       </div>
+      <div class="van-cell__value">
+        <span class="goods-buy__total">合计:</span>
+        <span class="goods-buy__price">{{ countPrice }}</span>
+      </div>
     </div>
+  </div>
   </div>
   
   
@@ -70,15 +74,33 @@ export default {
   components: {},
   data() {
     return {
-      goodsList: []
+      goodsList: [],
+      goodsTotal: 0,
+      countPrice: 0
     }
   },
   methods: {
 
   },
  mounted() {
-   const { goodsList } = this.$route.query;
-   this.goodsList = JSON.parse(goodsList);
+   let { goodsList } = this.$route.query;
+   goodsList = JSON.parse(goodsList);
+   console.log(goodsList);
+   this.goodsList = goodsList.map(item => {
+    item.countPrice = (item.countPrice * item.countNum).toFixed(2);
+    return item;
+   });
+
+   let countPrice = this.goodsList.reduce((pre, next) => {
+    return Number(next.countPrice) + pre;
+   }, 0);
+   
+   let goodsTotal = this.goodsList.reduce((pre, next) => {
+    return Number(next.countNum) + pre;
+   }, 0);
+
+   this.countPrice = countPrice.toFixed(2);
+   this.goodsTotal = goodsTotal;
   }
 };
 </script>

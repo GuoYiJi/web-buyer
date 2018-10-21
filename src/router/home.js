@@ -4,6 +4,7 @@ const home = [{
   config: {
     navigationBarTitleText: '首页',
     navigationBarBackgroundColor: '#ffffff',
+    enablePullDownRefresh: true,
     'usingComponents': {
       'i-drawer': '/iview/drawer/index',
       'zan-popup': '/zan-weapp/dist/popup/index',

@@ -91,6 +91,7 @@ export default {
   },
   data () {
     return {
+      isDataLast: false,
       List: [],
       showType: 0,
       page: 1,
@@ -108,10 +109,14 @@ export default {
     },
     async goodsList (page, payload) {
       if (page === 1) {
-        this.List = [];
+        if (!this.isDataLast) {
+          this.List = [];
+        }
         this.lastPage = false;
       }
-      this.loading = true;
+      if (!this.isDataLast) {
+        this.loading = true;
+      }
       const data = await API.getGoods({
         labelId: 1,
         state: 1,
@@ -125,10 +130,15 @@ export default {
       this.lastPage = data.data.lastPage
       // console.log('每日上新', data)
       if (data.code === 1) {
-        if (this.List.length !== 0) {
-          this.List.push.apply(this.List, data.data.list)
+        if (this.isDataLast) {
+          this.List = data.data.list || [];
+          this.isDataLast = false;
         } else {
-          this.List = data.data.list
+          if (this.List.length !== 0) {
+            this.List.push.apply(this.List, data.data.list)
+          } else {
+            this.List = data.data.list
+          }
         }
         this.page = data.data.pageNumber
         this.totalPage = data.data.totalPage
@@ -157,6 +167,11 @@ export default {
       this.goodsFilterOptions = {};
       this.goodsList(1);
     }
+  },
+  onShow() {
+    this.page = 1;
+    this.isDataLast = true;
+    this.goodsList(this.page);
   },
   onReady() {
     this.goodsList(this.page);

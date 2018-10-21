@@ -17,9 +17,8 @@
 
         <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(item.goodsList)">
           <div class="van-cell__title">
-            <span class="goods-thumb-item" v-for="(goods, j) in item.goodsList" :key="j">
-              <img v-if="goods.image&&j < 3" class="n-img" :src="goods.image" mode="aspectFill">
-              <img v-else-if="j < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+            <span class="goods-thumb-item" v-for="(goods, j) in item.goodsList" :key="j" v-if="goods.image&& j < 3">
+              <img class="n-img" :src="goods.image" mode="aspectFill">
             </span>
           </div>
           <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
@@ -47,18 +46,18 @@
       </div>
       <div v-else>
         <!-- 待发货 -->
-        <div v-for="(goods,j) in item.goodsList" :key="j">
-          <div class="van-cell goods-thumb__list">
+        <div>
+          <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(item.goodsList)">
             <div class="van-cell__title">
-              <span class="goods-thumb-item" v-for="(goods, listIndex) in item.goodsList" :key="listIndex">
-                <img v-if="goods.image && listIndex < 3" class="n-img" :src="goods.image" mode="aspectFill">
-                <img v-else-if="listIndex < 3" class="n-img" src="http://www.qckj.link/upload/goods/20180520/1526794348353_160563.jpg">
+              <span class="goods-thumb-item" v-for="(goods, listIndex) in item.goodsList" :key="listIndex" v-if="goods.image && listIndex < 3">
+                <img class="n-img" :src="goods.image" mode="aspectFill">
               </span>
             </div>
+            <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
           </div>
           <div class="van-cell">
             <div class="van-cell__title">
-              <span class="goods-buy__info">共<span class="goods-buy__num">{{ item.goodsListSize }}</span>个款  <span class="goods-buy__num">{{goods.countNum}}</span>件商品  </span>
+              <span class="goods-buy__info">共<span class="goods-buy__num">{{ item.goodsListSize }}</span>个款  <span class="goods-buy__num">{{item.num}}</span>件商品  </span>
             </div>
             <div class="van-cell__value">
               <span class="goods-buy__total">合计:</span>
@@ -66,25 +65,20 @@
               <span class="cap-express__fee" v-if="item.expressWay > 0">（含运费￥{{item.expressWay}}）</span>
             </div>
           </div>
-<!--           <div class="below">
-            <div class="total">
-              <p class="t-right">
-                共<span class="piece">{{goods.countNum}}</span>件商品, 合计:<span class="money">￥{{item.paid}}</span>
-              </p>
-            </div>
-          </div> -->
-          <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
-            <tr>
-              <th>颜色</th>
-              <th>码数</th>
-              <th>总件数</th>
-              <th>已发</th>
-              <th>未发</th>
-            </tr>
-            <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
-              <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
-            </tr>
-          </table>
+          <div  v-for="(goods, j) in item.goodsList" :key="j">
+            <table class="skuCode" v-if="item.state === 5 && item.isHasChildren">
+              <tr>
+                <th>颜色</th>
+                <th>码数</th>
+                <th>总件数</th>
+                <th>已发</th>
+                <th>未发</th>
+              </tr>
+              <tr v-for="(skuChild, c1) in skuCodeList[j]" :key="c1">
+                <td v-for="(skuValue, c2) in skuChild" :key="c2">{{skuValue}}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
       <div class="below">
@@ -187,10 +181,25 @@ export default {
     },
     // 申请售后1or退款0
     afterSale (orderId, price, freight, type) {
-      this.$router.push({
-        path: '/pages/refund/applyCustomer',
-        query: {orderId: orderId, price: price, freight: freight, type: type}
-      })
+      console.log(this.item);
+
+      // 待发货
+      if (this.item.state === 5) {
+        this.$router.push({
+          path: '/pages/refund/refund',
+          query: {
+            orderId,
+            type: 0,
+            price,
+            freight
+          }
+        })
+      } else {
+        this.$router.push({
+          path: '/pages/refund/applyCustomer',
+          query: {orderId: orderId, price: price, freight: freight, type: type}
+        })
+      }
     },
     // 查看物流
     logistics (orderId) {

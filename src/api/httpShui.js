@@ -57,6 +57,7 @@ class API {
   retreatGoods = params => http.post('api/order/doubleBack', params)
   // 售后列表
   afterService = params => http.post('api/order/refund/selectOrderRefund', params)
+  backRefund = params => http.post('api/order/refund/backRefund', params);
   // 售后详情
   getRefundDetails = params => http.post('api/order/refund/selectOrderRefundDetail', params)
   // 发送物流单号

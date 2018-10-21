@@ -33,10 +33,10 @@ import axios from 'axios'
 import Vue from 'vue'
 import qs from 'qs'
 import wx from 'wx'
+import loginAPI from './httpJsong';
 const vm = new Vue()
 axios.defaults.adapter = function(config){
   return new Promise((resolve,reject) => {
-    console.log(config)
     wx.request({
       url: config.url,
       data: config.data,
@@ -95,7 +95,7 @@ export default {
   //     }
   //   }) 
   // }, 
-  post(url, params = {},back=true ) {
+  post(url, params = {}, back=true ) {
     return new Promise(async (resolve, reject) => {
       try {
         const data = await http.post(url, qs.stringify(params))

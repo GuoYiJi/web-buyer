@@ -25,13 +25,19 @@ export default {
   methods: {
     handleBuyClick() {
       this.$router.push({path: '/pages/home/details/details', query: {goodsId: this.data.id}});
+    },
+    fetch() {
+      API.selectTopGoods()
+        .then(res => {
+          this.data = res.data;
+        })
     }
   },
+  onShow() {
+    this.fetch();
+  },
   mounted() {
-    API.selectTopGoods()
-      .then(res => {
-        this.data = res.data;
-      })
+    this.fetch();
   }
 };
 </script>

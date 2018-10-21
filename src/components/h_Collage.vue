@@ -91,6 +91,7 @@ export default {
   },
   data () {
     return {
+      isDataLast: false,
       List: [],
       loading: false,
       nodata: false,
@@ -110,12 +111,15 @@ export default {
 
       if (page === 1) {
         this.page = 1;
-        this.List = [];
+        if (!this.isDataLast) {
+          this.List = [];
+        }
         this.nodata = false;
         this.lastPage = false;
       }
-
-      this.loading = true;
+      if (!this.isDataLast) {
+        this.loading = true;
+      }
       const data = await API.getPinGoods({
         pageSize: 10,
         pageNumber: page,
@@ -130,7 +134,11 @@ export default {
           this.nodata = true;
           return;
         }
-        this.List = this.List.concat(list);
+        if (this.isDataLast) {
+          this.isDataLast = false;
+        } else {
+          this.List = this.List.concat(list);
+        }
         this.page++;
         // console.log(this.List)
       }
@@ -150,6 +158,10 @@ export default {
       this.goodsFilterOptions = Object.assign(this.goodsFilterOptions, payload);
       this.goodsList(1);
     },
+  },
+  onShow() {
+    this.isDataLast = true;
+    this.goodsList(1);
   },
   onReady() {
     this.goodsList(this.page)

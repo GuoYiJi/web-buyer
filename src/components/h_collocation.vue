@@ -85,12 +85,19 @@ import scard from "@/components/group_card";
 import API from "@/api/httpJchan";
 import isOdd from 'is-odd';
 export default {
+  props: {
+    initCount: {
+      type: Number,
+      default: 10
+    }
+  },
   components: { scard },
   data() {
     return {
       lastPage: false,
       loading: false,
       pageNumber: 1,
+      pageSize: 10,
       selectMGP: []
     };
   },
@@ -111,10 +118,10 @@ export default {
       });
     },
     async fetch() {
-      const { pageNumber } = this;
+      const { pageNumber, pageSize } = this;
       this.loading = true;
       const { data: { list, lastPage }, code } = await API.selectMGP({
-        pageSize: 10,
+        pageSize,
         pageNumber
       });
       this.loading = false;
@@ -149,7 +156,12 @@ export default {
       this.fetch();
     }
   },
+  onShow() {
+    this.pageNumber = 1;
+    this.fetch();
+  },
   async onReady() {
+    this.pageSize = this.initCount;
     this.fetch();
   }
 };

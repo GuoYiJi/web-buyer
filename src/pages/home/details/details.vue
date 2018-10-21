@@ -1,9 +1,11 @@
 <template>
   <div class="nav" v-if="hasFetch">
-    <video class="preview-video-wrapper" id="video-container" :src="goodsInfo.video" direction="0" controls @fullscreenchange="handleFullscreenchange" v-if="goodsInfo.video" binderror="handleVideoError" bindwaiting="bindVideoWaiting"></video>
     <div class="head">
       <div class="swiper-wrapper">
-        <div class="swiper__video-icon" @click="handlePlayVideo" v-if="goodsInfo.video"></div>
+        <div class="swiper__video-icon" v-if="goodsInfo.video" @click="handlePlayVideo">
+          <video class="preview-video-wrapper" id="video-container" :src="goodsInfo.video" direction="0" @fullscreenchange="handleFullscreenchange" v-if="goodsInfo.video" binderror="handleVideoError" bindwaiting="bindVideoWaiting"></video>
+          <cover-view></cover-view>
+        </div>
         <swiper
           :indicator-dots="imgUrls.length > 1"
           indicatorColor="rgba(255, 255, 255, .4)"
@@ -658,7 +660,7 @@ export default {
       this.VideoContext.requestFullScreen({
         direction: 0
       })
-      console.log(this.VideoContext);
+
       this.VideoContext.play();
     },
     handleFullscreenchange(e) {

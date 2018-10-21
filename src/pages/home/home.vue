@@ -1,9 +1,13 @@
 <template>
   <div class="home" v-if="isInitFetch">
     <div class="head">
-      <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
-      <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
-      <p class="text">{{ Warehouse.name }}</p>
+      <div class="head__absolute">
+        <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
+        <div class="head__avatar">
+          <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
+          <p class="text">{{ Warehouse.name }}</p>
+        </div>
+      </div>
     </div>
     <div class="search-box">
       <div class="input">
@@ -33,7 +37,7 @@
       </scroll-view>
     </div>
     <div>
-      <block v-if="isFetch">
+      <block>
         <div class="nav">
           <scroll-view class="list" scroll-x>
             <div v-for="(item, idx) in navData" :key="idx" class="item" :class="[tag == item.id && 'active']" @click="handleNav(item.id)">
@@ -42,12 +46,12 @@
             </div>
           </scroll-view>
         </div>
-        <div class="content" v-if="isFetch">
+        <div class="content">
           <div v-if="tag == 1">
             <colligate/>
             <Upnew :hidenSort="true" />
             <selling :hidenSort="true" />
-            <collocation :hidenSort="true" />
+            <collocation :init-count="3" :hidenSort="true" />
             <Collage :hidenSort="true" />
             <discount :hidenSort="true" />
           </div>
@@ -196,6 +200,59 @@ export default {
     },
     handleSortChange(event) {
       console.log(event);
+    },
+    async handleInitFetch() {
+
+      // 首页封面图
+      // const cover = await API.getImg({type: 5})
+      // if (cover.code === 1) {
+      //   this.coverImg = cover.data[0].image
+      // }
+      wx.showLoading({
+        title: '加载中'
+      })
+      const shopInfo = await API.getShopInfo();
+      this.isInitFetch = true;
+      wx.hideLoading();
+      if (shopInfo.code === 1) {
+        wx.setStorage({
+          key: 'shopName',
+          data: shopInfo.data.name
+        })
+        wx.setNavigationBarTitle({
+          title: shopInfo.data.name
+        })
+        this.coverImg = shopInfo.data.wall;
+        this.Warehouse = shopInfo.data;
+      }
+      const pageByCreate = await API.pageByCreate({state: 1})
+      this.coupon = pageByCreate.data.list
+      try {
+
+        // const { code, data } = await APIShui.getTabs({types: '0,1'});
+        // if (code === 1) {
+        //   const images_default = [
+        //     require('../../assets/img/home/zonghe.png'),
+        //     require('../../assets/img/home/shangxin.png'),
+        //     require('../../assets/img/home/baokuan.png'),
+        //     require('../../assets/img/home/dapei.png'),
+        //     require('../../assets/img/home/pintuan.png'),
+        //     require('../../assets/img/home/tejia.png')
+        //   ]
+        //   this.tabs = data.map(item => {
+        //     return {
+        //       id: item.id,
+        //       text: item.name,
+        //       img: item.image || images_default[item.id - 1]
+        //     }
+        //   })
+        // }
+        // this.isFetch = true;
+      } catch (err) {
+        console.log(err)
+      }
+      this.loading = false;
+      return Promise.resolve();
     }
   },
   onShareAppMessage() {
@@ -203,57 +260,12 @@ export default {
       title: '发现一家好店，与你分享！'
     }
   },
+  async onPullDownRefresh() {
+    await this.handleInitFetch();
+    wx.stopPullDownRefresh();
+  },
   async mounted () {
-    // 首页封面图
-    // const cover = await API.getImg({type: 5})
-    // if (cover.code === 1) {
-    //   this.coverImg = cover.data[0].image
-    // }
-    wx.showLoading({
-      title: '加载中'
-    })
-    const shopInfo = await API.getShopInfo();
-    this.isInitFetch = true;
-    wx.hideLoading();
-    if (shopInfo.code === 1) {
-      wx.setStorage({
-        key: 'shopName',
-        data: shopInfo.data.name
-      })
-      wx.setNavigationBarTitle({
-        title: shopInfo.data.name
-      })
-      this.coverImg = shopInfo.data.wall;
-      this.Warehouse = shopInfo.data;
-    }
-    const pageByCreate = await API.pageByCreate({state: 1})
-    this.coupon = pageByCreate.data.list
-    try {
-
-      const { code, data } = await APIShui.getTabs({types: '0,1'});
-      if (code === 1) {
-        const images_default = [
-          require('../../assets/img/home/zonghe.png'),
-          require('../../assets/img/home/shangxin.png'),
-          require('../../assets/img/home/baokuan.png'),
-          require('../../assets/img/home/dapei.png'),
-          require('../../assets/img/home/pintuan.png'),
-          require('../../assets/img/home/tejia.png')
-        ]
-        this.tabs = data.map(item => {
-          return {
-            id: item.id,
-            text: item.name,
-            img: item.image || images_default[item.id - 1]
-          }
-        })
-      }
-      this.isFetch = true;
-      console.log(this.tabs);
-    } catch (err) {
-      console.log(err)
-    }
-    this.loading = false;
+    this.handleInitFetch();
   },
   onUnload() {
     Object.assign(this, this.$options.data());
@@ -290,29 +302,36 @@ export default {
   .head
     position: relative
     width: 100%
-    height: 900px
+    padding-top: 100%;
+    &__absolute
+      position: absolute
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    &__avatar
+      display: flex;
+      align-items: center;
+      position: absolute;
+      bottom: 20px;
+      left: 24px;
     .bg
       display: block
       width: 100%
-      height: 900px
+      height: 440px
     .tx
-      position: absolute
-      top: 720px
-      left: 24px
       width: 120px
       height: 120px
       border-radius: 50%
     .text
+      margin-left: 20px;
       display: inline-block
       box-sizing: border-box
       height: 60px
       line-height: 60px
       padding: 0 22px
       background: #fff
-      text-align: center
-      position: absolute
-      top: 750px
-      left: 154px
+      text-align: center;
       border-radius: 8px
       font-size: 28px
       color: #000

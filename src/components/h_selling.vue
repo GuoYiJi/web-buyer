@@ -101,6 +101,7 @@ export default {
   },
   data () {
     return {
+      isDataLast: false,
       loading: false,
       List: [],
       waterfallLeft: [],
@@ -122,13 +123,17 @@ export default {
 
       if (page === 1) {
         this.page = 1;
-        this.List = [];
-        this.waterfallLeft = [];
-        this.waterfallRight = [];
+        if (!this.isDataLast) {
+          this.List = [];
+          this.waterfallLeft = [];
+          this.waterfallRight = [];
+        }
         this.nodata = false;
         this.lastPage = false;
       }
-      this.loading = true;
+      if (!this.isDataLast) {
+        this.loading = true;
+      }
       const data = await API.getGoods({
         labelId: 2,
         state: 1,
@@ -145,9 +150,16 @@ export default {
           this.nodata = true;
           return;
         }
-        this.List = this.List.concat(list);
-        this.waterfallLeft = this.List.filter((item, index) => isOdd(index + 1));
-        this.waterfallRight = this.List.filter((item, index) => !isOdd(index + 1));
+        if (this.isDataLast) {
+          this.List = list;
+          this.waterfallLeft = this.List.filter((item, index) => isOdd(index + 1));
+          this.waterfallRight = this.List.filter((item, index) => !isOdd(index + 1));
+          this.isDataLast = false;
+        } else {
+          this.List = this.List.concat(list);
+          this.waterfallLeft = this.List.filter((item, index) => isOdd(index + 1));
+          this.waterfallRight = this.List.filter((item, index) => !isOdd(index + 1));
+        }
         // console.error(this.List, this.waterfallLeft, this.waterfallRight)
         // if (this.List.length !== 0) {
         //   this.List.push.apply(this.List, data.data.list)
@@ -179,6 +191,11 @@ export default {
       this.goodsFilterOptions = {};
       this.goodsList(1);
     }
+  },
+  onShow() {
+    this.isDataLast = true;
+    this.page = 1;
+    this.goodsList(this.page);
   },
   onReady () {
     this.goodsList(this.page)

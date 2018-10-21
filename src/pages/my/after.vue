@@ -9,8 +9,8 @@
           {{stateName[item.state]}}
         </span>
       </div>
-      <div class="nav" @click="goodsList(item.goodsList)">
-        <img v-if="i<3" class="n-img" v-for="(ite,i) in item.goodsList" :key="i" :src="ite.image" alt="">
+      <div class="nav" @click="handleShopListClick(item.goodsList)">
+        <img v-if="i<3" class="n-img" v-for="(ite,i) in item.goodsList" :key="i" :src="ite.image" mode="aspectFill" alt="">
         <i class="n-icon"></i>
       </div>
       <div class="below">
@@ -54,11 +54,15 @@
 </template>
 <script>
 import wx from 'wx'
-import API from '@/api/httpShui'
+import API from '@/api/httpShui';
+
+import orderMixins from '@/orderMixins';
 export default {
   components: {},
+  mixins: [orderMixins],
   data () {
     return {
+      pageNumber: 1,
       loading: false,
       lastPage: false,
       shopName: '',
@@ -81,24 +85,18 @@ export default {
         })
       }
     },
-    // 商品清单
-    goodsList (list) {
-
-    },
     async getList () {
-      this.loading = true;
-      const data = await API.afterService()
-      this.loading = false;
-      if (data.code === 1) {
-        this.list = this.list.concat(data.data.list)
-        this.lastPage = data.data.lastPage;
-      }
-      let that = this
-      wx.getStorage({
-        key: 'shopName',
-        success: function (res) {
-          that.shopName = res.data
+      return new Promise(async (resolve, reject) => {
+        this.loading = true;
+        const { pageNumber } = this;
+        const data = await API.afterService({ pageSize: 10, pageNumber })
+        this.loading = false;
+        if (data.code === 1) {
+          this.list = this.list.concat(data.data.list)
+          this.lastPage = data.data.lastPage;
+          this.pageNumber++;
         }
+        resolve();
       })
     }
   },
@@ -107,7 +105,28 @@ export default {
       this.getList();
     }
   },
+  async onPullDownRefresh() {
+    this.pageNumber = 1;
+    this.list = [];
+    this.lastPage = false;
+    await this.getList();
+    wx.stopPullDownRefresh();
+  },
+  onShow() {
+    const isUpdate = wx.getStorageSync('is-list-update');
+    if (isUpdate) {
+      wx.removeStorageSync('is-list-update');
+      wx.startPullDownRefresh();
+    }
+  },
   mounted() {
+    let that = this
+    wx.getStorage({
+      key: 'shopName',
+      success: function (res) {
+        that.shopName = res.data
+      }
+    })
     this.getList();
   },
   onUnload() {

@@ -1,6 +1,6 @@
 <template>
   <div class="nav">
-    <div class="kong" v-if="kong">
+    <div class="kong" v-if="!cardList.length">
       <img class="k_img" src="../../assets/img/shopping/kgwc.png">
       <p class="k_text">你的购物车还没有商品~</p>
       <span class="k_btn" @click="toHome()">去首页逛逛吧</span>
@@ -35,7 +35,7 @@
           <div class="item_3">
             <p class="i_title" v-text="item.name"></p>
             <p class="uniform" v-for="(ite,i) in item.skuCode" :key="i">{{ite}}</p>
-            <p class="money">¥{{item.sellPrice}}</p>
+            <p class="money">¥{{item.disPrice || item.sellPrice}}</p>
             <span class="quantity">x{{item.totalNum}}</span>
             <span class="btn" @click="editOrder(index)">编辑</span>
           </div>

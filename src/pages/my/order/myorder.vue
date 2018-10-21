@@ -293,10 +293,13 @@ export default {
   },
   onShow() {
     const isOrderDelete = wx.getStorageSync('isOrderDelete');
-    if (isOrderDelete) {
+    const isUpdate = wx.getStorageSync('is-ordet-update');
+    if (isOrderDelete || isUpdate) {
       wx.removeStorageSync('isOrderDelete');
+      wx.removeStorageSync('is-ordet-update');
       wx.startPullDownRefresh()
     }
+
   },
   mounted() {
     let selectedId = this.$route.query.selectedId

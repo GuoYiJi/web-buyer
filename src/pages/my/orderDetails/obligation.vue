@@ -425,35 +425,51 @@ export default {
     
 
     handleSaleClick(orderId) {
-      const { paid, freight } = this.details;
-      this.$router.push({
-        path: '/pages/refund/applyCustomer',
-        query: {orderId, price: paid, freight, type: 0}
-      })
+      const { paid, freight, state } = this.details;
+      if (state === 5) {
+        this.$router.push({
+          path: '/pages/refund/refund',
+          query: {
+            orderId,
+            type: 0,
+            price: paid,
+            freight
+          }
+        })
+      } else {
+        this.$router.push({
+          path: '/pages/refund/applyCustomer',
+          query: {orderId, price: paid, freight, type: 0}
+        })
+      }
     },
     // 删除订单
     handleDeleteClick() {
       this.handleOrderDelete(this.details.id)
         .then(res => {
           wx.setStorageSync('isOrderDelete', true);
+          wx.setStorageSync('is-ordet-update', true);
           this.$router.back();
         })
     },
     handleCancelClick() {
       this.handleOrderCancel(this.details.id)
         .then(res => {
+          wx.setStorageSync('is-ordet-update', true);
           wx.startPullDownRefresh();
         })
     },
     handlePayClick() {
       this.payAsync(this.details.id)
         .then(res => {
+          wx.setStorageSync('is-ordet-update', true);
           wx.startPullDownRefresh();
         });
     },
     handleBtnAction() {
       this.handleOrderDone(this.details.id)
         .then(res => {
+          wx.setStorageSync('is-ordet-update', true);
           wx.startPullDownRefresh();
         })
     }

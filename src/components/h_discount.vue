@@ -95,6 +95,7 @@ export default {
   },
   data () {
     return {
+      isDataLast: false,
       List: [],
       loading: false,
       page: 1,
@@ -112,10 +113,14 @@ export default {
     },
     async goodsList (page) {
       if (page === 1) {
-        this.List = [];
+        if (!this.isDataLast) {
+          this.List = [];
+        }
         this.lastPage = false;
       }
-      this.loading = true;
+      if (!this.isDataLast) {
+        this.loading = true;
+      }
       const data = await API.getGoods({
         isDis: 1,
         state: 1,
@@ -127,10 +132,12 @@ export default {
       this.loading = false;
       this.lastPage = data.data.lastPage;
       if (data.code === 1) {
-        if (this.List.length !== 0) {
-          this.List.push.apply(this.List, data.data.list)
+        const { data: { list } } = data;
+        if (this.isDataLast) {
+          this.List = list;
+          this.isDataLast = false;
         } else {
-          this.List = data.data.list
+          this.List = this.List.concat(list);
         }
         this.page = data.data.pageNumber
         this.totalPage = data.data.totalPage
@@ -155,6 +162,11 @@ export default {
     clickItem (goodsId) {
       this.$router.push({path: '/pages/home/details/details', query: {goodsId}})
     }
+  },
+  onShow() {
+    this.page = 1;
+    this.isDataLast = true;
+    this.goodsList(1);
   },
   mounted () {
     this.goodsList(this.page)

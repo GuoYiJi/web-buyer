@@ -98,7 +98,28 @@ export default {
       }
     },
     revokes () {
-      // this.$router.back()
+      
+      wx.showModal({
+        title: '撤销申请',
+        content: '您确定要撤销该订单的售后申请吗？',
+        success: res => {
+          if (res.confirm) {
+            const { orderRefundId } = this;
+            API.backRefund({
+              orderRefundId
+            })
+              .then(res => {
+                wx.setStorageSync('is-list-update', true);
+                wx.showToast({
+                  title: '操作成功',
+                  icon: 'none',
+                  duration: 1500
+                })
+                this.$router.back()
+              })
+          }
+        }
+      })
     },
     // 定时器弹窗
     mySetTimeout (msg) {

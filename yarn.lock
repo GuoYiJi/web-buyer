@@ -1808,7 +1808,7 @@ decode-uri-component@^0.2.0:
 
 deep-equal@^1.0.1:
   version "1.0.1"
-  resolved "http://registry.npm.taobao.org/deep-equal/download/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
+  resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
 
 deep-extend@^0.6.0:
   version "0.6.0"
@@ -3949,9 +3949,9 @@ mpvue-entry@^1.4.4:
   version "1.4.4"
   resolved "http://registry.npm.taobao.org/mpvue-entry/download/mpvue-entry-1.4.4.tgz#73ab507577cbd05383bf06dd8e8ab1df3741b8a4"
 
-mpvue-loader@^1.0.13:
+mpvue-loader@1.0.15:
   version "1.0.15"
-  resolved "http://registry.npm.taobao.org/mpvue-loader/download/mpvue-loader-1.0.15.tgz#1ed2f8818f8c19c138953aad88ee72f933a315d9"
+  resolved "https://registry.yarnpkg.com/mpvue-loader/-/mpvue-loader-1.0.15.tgz#1ed2f8818f8c19c138953aad88ee72f933a315d9"
   dependencies:
     babelon "^1.0.5"
     consolidate "^0.14.0"

@@ -6,9 +6,8 @@
 
 .preview-video-wrapper {
   display: block;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  position: absolute;
+  left: -1000em;
 }
 .swiper {
   &-wrapper {
@@ -23,7 +22,17 @@
     width: $size;
     height: $size;
     background: url(./bf@2x.png) no-repeat;
+
     background-size: $size;
+    // cover-view {
+    //   position: absolute;
+    //   left: 0;
+    //   top: 0;
+    //   z-index: 5;
+
+    //   width: 100%;
+    //   height: 100%;
+    // }
   }
 }
 .sku-content {
