@@ -16,7 +16,7 @@ export default {
       try {
         loginAPI.authLogin()
           .then(async res => {
-
+            console.log('xxx', params);
             var value = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
             if (value) {
               params.sessionId = value

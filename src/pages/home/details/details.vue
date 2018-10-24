@@ -97,7 +97,9 @@
       <p class="title">商品说明</p>
       <div class="description__items">
         <p class="commodity">类别：<span>{{goodsInfo.labelInfo}}</span></p>
-        <p class="commodity" v-for="(item,i) in specGroup" :key="i">{{item.value}}：<span v-for="(val, j) in item.specAttr" :key="j">{{val.name}}</span></p>
+        <p class="commodity" v-for="(item, index) in goodsInfo.goodsLabel" :key="index">{{ item.labelKey }}：<span>{{item.labelValue}}</span></p>
+
+        <p class="commodity" v-for="(item,i) in specGroup" :key="i" :style="{ width: '100%' }">{{item.value}}：<span v-for="(val, j) in item.specAttr" :key="j">{{val.name}}</span></p>
       </div>
       <!--<p class="commodity">材料：<span>纯棉</span></p>-->
     </div>
@@ -703,16 +705,11 @@ export default {
   },
   async mounted() {
     const { goodsId, toNew, isPin } = this.$route.query;
+    console.log(goodsId);
     this.isPin = !!isPin;
     if (toNew) {
       this.toNew = toNew;
     }
-
-    API.getCardList()
-      .then(res => {
-        const { data } = res;
-        this.shopcardTotal = data.length;
-      });
     wx.showLoading({title: '努力加载中'})
     const { code, data } = await API.selectGoodsDetail({ goodsId });
     wx.hideLoading();
@@ -782,6 +779,19 @@ export default {
         }
       }
       this.skuAttr = attrArray
+
+      try {
+        API.getCardList()
+          .then(res => {
+            console.log(res);
+            const { data } = res;
+            if (data) {
+              this.shopcardTotal = data.length;
+            }
+          });
+      } catch (err) {
+        console.log(err);
+      }
     }
   },
   onUnload() {

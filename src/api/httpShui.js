@@ -46,7 +46,10 @@ class API {
   calculateFreight = params => http.post('api/order/calculateFreight', params, { 'content-type': 'application/json' })
 
   // 获取商品详情
-  selectGoodsDetail = params => http.post('api/goods/selectGoodsDetail', params)
+  selectGoodsDetail = params => {
+    console.log('params', params)
+    return http.post('api/goods/selectGoodsDetail', params);
+  }
   // 支付
   wxSign = params => http.post('api/order/wechatPay', params)
 

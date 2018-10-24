@@ -9,9 +9,10 @@ const home = require('./home')
 const my = require('./my')
 const shopping = require('./shopping')
 const classify = require('./classify')
+const groupon = require('./groupon')
 const search = require('./search/search')
 // 路由集合
-const routes = [].concat(home, my, shopping, classify, search)
+const routes = [].concat(home, my, shopping, classify, search, groupon)
 // console.log(routes)
 module.exports = routes
 // export default new Router({

@@ -38,6 +38,7 @@ const address = [{
     path: '/pages/my/procedures',
     config: {
       navigationBarTitleText: '申请小程序',
+      backgroundColor: '#ffffff',
       'usingComponents': {
         'i-modal': '/iview/modal/index',
       }
