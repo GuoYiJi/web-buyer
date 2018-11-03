@@ -11,7 +11,10 @@ import loginAPI from './httpJsong';
 const vm = new Vue()
 export default {
   async post (url, params = {}, headers = {}) {
-    params.appId = config.appId
+
+    const account = wx.getAccountInfoSync();
+    const { miniProgram: { appId } } = account;
+    params.appId = appId
     return new Promise(async (resolve, reject) => {
       try {
         loginAPI.authLogin()

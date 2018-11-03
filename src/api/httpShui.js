@@ -13,6 +13,7 @@ class API {
   getTabs = params => http.post('api/label/data/selectLabelList', params)
   // 二级分类
   getClassify = params => http.post('api/label/data/selectLabelList', params)
+  selectAppLabelList = params => http.post('api/label/data/selectAppLabelList', params)
   // 获取商品
   getGoods = params => http.post('api/goods/pageManageByLabel', params)
   // 获取拼团商品
@@ -77,6 +78,8 @@ class API {
   
 
   copyGoods = params => http.post('api/goods/copy', params)
+
+  updateRefund = params => http.post('api/order/refund/updateRefund', params)
 }
 
 export default new API()

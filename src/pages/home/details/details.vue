@@ -75,7 +75,7 @@
           <div class="m_title">{{ite.name ? ite.name : '未填写'}}</div>
           <div class="m_text">
             <p class="mt_1">还差{{item.chaNum}}人成团</p>
-            <p class="mt_2">截止{{item.endTime}}</p>
+            <p class="mt_2">截止{{item.endDate}}</p>
           </div>
           <div class="m_btn" @click="handleGroupClick(index)">去参团</div>
         </div>
@@ -158,7 +158,7 @@
               <div class="m_title">{{ite.name ? ite.name : '未填写'}}</div>
               <div class="m_text">
                 <p class="mt_1">还差{{item.chaNum}}人成团</p>
-                <p class="mt_2">截止{{item.endTime}}</p>
+                <p class="mt_2">截止{{item.endDate}}</p>
               </div>
               <div class="m_btn" @click="handleGroupClick(index)">去参团</div>
             </div>
@@ -173,8 +173,8 @@
 
     <i-modal :visible="groupVisible" @ok="handleModalActionClick({ confirm: true })" @cancel="handleModalActionClick({ cancel: true })">
 
-      <div class="cT">
-        <p class="c-time">距结束:01天12时12分21秒</p>
+      <div class="cT" v-if="goodsInfo.pingdEndDate">
+        <p class="c-time">距结束: <block v-if="goodsInfo.pingdEndDate.day > 0">{{ goodsInfo.pingdEndDate.day }}天</block> {{ goodsInfo.pingdEndDate.hours }}时 {{ goodsInfo.pingdEndDate.minute }}分 {{ goodsInfo.pingdEndDate.second }}秒</p>
         <p class="c-title">还差{{wellPingUser.chaNum}}人成团，赶快加入吧！</p>
         <div class="c-imgk" v-for="(item,index) in wellPingUser.heads" :key="index">
           <img v-if="item" class="c-img" :src="item">
@@ -256,6 +256,7 @@
 import wx from 'wx'
 import config from '@/config.js'
 import API from '@/api/httpShui'
+import moment from 'moment';
 export default {
   components: {},
   data () {
@@ -507,7 +508,9 @@ export default {
           const TEST_URL = config.url
           const BASE_URL = config.url
           const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
-          let appId = config.appId
+
+          const account = wx.getAccountInfoSync();
+          const { miniProgram: { appId } } = account;
           let obj = {
             sessionId: this.sessionId,
             appId,
@@ -705,7 +708,6 @@ export default {
   },
   async mounted() {
     const { goodsId, toNew, isPin } = this.$route.query;
-    console.log(goodsId);
     this.isPin = !!isPin;
     if (toNew) {
       this.toNew = toNew;
@@ -729,12 +731,16 @@ export default {
           }
         })
       }
-      // for (let i = 0; i < this.pingOrder.length; i++) {
-      //   let obj = this.pingOrder[i].pingUser
-      //   this.pingOrder[i].endTime = this.ping.endTime
-      //   this.pingOrder[i].chaNum = this.ping.num - obj.length
-      // }
-      this.goodsInfo = data;
+      this.goodsInfo = {
+        ...data,
+        pingdEndDate: (data.ping && data.ping.endTime) ? this.format(+moment(data.ping.endTime) - Date.now()) : null,
+        pingOrder: data.pingOrder ? data.pingOrder.map(item => {
+          return {
+            ...item,
+            endDate: moment(item.endTime).format('YYYY-MM-DD')
+          };
+        }) : []
+      };
       // 图片列表
       this.imgUrls = this.goodsInfo.images.split(',');
       // 标签列表
@@ -779,7 +785,12 @@ export default {
         }
       }
       this.skuAttr = attrArray
-
+      if (this.$route.query.pingOrderId) {
+        const index = this.goodsInfo.pingOrder.findIndex(item => item.id === this.$route.query.pingOrderId);
+        if (index !== -1) {
+          this.handleGroupClick(index);
+        }
+      }
       try {
         API.getCardList()
           .then(res => {

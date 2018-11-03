@@ -9,13 +9,15 @@
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
       <!-- 商家收货地址 -->
       <div v-if="isFh" class="addressBox">
-        <p class="name">收货人：{{details.addressName + '     ' + details.addressMobile}}</p>
-        <p class="address">收货地址：{{details.addressValue}}</p>
+        <p class="name">收货人：{{details.shopAddressName}}</p>
+        <p class="address">收货地址：{{details.shopAddress}}</p>
       </div>
       <!-- 物流单号 -->
       <div v-if="isFh" class="logisticsNumber">
         <p class="text">物流单号</p>
-        <p v-if="details.state == 4 || details.state == 6" class="num"></p>
+        <p v-if="details.orderLogistics && (details.state == 4 || details.state == 6)" class="num">
+          {{ details.orderLogistics.logisticsNo }}
+        </p>
         <div v-if="details.state == 3" class="label">
           <input class="number" type="number" v-model="logisticsNum">
           <span class="btn" @click="sendNum(details.id)">点击发送</span>
@@ -23,23 +25,29 @@
       </div>
       <!-- 商品信息 -->
       <p class="title">{{state[details.refundType]}}信息</p>
-      <div class="refundGoods" v-for="(item,index) in goods" :key="index">
-        <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
-          <img v-else src="../../assets/img/classify/goods.png" alt="">
+      <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(goods)">
+        <div class="van-cell__title">
+          <span class="goods-thumb-item" v-for="(item, index) in goods" :key="j" v-if="index < 3">
+            <img class="n-img" :src="item.image" mode="aspectFill">
+          </span>
         </div>
-        <div class="text">
-          <p class="name">{{item.name}}</p>
-          <p class="spec">{{item.skuCode}} / {{item.num}}件</p>
-        </div>
+        <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
       </div>
       <!-- 卖家信息 -->
       <div class="businessInfo">
         <p>卖家：{{shopName}}</p>
-        <p>{{state[details.refundType]}}原因：{{details.result}}</p>
+        <p>原因：{{reason}}</p>
+        <p>{{state[details.refundType]}}说明：{{details.content}}</p>
         <p>退款金额：{{details.price}}</p>
         <p>申请时间：{{details.createTime}}</p>
         <p>编号：{{details.orderRefundNo}}</p>
+        <div>
+          <ul class="weui-uploader__files">
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img1 + ')' }" alt="" v-if="details.img1"></li>
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img2 + ')' }" alt="" v-if="details.img2"></li>
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img3 + ')' }" alt="" v-if="details.img3"></li>
+          </ul>
+        </div>
       </div>
 
     </div>
@@ -57,7 +65,9 @@
 <script>
 import wx from 'wx'
 import API from '@/api/httpShui'
+import orderMixins from '@/orderMixins';
 export default {
+  mixins: [orderMixins],
   data () {
     return {
       isFh: false,
@@ -67,6 +77,12 @@ export default {
       stateName: ['等待商家处理', '已完成', '商家已拒绝', '商家已同意', '等待商家确认收货', '已撤销'],
       shopName: '',
       details: {},
+      reasonList: [
+        {id: 1, text: '不喜欢/不想要'},
+        {id: 2, text: '未按约定时间发货'},
+        {id: 3, text: '空包裹'},
+        {id: 4, text: '快递/物流未送达'}
+      ],
       goods: [],
       stateIndex: '',
       refundTypeIndex: '',
@@ -74,12 +90,32 @@ export default {
       isFetch: false
     }
   },
+  computed: {
+    reason() {
+      const index = this.reasonList.findIndex(e => e.id == this.details.type);
+      if (index !== -1) {
+        return this.reasonList[index].text;
+      } else {
+        return ''
+      }
+    }
+  },
   methods: {
     // 发送物流单号
     async sendNum (id) {
       if (this.logisticsNum != '') {
-        const data = await API.sendLogisticsNum({logistics: this.logisticsNum, orderRefundId: id})
-        console.log(data)
+        wx.showLoading();
+        const data = await API.sendLogisticsNum({logisticsNo: this.logisticsNum, orderRefundId: id})
+        wx.hideLoading();
+        if (data.code === 1) {
+          wx.startPullDownRefresh();
+        } else {
+          wx.showToast({
+            title: data.desc,
+            icon: 'none',
+            duration: 1500
+          })
+        }
       } else {
         this.mySetTimeout('请输入物流单号！')
       }
@@ -102,10 +138,11 @@ export default {
           query: {
             orderId: this.details.orderId,
             type,
+            orderRefundId: this.details.id,
             price: this.details.price,
             freight: this.details.freight,
             data: JSON.stringify({
-              result: this.details.result,
+              content: this.details.content,
               img1: this.details.img1,
               img2: this.details.img2,
               img3: this.details.img3
@@ -115,7 +152,7 @@ export default {
       } else {
         this.$router.push({
         path: path,
-        query: {orderId: this.orderId, type: type}
+        query: {orderId: this.orderId, type: type, orderRefundId: this.details.id}
         })
       }
     },
@@ -157,6 +194,31 @@ export default {
         that.wellMsgShow = false
         that.msg = ''
       }, 1000)
+    },
+    async fetch() {
+
+      const { orderRefundId } = this;
+      const data = await API.getRefundDetails({orderRefundId})
+      this.isFetch = true;
+      if (data.code === 1) {
+        this.details = data.data
+        this.goods = data.data.goodsList
+        this.stateIndex = data.data.state
+        this.refundTypeIndex = data.data.refundType
+        // 订单状态
+        let refundType = data.data.refundType
+        // 商家回复状态
+        let state = data.data.state
+        if (refundType === 1 || refundType === 2) {
+          if (state === 0 || state === 2 || state === 5) {
+            this.isFh = false
+          }
+          if (state === 1 || state === 3 || state === 4) {
+            this.isFh = true
+          }
+        }
+      }
+      return Promise.resolve();
     }
   },
   async created () {
@@ -168,33 +230,26 @@ export default {
       }
     })
   },
+
+  async onPullDownRefresh() {
+    await this.fetch();
+    wx.stopPullDownRefresh();
+  },
+
+  onShow() {
+    const isUpdate = wx.getStorageSync('update');
+    if (isUpdate) {
+      wx.removeStorageSync('update');
+      wx.startPullDownRefresh();
+    }
+  },
   async mounted () {
+    this.orderRefundId = this.$route.query.id;
     wx.showLoading({
       title: '加载中'
     })
-    this.orderRefundId = this.$route.query.id;
-    const { orderRefundId } = this;
-    const data = await API.getRefundDetails({orderRefundId})
-    this.isFetch = true;
+    await this.fetch();
     wx.hideLoading();
-    if (data.code === 1) {
-      this.details = data.data
-      this.goods = data.data.goodsList
-      this.stateIndex = data.data.state
-      this.refundTypeIndex = data.data.refundType
-      // 订单状态
-      let refundType = data.data.refundType
-      // 商家回复状态
-      let state = data.data.state
-      if (refundType === 1 || refundType === 2) {
-        if (state === 0 || state === 2 || state === 5) {
-          this.isFh = false
-        }
-        if (state === 1 || state === 3 || state === 4) {
-          this.isFh = true
-        }
-      }
-    }
   },
   
   onUnload() {
@@ -204,6 +259,9 @@ export default {
 </script>
 <style type="text/sass" lang="sass" scoped>
   @import '~@/assets/css/mixin'
+  .wrapper 
+    height: auto;
+    padding-bottom: 100px;
   .clearfix:after
     content: ""
     display: block
@@ -317,6 +375,7 @@ export default {
     .businessInfo
       /*height: 360px*/
       padding: 32px 24px
+      overflow: hidden;
       background: #ffffff
       p
         line-height: 60px

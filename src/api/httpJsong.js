@@ -26,26 +26,21 @@ class API {
       }
       function _getAuthSetting() {
         return new Promise((resolve, reject) => {
-          const _cache = wx.getStorageSync(`${process.env.NODE_ENV}_scopeUserInfo`);
-          if (_cache) {
-            resolve();
-          } else {
-            wx.getSetting({
-              success: res => {
-                const { authSetting } = res;
-                if (authSetting['scope.userInfo']) {
-                  wx.setStorageSync(`${process.env.NODE_ENV}_scopeUserInfo`, true);
-                  resolve();
-                } else {
-                  wx.reLaunch({
-                    url: '/pages/home/login'
-                  })
-                  loading = false;
-                  hasLogin = false;
-                }
+          wx.getSetting({
+            success: res => {
+              const { authSetting } = res;
+              console.log('authSetting', authSetting)
+              if (authSetting['scope.userInfo']) {
+                resolve();
+              } else {
+                wx.reLaunch({
+                  url: '/pages/home/login'
+                })
+                loading = false;
+                hasLogin = false;
               }
-            });
-          }
+            }
+          });
         });
       }
       loading = true;
@@ -57,10 +52,12 @@ class API {
 
               wx.getUserInfo({
                 success: res => {
+                  const account = wx.getAccountInfoSync();
+                  const { miniProgram: { appId } } = account;
                   const { encryptedData, iv, userInfo: { avatarUrl: avatar, nickName: nick } } = res;
                   wx.request({
                     url: `${URL}/api/account/userLogin`,
-                    data: qs.stringify({...params, code, encryptedData, iv, avatar, nick, appId: config.appId}),
+                    data: qs.stringify({...params, code, encryptedData, iv, avatar, nick, appId}),
                     header: {'content-type': 'application/x-www-form-urlencoded'},
                     method: 'POST',
                     // dataType: 'json',
@@ -85,6 +82,7 @@ class API {
                     },
                     fail: res => {
                       loading = false;
+                      wx.reLaunch({url: '/pages/home/login'});
                     }
                   })
                 }

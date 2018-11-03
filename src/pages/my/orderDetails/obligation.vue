@@ -484,6 +484,12 @@ export default {
       });
     
   },
+  onShow() {
+    const refundSuccess = wx.getStorageSync('refundSuccess');
+    if (refundSuccess) {
+      wx.startPullDownRefresh();
+    }
+  },
   mounted () {
     this.id = this.$route.query.id
     this.xq = this.$route.query.xq

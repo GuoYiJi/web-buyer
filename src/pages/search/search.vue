@@ -20,21 +20,16 @@
       <span class="searchBtn" @click="search()">搜索</span>
     </div> -->
 
-    <div class="history-container" v-show="!keyword.length">
+    <div class="history-container" v-show="historyList.length && (!keyword.length)">
       <div class="history__hd">
         <div class="history__title">
           <i class="clock-icon"></i>
           <span>历史搜索记录</span>
         </div>
-        <i class="history-clear-icon" @click="handleHistoryClear"></i>
+        <!-- <i class="history-clear-icon" @click="handleHistoryClear"></i> -->
       </div>
-      <div class="history__list">
-        <span class="history__list-item">衬衫</span>
-        <span class="history__list-item">上衣</span>
-        <span class="history__list-item">牛仔长裤</span>
-        <span class="history__list-item">衬衫</span>
-        <span class="history__list-item">牛仔长裤</span>
-        <span class="history__list-item">衬衫</span>
+      <div class="history__list" v-if="historyList.length">
+        <span class="history__list-item" v-for="(item, index) in historyList" :key="index" @click="handleHistoryClick(item)">{{ item.message }}</span>
       </div>
     </div>
     <div class="msg" v-if="searchEmptyData">
@@ -111,6 +106,7 @@
         visible: false,
         showType: true,
         keyword: '',
+        historyList: [],
         wellMsgShow: '',
         msg: '',
         goodsList: [],
@@ -176,8 +172,12 @@
       clickItem (obj) {
         this.$router.push({path: '/pages/home/details/details', query: {goodsId: obj.id}});
       },
+      handleHistoryClick(item) {
+        this.keyword = item.message;
+        this.search(true);
+      },
       // 搜索
-      async search () {
+      async search (hasHistory = false) {
         if (this.keyword) {
           this.sortTabs = 1;
           this.searchStr = this.keyword;
@@ -186,9 +186,11 @@
           this.hasFilter = false;
           this.$refs.filterRef._reset();
           this.nodata = false;
-          API.saveHistory({
-            message: this.keyword
-          })
+          if (!hasHistory) {
+            API.saveHistory({
+              message: this.keyword
+            })
+          }
           // this.isFocus = false;
           const list = await this.setGoodsList();
           if (!list.length) {
@@ -287,6 +289,15 @@
       }
     },
     async mounted () {
+
+      API.selectHistoryPage({
+        pageNumber: 1,
+        pageSize: 10
+      })
+        .then(res => {
+          const { data: { list } } = res;
+          this.historyList = list;
+        })
       const { key } = this.$route.query;
       if (key) {
         this.sortTabs = 1;
@@ -294,11 +305,8 @@
         this.searchStr = key;
         this.search();
       } else {
-        API.selectHistoryPage({
-          pageNumber: 1,
-          pageSize: 10
-        })
       }
+
 
     },
     onUnload() {

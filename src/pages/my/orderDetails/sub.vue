@@ -443,6 +443,13 @@ export default {
       });
     
   },
+  
+  onShow() {
+    const refundSuccess = wx.getStorageSync('refundSuccess');
+    if (refundSuccess) {
+      wx.startPullDownRefresh();
+    }
+  },
   mounted () {
     console.log('sub')
     this.id = this.$route.query.id

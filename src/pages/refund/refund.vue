@@ -76,6 +76,7 @@ export default {
       freight: '',
       price: '',
       isCheck: 0,
+      orderRefundId: '',
       reasonList: [
         {id: 1, text: '不喜欢/不想要'},
         {id: 2, text: '未按约定时间发货'},
@@ -89,6 +90,7 @@ export default {
       wellShow: false,
       wellMsgShow: false,
       msg: '',
+      userType: 1,
       explain: ''
     }
   },
@@ -101,6 +103,7 @@ export default {
       this.isCheck = i
       this.reason = text
       this.wellShow = false
+      this.userType = this.reasonList[i].id;
     },
     // 上传图片
     chooseImg (num) {
@@ -126,17 +129,22 @@ export default {
       })
     },
     uploadImg (tempFilePath, callback) {
-      let that = this
+      var location = tempFilePath.lastIndexOf('/') + 1;
+      let that = this;
+      console.log(tempFilePath.slice(location).toString(), 'sdf')
+      wx.showLoading({
+        title: '上传中'
+      })
       wx.uploadFile({
         url: config.uploadImageUrl,
         filePath: tempFilePath,
         name: 'file',
         formData: {
-          name: tempFilePath.substring(10),
-          key: 'img/${filename}',
+          name: tempFilePath.slice(location).toString(),
+          key: "img/${filename}",
           policy: config.imgPolicy,
-          OSSAccessKeyId: '6MKOqxGiGU4AUk44',
-          success_action_status: '200',
+          OSSAccessKeyId: config.OSSAccessKeyId,
+          success_action_status: "200",
           signature: config.imgSignature
         },
         success: function (res) {
@@ -149,18 +157,22 @@ export default {
               return
             }
             callback (
-              config.uploadImageUrl + '/img' + tempFilePath.substring(10)
+              config.uploadImageUrl + "/img/" + tempFilePath.slice(location).toString()
             )
           }
         },
         fail: function (err) {
           console.log(err)
+        },
+        complete: res => {
+          wx.hideLoading();
         }
       })
     },
     // 清除选择的图片
     closeImg (name, event) {
-      this[name] = ''
+      this.$set(this, name, '');
+      this[name] = '';
     },
     // 提交按钮
     async submit () {
@@ -172,17 +184,55 @@ export default {
         this.mySetTimeout('请填写退款说明!')
         return false
       }
-      const data = await API.retreatGoods({
+      let params = {
         orderId: this.orderId,
         refundType: this.type,
-        result: this.explain,
+        content: this.explain,
         img1: this.img1,
         img2: this.img2,
-        img3: this.img3
-      })
-      console.log('退款/货', data)
+        img3: this.img3,
+        type: this.userType
+      };
+      let data;
+      wx.showLoading()
+      if (this.orderRefundId) {
+        Object.assign(params, {orderRefundId: this.orderRefundId});
+        data = await API.updateRefund(params)
+      } else {
+        data = await API.retreatGoods(params);
+      }
+      wx.hideLoading();
       if (data.code === 1) {
-        this.$router.push('/pages/my/after')
+        if (this.orderRefundId) {
+          wx.setStorageSync('update', true);
+          this.$router.back();
+        } else {
+          wx.setStorageSync('refundSuccess', true);
+          console.log(this.type)
+          if (this.type == 2) {
+            console.log('data', data);
+            this.$router.replace({
+              path: '/pages/refund/barterDetails',
+              query: {
+                id: data.data.id
+              }
+            })
+          } else {
+            this.$router.replace({
+              path: '/pages/refund/refundDetails',
+              query: {
+                id: data.data.id
+              }
+            })
+          }
+          
+        }
+      } else {
+        wx.showToast({
+          title: data.desc,
+          icon: 'none',
+          duration: 1500
+        })
       }
     },
     // 定时器弹窗
@@ -197,8 +247,23 @@ export default {
     }
   },
   mounted () {
-    this.orderId = this.$route.query.orderId
-    this.type = this.$route.query.type
+    console.log(this.$route.query);
+    const { orderRefundId, orderId, explain, userType, img1, img2, img3 } = this.$route.query;
+    this.img1 = img1;
+    this.img2 = img2;
+    this.img3 = img3;
+    this.explain = explain;
+    if (orderRefundId) {
+      this.orderRefundId = orderRefundId;
+    }
+    this.orderId = this.$route.query.orderId;
+    this.userType = userType || 1;
+    this.isCheck = this.userType;
+    const reasonIndex = this.reasonList.findIndex(item => item.id == this.userType);
+    if (reasonIndex !== -1) {
+      this.reason = this.reasonList[reasonIndex].text;
+    }
+    this.type = this.$route.query.type;
     this.price = Number(this.$route.query.price)
     this.freight = Number(this.$route.query.freight)
     switch (this.type) {
@@ -210,7 +275,7 @@ export default {
     }
     if (this.$route.query.data) {
       const data = JSON.parse(this.$route.query.data);
-      this.explain = data.result;
+      this.explain = data.content;
       this.img1 = data.img1;
       this.img2 = data.img2;
       this.img3 = data.img3;

@@ -264,6 +264,7 @@ export default {
     async addres() {
       return new Promise(async (resolve, reject) => {
         let value = this.region.join(",");
+        console.log('this.recode', this.recode)
         const data = {
           name: this.addObj.tc_name,
           mobile: this.addObj.tc_phone,
@@ -307,7 +308,7 @@ export default {
           value: this.region.join(","),
           isChoice: 1,
           areaId: this.recode,
-          addressId:this.addObj.addressId,
+          addressId: this.addObj.addressId,
         };
         this.validate(data)
           .then(async res => {
@@ -387,9 +388,9 @@ export default {
     Delivery (type) {
       this.expressWay = type
     },
-    bindRegionChange (e) {
-      console.log(e)
-      this.region = e.mp.detail.value
+    bindRegionChange(e) {
+      this.region = e.mp.detail.value;
+      this.recode = e.mp.detail.code[2];
     },
     // 默认地址
     // 添加地址
@@ -485,7 +486,9 @@ export default {
       const TEST_URL = config.url
       const BASE_URL = config.url
       const URL = process.env.NODE_ENV === 'development' ? TEST_URL : BASE_URL
-      let appId = config.appId
+
+      const account = wx.getAccountInfoSync();
+      const { miniProgram: { appId } } = account;
       let obj = {
         sessionId: this.sessionId,
         appId: appId,
@@ -602,7 +605,10 @@ export default {
               }
               if (type === 2) {
                 that.$router.replace({
-                  path: '/pages/my/myget/get'
+                  path: '/pages/groupon/index',
+                  query: {
+                    orderId
+                  }
                 })
               }
             }

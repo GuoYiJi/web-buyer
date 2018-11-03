@@ -92,7 +92,7 @@ export default {
         nodata: false,
         classifyList: []
       })
-      const { data } = await API.getClassify({pId, types: 2});
+      const { data } = await API.selectAppLabelList({pId, types: 2});
 
       this.tabs.splice(this.tabIndex, 1, {
         ...this.tabs[this.tabIndex],
@@ -109,7 +109,7 @@ export default {
   async mounted () {
 
     // 获取一级分类接口
-    const { data, code } = await API.getTabs({types: '2'})
+    const { data, code } = await API.selectAppLabelList({types: '2'})
     if (code === 1) {
       this.tabs = data.map(item => ({
         ...item,
@@ -118,10 +118,9 @@ export default {
       }))
     }
     // console.log('一级分类数据', tabsList)
-    
     if (this.tabs.length) {
-
       // 获取二级分类
+      // this.selectAppLabelList(this.tabs[0].id)
       this.getClassify(this.tabs[0].id)
     }
   }

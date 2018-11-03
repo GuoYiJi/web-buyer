@@ -9,7 +9,7 @@
       <p>{{userInfo.userInfo ? userInfo.userInfo.nickName : '微信登陆'}}</p>
     </div>
     <i-message id="message" />
-    <button v-if="!userInfoBool" class="user_btn wx_btn" open-type="getUserInfo" @getuserinfo="getUserInfo">授权登陆</button>
+    <button class="user_btn wx_btn" open-type="getUserInfo" @getuserinfo="getUserInfo">授权登陆</button>
     <!-- <button v-if="userInfoBool" class="wx_btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权登陆</button>  -->
   </div>
 </template>
@@ -60,6 +60,9 @@ export default {
     },
     async login (encryptedData) {
       clearUser();
+      wx.showLoading({
+        title: '登录中'
+      })
       await API.authLogin({
         code: this.code,
         avatar: this.userInfo.userInfo.avatarUrl,
@@ -72,38 +75,20 @@ export default {
         iv: this.userInfo.iv
       })
         .then(res => {
-          console.log('ssfsdf');
           wx.reLaunch({
             url: '/pages/home/home'
           });
         })
+        .catch(err => {
+          this.userInfoBool = false;
+        })
+        .finally(() => {
+          console.log(1);
+        })
     }
   },
   async mounted () {
-    let self = this
-    wx.login({
-      success: async res => {
-        if (res.code) {
-          this.code = res.code
-          wx.getUserInfo({
-            success: res => {
-              // console.log(res)
-              this.userInfoBool = true
-              this.userInfo = res
-              this.login()
-            },
-            fail: err => {
-              // this.userInfoBool = true
-            }
-          })
-        } else {
-          console.log('登录失败！' + res.errMsg)
-        }
-      },
-      fail: () => {
-        self.handleError('授权失败！')
-      }
-    })
+
   }
 }
 </script>

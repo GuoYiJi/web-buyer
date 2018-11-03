@@ -15,7 +15,40 @@ import MpvueRouterPatch from 'mpvue-router-patch'
 import check from '@/plugins/check'
 import { $Message, $Toast, $success } from '@/utils/index'
 Vue.use(MpvueRouterPatch)
+Vue.mixin({
+  methods: {
+    format(seconds) {
+      if (seconds <= 0) {
+        return {
+          day: '0',
+          hours: '00',
+          minute: '00',
+          second: '00'
+        }
+      }
 
+      let dayTime = 1000 * 60 * 60 * 24;
+      var day = Math.floor((seconds / dayTime));
+      seconds = seconds - (day * dayTime);
+      // seconds -= day * ((1000 * 60) * 60) * 24));
+      // 时
+      var hours = Math.floor(seconds / ((1000 * 60) * 60));
+      seconds -= hours * (1000 * 60) * 60;
+      // 分
+      var minute = Math.floor(seconds / ((1000 * 60)));
+      seconds -= minute * (1000 * 60);
+
+      // 秒
+      var second = Math.floor(seconds / 1000);
+      return {
+        day: String(day),
+        hours: hours < 10 ? `0${hours}` : String(hours),
+        minute: minute < 10 ? `0${minute}` : String(minute),
+        second: second < 10 ? `0${second}` : String(second)
+      }
+    }
+  }
+})
 Vue.prototype.$API = api
 Vue.prototype.$check = check
 Vue.prototype.$Message = $Message

@@ -6,33 +6,42 @@
       </p>
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
       <div v-if="isFh" class="addressBox">
-        <p class="name">收货人：{{details.addressName + '     ' + details.addressMobile}}</p>
-        <p class="address">收货地址：{{details.addressValue}}</p>
+        <p class="name">收货人：{{details.shopAddressName}}</p>
+        <p class="address">收货地址：{{details.shopAddress}}</p>
       </div>
       <div v-if="isFh" class="logisticsNumber">
         <p class="text">物流单号</p>
-        <p v-if="details.state == 4 || details.state == 6" class="num"></p>
+        <p v-if="details.orderLogistics && (details.state == 4 || details.state == 6)" class="num">
+          {{ details.orderLogistics.logisticsNo }}
+        </p>
         <div v-if="details.state == 3" class="label">
           <input class="number" type="number" v-model="logisticsNum">
           <span class="btn" @click="sendNum(details.id)">点击发送</span>
         </div>
       </div>
       <p class="title">换货信息</p>
-      <div class="refundGoods" v-for="(item,index) in goods" :key="index">
-        <div class="img">
-          <img v-if="item.image" :src="item.image" alt="">
-          <img v-else src="../../assets/img/classify/goods.png" alt="">
+
+      <div class="van-cell van-cell--clickable goods-thumb__list" @click="handleShopListClick(goods)">
+        <div class="van-cell__title">
+          <span class="goods-thumb-item" v-for="(item, index) in goods" :key="j" v-if="index < 3">
+            <img class="n-img" :src="item.image" mode="aspectFill">
+          </span>
         </div>
-        <div class="text">
-          <p class="name">{{item.name}}</p>
-          <p class="spec">{{item.skuCode}} / {{item.num}}件</p>
-        </div>
+        <div class="van-icon van-icon-arrow van-cell__right-icon"></div>
       </div>
       <div class="businessInfo">
         <p>卖家：{{shopName}}</p>
-        <p>换货原因：{{details.result}}</p>
+        <p>换货原因：{{reason}}</p>
+        <p>换货说明：{{details.content}}</p>
         <p>申请时间：{{details.createTime}}</p>
         <p>编号：{{details.orderRefundNo}}</p>
+        <div>
+          <ul class="weui-uploader__files">
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img1 + ')' }" alt="" v-if="details.img1"></li>
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img2 + ')' }" alt="" v-if="details.img2"></li>
+            <li class="weui-uploader__file" :style="{ backgroundImage: 'url(' + details.img3 + ')' }" alt="" v-if="details.img3"></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="btnGroup clearfix">
@@ -47,8 +56,11 @@
 </template>
 <script>
 import wx from 'wx'
-import API from '@/api/httpShui'
+import API from '@/api/httpShui';
+
+import orderMixins from '@/orderMixins';
 export default {
+  mixins: [orderMixins],
   data () {
     return {
       isFh: false,
@@ -60,7 +72,24 @@ export default {
       details: {},
       goods: [],
       logisticsNum: '',
+
+      reasonList: [
+        {id: 1, text: '不喜欢/不想要'},
+        {id: 2, text: '未按约定时间发货'},
+        {id: 3, text: '空包裹'},
+        {id: 4, text: '快递/物流未送达'}
+      ],
       isFetch: false
+    }
+  },
+  computed: {
+    reason() {
+      const index = this.reasonList.findIndex(e => e.id == this.details.type);
+      if (index !== -1) {
+        return this.reasonList[index].text;
+      } else {
+        return ''
+      }
     }
   },
   components: {
@@ -70,10 +99,18 @@ export default {
     // 发送物流单号
     async sendNum (id) {
       if (this.logisticsNum != '') {
-        const data = await API.sendLogisticsNum({logistics: this.logisticsNum, orderRefundId: id})
+        wx.showLoading();
+        const data = await API.sendLogisticsNum({logisticsNo: this.logisticsNum, orderRefundId: id})
+        wx.hideLoading();
         if (data.code === 1) {
-
-        } 
+          wx.startPullDownRefresh();
+        } else {
+          wx.showToast({
+            title: data.desc,
+            icon: 'none',
+            duration: 1500
+          })
+        }
       } else {
         this.mySetTimeout('请输入物流单号！')
       }
@@ -82,18 +119,26 @@ export default {
       const { details } = this;
       console.log(details.refundType)
       if (details.refundType == 2) {
+        const { img1, img2, img3 } = details;
         this.$router.push({
           path: '/pages/refund/refund',
           query: {
             orderId: details.id,
+            orderRefundId: details.id,
+            explain: details.content,
+            img1,
+            img2,
+            img3,
             type: 1,
-            price: details.price
+            price: details.price,
+            freight: 0,
+            userType: details.type
           }
         })
       } else {
         this.$router.push({
           path: '/pages/refund/refundDetails',
-          query: {id: details.id}
+          query: {id: details.id, orderRefundId: details.id}
         })
       }
     },
@@ -104,18 +149,22 @@ export default {
         content: '您确定要撤销该订单的售后申请吗？',
         success: res => {
           if (res.confirm) {
-            const { orderRefundId } = this;
+            const { id: orderRefundId } = this.details;
             API.backRefund({
               orderRefundId
             })
               .then(res => {
-                wx.setStorageSync('is-list-update', true);
-                wx.showToast({
-                  title: '操作成功',
-                  icon: 'none',
-                  duration: 1500
-                })
-                this.$router.back()
+
+                if (res.code === 1) {
+                  wx.setStorageSync('is-list-update', true);
+                  this.$router.back()
+                } else {
+                  wx.showToast({
+                    title: res.desc,
+                    icon: 'none',
+                    duration: 1500
+                  })
+                }
               })
           }
         }
@@ -130,6 +179,42 @@ export default {
         that.wellMsgShow = false
         that.msg = ''
       }, 1000)
+    },
+    async fetch() {
+
+      const data = await API.getRefundDetails({orderRefundId: this.$route.query.id});
+      this.isFetch = true;
+      if (data.code === 1) {
+        this.details = data.data
+        this.goods = data.data.goodsList
+        // 订单状态
+        let refundType = data.data.refundType
+        // 商家回复状态
+        let state = data.data.state
+        if (refundType === 0) {
+          this.isFh = false
+        }
+        if (refundType === 1 || refundType === 2) {
+          if (state === 0 || state === 2 || state === 5) {
+            this.isFh = false
+          }
+          if (state === 1 || state === 3 || state === 4) {
+            this.isFh = true
+          }
+        }
+      }
+      return Promise.resolve();
+    }
+  },
+  async onPullDownRefresh() {
+    await this.fetch();
+    wx.stopPullDownRefresh();
+  },
+  onShow() {
+    const isUpdate = wx.getStorageSync('update');
+    if (isUpdate) {
+      wx.removeStorageSync('update');
+      wx.startPullDownRefresh();
     }
   },
   async mounted () {
@@ -143,29 +228,8 @@ export default {
     wx.showLoading({
       title: '加载中'
     })
-    const data = await API.getRefundDetails({orderRefundId: this.$route.query.id})
+    await this.fetch();
     wx.hideLoading();
-    this.isFetch = true;
-    if (data.code === 1) {
-      console.log(data)
-      this.details = data.data
-      this.goods = data.data.goodsList
-      // 订单状态
-      let refundType = data.data.refundType
-      // 商家回复状态
-      let state = data.data.state
-      if (refundType === 0) {
-        this.isFh = false
-      }
-      if (refundType === 1 || refundType === 2) {
-        if (state === 0 || state === 2 || state === 5) {
-          this.isFh = false
-        }
-        if (state === 1 || state === 3 || state === 4) {
-          this.isFh = true
-        }
-      }
-    }
   },
   
   onUnload() {
@@ -175,6 +239,9 @@ export default {
 </script>
 <style type="text/sass" lang="sass" scoped>
   @import '~@/assets/css/mixin'
+  .wrapper 
+    height: auto;
+    padding-bottom: 100px;
   .clearfix:after
     content: ""
     display: block
@@ -286,9 +353,9 @@ export default {
           font-size: 24px
           color: #999999
     .businessInfo
-      height: 360px
       padding: 32px 24px
       background: #ffffff
+      overflow: hidden;
       p
         line-height: 60px
         font-size: 28px

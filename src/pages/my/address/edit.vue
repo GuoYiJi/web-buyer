@@ -84,6 +84,7 @@ export default {
       this.editddres();
     },
     async editddres() {
+      console.log(this.recode);
       const data = {
         name: this.name,
         mobile: this.phone,

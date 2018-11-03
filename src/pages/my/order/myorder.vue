@@ -299,7 +299,11 @@ export default {
       wx.removeStorageSync('is-ordet-update');
       wx.startPullDownRefresh()
     }
-
+    const refundSuccess = wx.getStorageSync('refundSuccess');
+    if (refundSuccess) {
+      wx.removeStorageSync('refundSuccess');
+      wx.startPullDownRefresh();
+    }
   },
   mounted() {
     let selectedId = this.$route.query.selectedId

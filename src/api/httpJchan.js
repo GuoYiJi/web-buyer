@@ -40,6 +40,8 @@ class API {
   getCoupon = params => http.post('api/coupon/getCoupon', params)
   // 首页搭配
   selectMGP = params => http.post('api/goods/selectMatchGoodsPage', params)
+
+  userDetail = params => http.post('api/account/userDetail', params)
 }
 
 export default new API()

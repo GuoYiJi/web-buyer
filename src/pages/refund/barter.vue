@@ -2,8 +2,8 @@
   <div class="wrapper">
     <p class="refundReason" @click="wellShow = true">换货原因<span class="reason">{{reason}}</span></p>
     <div class="refundExplain">
-      <p class="title">换货说明：<span>(最多可输入50个字)</span></p>
-      <textarea v-model="explain"  class="explain" name="" id="" maxlength=50>
+      <p class="title">换货说明：</p>
+      <textarea v-model="explain"  class="explain" name="" id="" maxlength="50" placeholder="(最多可输入50个字)">
       </textarea>
     </div>
     <div class="refundVoucher">
@@ -39,7 +39,7 @@
     <div class="well" v-show="wellShow">
       <div class="box">
         <p class="head">请选择换货原因</p>
-        <p class="select" @click="check(item.id,item.text)" v-for="(item,index) in reasonList" :key="index">
+        <p class="select" @click="check(index, item.text)" v-for="(item,index) in reasonList" :key="index">
           <span class="check" :class="{checked : isCheck == item.id}"></span>
           <span>{{item.text}}</span>
         </p>
@@ -61,15 +61,16 @@ import config from '@/config'
 export default {
   data () {
     return {
+      orderRefundId: '',
       orderId: '',
       type: '',
       isType: true,
       isCheck: 0,
       reasonList: [
-        {id: 1, text: '原因一'},
-        {id: 2, text: '原因二'},
-        {id: 3, text: '原因三'},
-        {id: 4, text: '原因四'}
+        {id: 1, text: '不喜欢/不想要'},
+        {id: 2, text: '未按约定时间发货'},
+        {id: 3, text: '空包裹'},
+        {id: 4, text: '快递/物流未送达'}
       ],
       img1: '',
       img2: '',
@@ -87,9 +88,10 @@ export default {
   methods: {
     // 退款原因选择
     check (i, text) {
-      this.isCheck = i
-      this.reason = text
-      this.wellShow = false
+      this.isCheck = this.reasonList[i].id;
+      this.reason = text;
+      this.wellShow = false;
+      this.type = this.reasonList[i].id;
     },
     // 上传图片
     chooseImg (num) {
@@ -99,7 +101,7 @@ export default {
         success: function (file) {
           console.log(file)
           // self.img = file.tempFilePaths[0]
-          self.uploadImg (file.tempFilePaths[0], function (url) {
+          self.uploadImg(file.tempFilePaths[0], function (url) {
             self.img = url
             if (num === 1) {
               self.img1 = url
@@ -115,37 +117,10 @@ export default {
       })
     },
     uploadImg (tempFilePath, callback) {
+      var location = tempFilePath.lastIndexOf('/') + 1;
+      console.log('3432234')
       let that = this
-      wx.uploadFile({
-        url: config.uploadImageUrl,
-        filePath: tempFilePath,
-        name: 'file',
-        formData: {
-          name: tempFilePath.substring(10),
-          key: 'img/${filename}',
-          policy: config.imgPolicy,
-          OSSAccessKeyId: '6MKOqxGiGU4AUk44',
-          success_action_status: '200',
-          signature: config.imgSignature
-        },
-        success: function (res) {
-          console.log(res)
-          if (res.statusCode === 400) {
-            that.handleError('上传的图片大小不能超过2m!')
-          } else if (res.statusCode === 200) {
-            if (that.maxNum && that.imgList.length >= that.maxNum) {
-              that.handleError('不能超过3张图片噢！')
-              return
-            }
-            callback (
-              config.uploadImageUrl + '/img' + tempFilePath.substring(10)
-            )
-          }
-        },
-        fail: function (err) {
-          console.log(err)
-        }
-      })
+
     },
     // 清除选择的图片
     closeImg (name, event) {
@@ -162,17 +137,40 @@ export default {
         this.mySetTimeout('请填写换货说明!')
         return false
       }
+      wx.showLoading();
       const data = await API.retreatGoods({
         orderId: this.orderId,
         refundType: this.type,
-        result: this.explain,
+        content: this.explain,
+        type: this.type,
         img1: this.img1,
         img2: this.img2,
         img3: this.img3
       })
-      console.log('换货', data)
+      wx.hideLoading();
+      
       if (data.code === 1) {
-        this.$router.push('/pages/my/after')
+
+        if (this.orderRefundId) {
+          wx.setStorageSync('update', true);
+          this.$router.back();
+        } else {
+          wx.setStorageSync('refundSuccess', true);
+            console.log('data', data);
+          this.$router.replace({
+            path: '/pages/refund/barterDetails',
+            query: {
+              id: data.data.id
+            }
+          })
+        }
+      } else {
+
+        wx.showToast({
+          title: data.desc,
+          icon: 'none',
+          duration: 1500
+        })
       }
     },
     // 定时器弹窗
@@ -187,6 +185,7 @@ export default {
     }
   },
   mounted () {
+
     this.orderId = this.$route.query.orderId
     this.type = this.$route.query.type
   },

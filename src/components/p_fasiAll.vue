@@ -146,7 +146,7 @@
               <div class="btn__cell">
                 <span class="below__btn" @click="handleBtnClick(item.id, 2)">确认收货</span>
               </div>
-              <div class="btn__cell">
+              <div class="btn__cell" v-if="!item.children.length">
                 <span class="below__btn" @click="handleLogistics(item.id)">查看物流</span>
               </div>
               <div class="btn__cell">

@@ -61,9 +61,13 @@
         <zan-loading />
       </div>
     </div>
-    <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)" @click="getMore()">
-      <div class="loadmore">
+    <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)">
+      <div class="loadmore" @click="getMore()">
         <span>查看更多</span>
+        <i></i>
+      </div>
+      <div class="loadmore up" v-if="hidenSort && page > 1" @click="handleReset()">
+        <span>收起更多</span>
         <i></i>
       </div>
     </div>
@@ -166,6 +170,10 @@ export default {
     handleFilterRest() {
       this.goodsFilterOptions = {};
       this.goodsList(1);
+    },
+    handleReset() {
+      this.page = 1;
+      this.goodsList(this.page);
     }
   },
   onShow() {

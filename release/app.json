@@ -24,12 +24,14 @@
     "pages/refund/barter",
     "pages/refund/barterDetails",
     "pages/my/shopList",
+    "pages/my/info/index",
     "pages/shopping/shopping",
     "pages/shopping/order/order",
     "pages/shopping/order/rules",
     "pages/classify/classify",
     "pages/classify/goodsList",
-    "pages/search/search"
+    "pages/search/search",
+    "pages/groupon/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

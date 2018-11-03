@@ -171,6 +171,7 @@ export default {
   height: 300px
   display: inline-block
 .nav
+  padding-bottom: 98px;
   .kuang
     width: 702px
     height: 203px

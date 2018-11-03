@@ -9,7 +9,7 @@
           <open-data class="h-name" type="userNickName"></open-data>
         </div>
         <div class="h-id">ID：{{no}}</div>
-        <div class="user-integral">0积分</div>
+        <div class="user-integral">{{ integral }}积分</div>
       </div>
       <!-- <span class="h-name">来年陌生的某某</span> -->
       <!-- <span class="h-integral">657积分</span> -->
@@ -67,6 +67,11 @@
         <span class="yhq">我的优惠券</span>
         <i class="m-icon"></i>
       </li>
+      <li class="m-item" @click="handleInfoClick()">
+        <i class="m-kf"></i>
+        <span class="yhq">商家信息</span>
+        <i class="m-icon"></i>
+      </li>
       <li class="m-item" @click="tuig()">
         <!-- <li class="m-item" @click="tuig()"> -->
         <i class="m-sz"></i>
@@ -91,10 +96,16 @@ export default {
       receive: 0,
       commented: 0,
       refund: 0,
-      no: ''
+      no: '',
+      integral: 0
     }
   },
   methods: {
+    handleInfoClick() {
+      this.$router.push({
+        path: '/pages/my/info/index'
+      })
+    },
     handleOrderClick(selectedId) {
       this.$router.push({
         path: '/pages/my/order/myorder',
@@ -133,6 +144,14 @@ export default {
       key: 'qwe',
       data: 123
     })
+    API.userDetail()
+      .then(res => {
+        console.log(res, 'res');
+        const { code, data } = res;
+        if (code === 1) {
+          this.integral = data.integral;
+        }
+      });
     // 获取用户id
     wx.getStorage({
       key: 'no',
@@ -151,9 +170,10 @@ export default {
 .menu-2
   margin-top: 20px
 .home
+  padding-bottom: 20px;
   background: #F9F9F9
+
   width: 100%
-  height: 100%
   .head
     display: flex
     

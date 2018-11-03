@@ -76,9 +76,13 @@
         </div>
       </div>
     </div>
-    <div class="home_opt_mod__ft" v-show="!loading && (List.length && !lastPage)" @click="getMore()">
-      <div class="loadmore">
+    <div class="home_opt_mod__ft">
+      <div class="loadmore" @click="getMore()" v-if="!loading && (List.length && !lastPage)">
         <span>查看更多</span>
+        <i></i>
+      </div>
+      <div class="loadmore up" v-if="!loading && hidenSort && page > 2" @click="handleReset()">
+        <span>收起更多</span>
         <i></i>
       </div>
     </div>
@@ -190,6 +194,10 @@ export default {
     handleFilterRest() {
       this.goodsFilterOptions = {};
       this.goodsList(1);
+    },
+    handleReset() {
+      this.page = 1;
+      this.goodsList(this.page);
     }
   },
   onShow() {
