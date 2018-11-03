@@ -34,8 +34,8 @@
         <div class="van-cell__title" :style="{ maxWidth: '90px' }">
           <span>店铺简介</span>
         </div>
-        <div class="van-cell__value">
-          <span  :style="{ textAlign: 'left' }">{{ info.remark }}</span>
+        <div class="van-cell__value" :style="{ textAlign: 'justify' }">
+          <span>{{ info.remark }}</span>
         </div>
       </div>
     </div>

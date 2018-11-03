@@ -69,7 +69,7 @@
       </li>
       <li class="m-item" @click="handleInfoClick()">
         <i class="m-kf"></i>
-        <span class="yhq">商家信息</span>
+        <span class="yhq paddinng-500" >商家信息</span>
         <i class="m-icon"></i>
       </li>
       <li class="m-item" @click="tuig()">
@@ -334,5 +334,6 @@ export default {
         +bg-img("home/shanJiao.png")
         width: 11px
         height: 18px
-
+.paddinng-500
+  padding-right: 500px!important;
 </style>

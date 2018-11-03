@@ -6,8 +6,8 @@
       </p>
       <p v-if="isFh" class="title">请将商品寄回以下地址并填写物流单号：</p>
       <div v-if="isFh" class="addressBox">
-        <p class="name">收货人：{{details.shopAddressName}}</p>
-        <p class="address">收货地址：{{details.shopAddress}}</p>
+        <p class="name">收货人：{{details.shopAddressName}} {{ details.shopMobile }}</p>
+        <p class="address">收货地址：{{ details.shopValue }} {{details.shopAddress}}</p>
       </div>
       <div v-if="isFh" class="logisticsNumber">
         <p class="text">物流单号</p>
