@@ -8,21 +8,22 @@ import Vue from 'vue'
 import wx from 'wx'
 import qs from 'qs'
 import loginAPI from './httpJsong';
+import LoginSDK from './LoginSDK';
+
 const vm = new Vue()
+const loginSDK = new LoginSDK();
 export default {
   async post (url, params = {}) {
 
-    const account = wx.getAccountInfoSync();
-    const { miniProgram: { appId } } = account;
-    params.appId = appId
     return new Promise(async (resolve, reject) => {
       try {
-        loginAPI.authLogin()
-          .then(async res => {
-
-            var value = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
-            if (value) {
-              params.sessionId = value
+        loginSDK.isLogin(res => {
+          if (res.code === 200) {
+            const appId = wx.getStorageSync('appId');
+            params = {
+              ...params,
+              sessionId: res.user.sessionId,
+              appId
             }
             wx.request({
               url: URL + '/' + url,
@@ -62,7 +63,8 @@ export default {
 
               }
             })
-          })
+          }
+        });
 
       } catch(err) {
         console.log(err)
