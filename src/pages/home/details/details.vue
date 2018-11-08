@@ -231,9 +231,17 @@
               <ul class="s_item_box" v-for="(item, index) in skuAttr[colorIndex] ? skuAttr[colorIndex].sizeArray : []" :key="index">
                 <li class="s_item">{{item.sizeVal}}</li>
                 <li class="s_item">
-                  <span class="minus" @click="minus(colorIndex, index)"></span>
+                  <div class="van-stepper">
+                    <button class="van-stepper__minus van-stepper__minus--disabled" @click="minus(colorIndex, index)"></button>
+                    <input class="van-stepper__input" type="number" v-model="item.sizeNum" />
+                    <button class="van-stepper__plus" @click="add(colorIndex, index)">
+                      <span class="before"></span>
+                      <span class="after"></span>
+                    </button>
+                  </div>
+<!--                   <span class="minus" @click="minus(colorIndex, index)"></span>
                   <span class="count">{{item.sizeNum}}</span>
-                  <span class="add" @click="add(colorIndex, index)"></span>
+                  <span class="add" @click="add(colorIndex, index)"></span> -->
                 </li>
               </ul>
             </div>
@@ -248,6 +256,64 @@
           </div>
         </div>
         
+      </div>
+    </zan-popup>
+    <zan-popup
+      :show="appPopup"
+      type="bottom"
+    >
+      <div class="app-items">
+
+        <scroll-view class="van-list" scroll-y>
+          <div class="van-radio-group">
+            <div class="van-cell van-cell--clickable" v-for="(app, index) in apps" :key="index" @click="handleAppToggle(index)">
+              <div class="van-cell__value van-cell__value--alone">
+                <div class="van-radio">
+                  <span class="van-radio__input">
+                    <input class="van-radio__control" type="radio" />
+                    <i class="van-icon" :class="[ app.select ? 'van-icon-checked' : 'van-icon-check' ]"></i>
+                  </span>
+                  <span class="van-radio__label">
+                    <div class="weui-media-box weui-media-box_appmsg">
+                      <div class="weui-media-box__bd">
+                        <div class="weui-media-box__title">{{app.name}}</div>
+                        <!-- <div class="weui-media-box__desc">小程序简介</div> -->
+                      </div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </scroll-view>
+
+        <div class="van-cell-group van-hairline--top-bottom">
+          <div class="van-cell van-field">
+            <div class="van-cell__title">
+              <span>商品售价</span>
+            </div>
+            <div class="van-cell__value">
+              <div class="van-field__body">
+                <input class="van-field__control" disabled placeholder="请填写姓名" type="text" :value=" goodsInfo.disPrice || goodsInfo.sellPrice " />
+              </div>
+            </div>
+          </div>
+          <div class="van-cell van-field van-hairline">
+            <div class="van-cell__title">
+              <span>自定义价格</span>
+            </div>
+            <div class="van-cell__value">
+              <div class="van-field__body">
+                <input class="van-field__control" placeholder="请填写价格" type="number" v-model="appCustomPrice" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="van-button van-button--default van-button--large" @click="handleCopyConfirm">
+          <span class="van-button__text">
+            一键铺货
+          </span>
+        </div>
       </div>
     </zan-popup>
   </div>
@@ -272,6 +338,7 @@ export default {
       duration: 1000,
       suspension: false,
       isLike: 0,
+      appCustomPrice: '',
       visible1: false,
       popupShow: false,
       msg: '',
@@ -289,10 +356,12 @@ export default {
       toptips: {
         duration: 1500
       },
+      apps: [],
       toNew: false, // 今日上新的拼团商品还是走普通购买
       groupVisible: false,
       wellPingUser: {},
-      shopcardTotal: 0
+      shopcardTotal: 0,
+      appPopup: false
     }
   },
   onPageScroll (e) {
@@ -630,6 +699,9 @@ export default {
         that.msg = ''
       }, 1000)
     },
+    handleAppToggle(index) {
+      this.$set(this.apps[index], 'select', !this.apps[index].select);
+    },
     handleCopyGoods() {
       if (!this.phoneNumber) return;
       wx.showModal({
@@ -683,19 +755,50 @@ export default {
           encryptedData,
           iv
         }
-        wx.showModal({
-          content: '是否一键转到自己的小程序店铺进行出售？',
-          success: res => {
-            if (res.confirm) {
-              API.copyGoods({
-                encryptedDataPhone: encryptedData,
-                ivPhone: iv,
-                goodsId: this.$route.query.goodsId
-              })
-            }
-          }
+
+        API.selectAccountShopList({
+          encryptedDataPhone: encryptedData,
+          ivPhone: iv
         })
+          .then(res => {
+            console.log(res);
+            const { data } = res;
+            this.apps = data.map(item => ({...item, select: true}));
+            this.appCustomPrice = this.goodsInfo.disPrice || this.goodsInfo.sellPrice;
+            this.appPopup = true;
+            // API.copyGoods({
+            //   shopIds: this.apps.filter(item => item.select).map(item => item.id).join(','),
+            //   goodsId: this.$route.query.goodsId,
+            //   price: 1
+            // })
+          })
+        // wx.showModal({
+        //   content: '是否一键转到自己的小程序店铺进行出售？',
+        //   success: res => {
+        //     if (res.confirm) {
+        //       // API.copyGoods({
+        //       //   encryptedDataPhone: encryptedData,
+        //       //   ivPhone: iv,
+        //       //   goodsId: this.$route.query.goodsId
+        //       // })
+        //     }
+        //   }
+        // })
       }
+    },
+    handleCopyConfirm() {
+      console.log(1);
+      API.copyGoods({
+        shopIds: this.apps.filter(item => item.select).map(item => item.id).join(','),
+        goodsId: this.$route.query.goodsId,
+        price: this.appCustomPrice
+      })
+        .then(res => {
+          
+        })
+        .finally(() => {
+          this.appPopup = false;
+        })
     }
   },
   onShareAppMessage() {

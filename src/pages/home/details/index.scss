@@ -85,10 +85,6 @@
       position: absolute;
       right: 24px;
       top: 20px;
-
-      @include bg-img('home/gb.png');
-      width: 44px;
-      height: 44px;
       position: absolute;
     }
   }
@@ -118,4 +114,11 @@
   width: 100vw;
   height: 765px;
   background-color: #fff;
+}
+.app-items {
+  width: 100vw;
+  background-color: #fff;
+  .van-list {
+    max-height: 80vh;
+  }
 }

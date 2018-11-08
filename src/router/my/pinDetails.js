@@ -6,7 +6,6 @@ const pinDetails = [
       navigationBarBackgroundColor: '#ffffff',
       // navigationBarBackgroundColor: '#FFF',
       'usingComponents': {
-        'i-input-number': '/iview/input-number/index',
         'i-panel': '/iview/panel/index',
         'i-modal': '/iview/modal/index'
       }

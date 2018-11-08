@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App'
 //css
 import '@/assets/css/weui.css'
+import '@/assets/css/van.css'
 import '@/assets/css/init.css'
 
 // Common Scss

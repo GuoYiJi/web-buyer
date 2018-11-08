@@ -3,8 +3,41 @@
     <div class="head">
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
       <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
+      <span class="delivery" :class="{active: expressWay==2}" @click="Delivery(2)">到店自提</span>
     </div>
-    <div class="address"  @click="toOpen('addressBox')">
+    <div v-if="expressWay === 2">
+      <div class="van-cell-group van-hairline--top-bottom">
+        <div class="van-cell van-field">
+          <div class="van-cell__title">
+            <span>姓名</span>
+          </div>
+          <div class="van-cell__value">
+            <div class="van-field__body">
+              <input class="van-field__control" placeholder="请填写姓名" type="text" v-model="selfFetchName" />
+            </div>
+          </div>
+        </div>
+        <div class="van-cell van-field van-hairline">
+          <div class="van-cell__title">
+            <span>电话</span>
+          </div>
+          <div class="van-cell__value">
+            <div class="van-field__body">
+              <input class="van-field__control" placeholder="请填写电话" type="number" v-model="selfFetchPhone" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="van-cell van-cell--center van-hairline van-cell--clickable" @click="toggleSelfFetch">
+        <div class="van-cell__title">自提地址</div>
+        <div class="van-cell__value">
+          <span v-if="selfFetchIndex === -1">选择提货地址</span>
+          <span v-else>{{ getSelfFetch.name }} {{ getSelfFetch.value }}</span>
+        </div>
+        <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+      </div>
+    </div>
+    <div class="address"  @click="toOpen('addressBox')" v-if="expressWay !== 2">
       <i class="dt"></i>
       <p class="add_text">收货人：{{name}}&nbsp;&nbsp;{{phone}}</p>
       <p class="add_text">收货地址：{{addressDetails}}</p>
@@ -178,6 +211,37 @@
         </scroll-view>
       </div>
     </zan-popup>
+    <zan-popup
+      :show="selfFetchVisible"
+      @click-overlay="toggleSelfFetch"
+      type="bottom"
+    >
+
+      <div class="self-fetch-address">
+        <div class="van-list">
+          <div class="van-radio-group">
+            <div class="van-cell van-cell--clickable" v-for="(item, index) in selfFetchList" :key="index" @click="handleSelfFetchItemClick(index)">
+              <div class="van-cell__value van-cell__value--alone">
+                <div class="van-radio">
+                  <span class="van-radio__input">
+                    <input class="van-radio__control" type="radio" />
+                    <i class="van-icon" :class="[ index === selfFetchIndex ? 'van-icon-checked' : 'van-icon-check' ]"></i>
+                  </span>
+                  <span class="van-radio__label">
+                    <div class="self-fetch-address__title">
+                      <span>{{ item.name }}</span>
+                    </div>
+                    <div class="self-fetch-address__detail">
+                      {{ item.value }}
+                    </div>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </zan-popup>
   </div>
 </template>
 <script>
@@ -205,11 +269,12 @@ export default {
       buy_list: [],
       name: '',
       phone: '',
+      selfFetchIndex: -1,
       addressDetails: '',
       totalPack: 0,
       totalPrice: 0,
       totalNum: 0,
-      expressWay: 0,
+      expressWay: 2,
       addressId: '',
       addressList: [],
       skuObj: '',
@@ -223,10 +288,42 @@ export default {
       pingOrderId: null,
       addObj:{tc_name:"",tc_phone:"",tc_detailedt:""},
       calculate: '0.00',
-      shopName: ''
+      shopName: '',
+      selfFetchList: [],
+      selfFetchVisible: false,
+      selfFetchPhone: '',
+      selfFetchName: ''
+    }
+  },
+  computed: {
+    getSelfFetch() {
+      if (this.selfFetchIndex === -1) {
+        return {}
+      } else {
+        return this.selfFetchList[this.selfFetchIndex];
+      }
     }
   },
   methods: {
+    toggleSelfFetch() {
+      this.selfFetchVisible = !this.selfFetchVisible;
+    },
+    handleSelfFetchItemClick(index) {
+      this.toggleSelfFetch();
+      if (index === this.selfFetchIndex) return;
+      this.selfFetchIndex = index;
+    },
+    fetchSelfFetch() {
+      this.selfFetchLoading = true;
+      API.selectTakeList()
+        .then(res => {
+          const { data } = res;
+          this.selfFetchList = data;
+        })
+        .finally(() => {
+          this.selfFetchLoading = false;
+        })
+    },
     toOpen (parent) {
       this[parent] = true
       if(this.addressList.length>0){
@@ -498,7 +595,17 @@ export default {
         couponId: this.couponId,
         expressWay: this.expressWay
       }
-      if (!this.addressId) {
+      if (this.expressWay === 2) {
+        obj = {
+          ...obj,
+          orderTake: {
+            name: this.selfFetchName,
+            phone: this.selfFetchPhone,
+            takeId: this.getSelfFetch.id
+          }
+        }
+      }
+      if (this.expressWay !== 2 && !this.addressId) {
         wx.showToast({
           title: '请先添加一个地址',
           duration: 3000,
@@ -640,7 +747,7 @@ export default {
   },
   async mounted () {
     this.shopName = wx.getStorageSync('shopName');
-
+    this.fetchSelfFetch();
     // 获取sessionId
     this.sessionId = await wx.getStorageSync(`${process.env.NODE_ENV}_sessionId`)
     // 详情过来

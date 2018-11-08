@@ -80,6 +80,9 @@ class API {
   copyGoods = params => http.post('api/goods/copy', params)
 
   updateRefund = params => http.post('api/order/refund/updateRefund', params)
+
+  selectTakeList = params => http.post('api/take/selectTakeList', params)
+  selectAccountShopList = params => http.post('api/warehouse/selectAccountShopList', params);
 }
 
 export default new API()

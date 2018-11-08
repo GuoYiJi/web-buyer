@@ -6,7 +6,6 @@ const shopping = [{
     navigationBarTextStyle: 'black',
     'usingComponents': {
       'zan-popup': '/zan-weapp/dist/popup/index',
-      'i-input-number': '/iview/input-number/index',
       'i-panel': '/iview/panel/index',
       'i-modal': '/iview/modal/index'
     }
@@ -16,6 +15,18 @@ const shopping = [{
   path: '/pages/shopping/order/order',
   config: {
     navigationBarTitleText: '填写订单',
+    navigationBarBackgroundColor: '#ffffff',
+    navigationBarTextStyle: 'black',
+    usingComponents: {
+      'zan-toast': '/zan-weapp/dist/toast/index',
+      'zan-popup': '/zan-weapp/dist/popup/index'
+    }
+  }
+},
+{
+  path: '/pages/shopping/order/express/index',
+  config: {
+    navigationBarTitleText: '选择自提地址',
     navigationBarBackgroundColor: '#ffffff',
     navigationBarTextStyle: 'black',
     usingComponents: {
