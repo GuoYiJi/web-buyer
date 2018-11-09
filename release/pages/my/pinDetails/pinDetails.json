@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "订单详情",
-  "navigationBarBackgroundColor": "#ffffff",
-  "usingComponents": {
-    "i-input-number": "/iview/input-number/index",
-    "i-panel": "/iview/panel/index",
-    "i-modal": "/iview/modal/index"
-  }
-}
