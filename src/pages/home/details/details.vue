@@ -808,7 +808,19 @@ export default {
         price: this.appCustomPrice
       })
         .then(res => {
-
+          const { data: { code, desc } } = res;
+          wx.showToast({
+            title: desc,
+            icon: 'none',
+            duration: 3000
+          })
+        })
+        .catch(err => {
+          wx.showToast({
+            title: '网络出错',
+            icon: 'none',
+            duration: 3000
+          })
         })
         .finally(() => {
           this.appPopup = false;
