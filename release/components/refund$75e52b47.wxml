@@ -1,7 +1,0 @@
-<template name="refund$75e52b47"><view class="_div data-v-48c97f2a wrapper"><view wx:if="{{type === '0'}}" bindtap="handleProxy" data-eventid="{{'0'}}" data-comkey="{{$k}}" class="_p data-v-48c97f2a"><label class="_span data-v-48c97f2a tui"></label>
-    仅退款(无需退货)
-  </view> <view wx:if="{{type != 0}}" bindtap="handleProxy" data-eventid="{{'1'}}" data-comkey="{{$k}}" class="_p data-v-48c97f2a"><label class="_span data-v-48c97f2a tui"></label>
-    退货退款(已收到货，需要退换已收到的货物)
-  </view> <view wx:if="{{type != 0}}" bindtap="handleProxy" data-eventid="{{'2'}}" data-comkey="{{$k}}" class="_p data-v-48c97f2a"><label class="_span data-v-48c97f2a huan"></label>
-    换货(商品存在质量等问题，需要协商换货)
-  </view></view></template>
