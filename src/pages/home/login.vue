@@ -19,6 +19,7 @@ import mixin from '@/mixin'
 import config from '@/config'
 import API from '@/api/httpJsong';
 import { clearUser } from '@/api/httpJsong';
+import LoginSDK from '@/api/LoginSDK';
 export default {
   mixins: [mixin],
   components: {},
@@ -53,16 +54,21 @@ export default {
         this.handleError('需要同意授权才可以使用噢！')
       } else {
         this.userInfoBool = true
-        this.userInfo = e.mp.detail
-        wx.setStorageSync(`${process.env.NODE_ENV}_scopeUserInfo`, true);
-        this.login()
+        this.userInfo = e.mp.detail;
+        const loginSDK = new LoginSDK();
+        wx.showLoading({
+          title: '登录中...'
+        })
+        loginSDK.login({ ...e.mp }, res => {
+          wx.hideLoading();
+          wx.reLaunch({
+            url: '/pages/home/home'
+          });
+        })
       }
     },
     async login (encryptedData) {
-      clearUser();
-      wx.showLoading({
-        title: '登录中'
-      })
+      
       await API.authLogin({
         code: this.code,
         avatar: this.userInfo.userInfo.avatarUrl,

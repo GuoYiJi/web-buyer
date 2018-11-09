@@ -261,6 +261,8 @@
     <zan-popup
       :show="appPopup"
       type="bottom"
+      closeOnClickOverlay
+      @overlay="toggleAppPopup"
     >
       <div class="app-items">
 
@@ -387,6 +389,10 @@ export default {
     }
   },
   methods: {
+    toggleAppPopup() {
+      console.log(1)
+      this.appPopup = !this.appPopup;
+    },
     // 回到顶部
     toTop () {
       wx.pageScrollTo({
@@ -762,10 +768,18 @@ export default {
         })
           .then(res => {
             console.log(res);
-            const { data } = res;
-            this.apps = data.map(item => ({...item, select: true}));
-            this.appCustomPrice = this.goodsInfo.disPrice || this.goodsInfo.sellPrice;
-            this.appPopup = true;
+            const { code, data, desc } = res;
+            if (code === 1 && data && data.length) {
+              this.apps = data.map(item => ({...item, select: true}));
+              this.appCustomPrice = this.goodsInfo.disPrice || this.goodsInfo.sellPrice;
+              this.appPopup = true;
+            } else {
+              wx.showToast({
+                title: desc,
+                icon: 'none',
+                duration: 3000
+              })
+            }
             // API.copyGoods({
             //   shopIds: this.apps.filter(item => item.select).map(item => item.id).join(','),
             //   goodsId: this.$route.query.goodsId,
@@ -794,7 +808,7 @@ export default {
         price: this.appCustomPrice
       })
         .then(res => {
-          
+
         })
         .finally(() => {
           this.appPopup = false;
