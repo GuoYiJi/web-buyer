@@ -808,7 +808,7 @@ export default {
         price: this.appCustomPrice
       })
         .then(res => {
-          const { data: { code, desc } } = res;
+          const { code, desc } = res;
           wx.showToast({
             title: desc,
             icon: 'none',
