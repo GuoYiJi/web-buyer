@@ -34,7 +34,7 @@
         </li>
         <li class="box-item" @click="handleOrderClick('done')">
           <i class="will-reply"></i>
-          <!-- <span class="num" v-show="commented > 0">{{commented > 99 ? '99+' : commented}}</span> -->
+          <span class="num" v-show="successCount > 0">{{successCount > 99 ? '99+' : successCount}}</span>
           <p>已完成</p>
         </li>
         <li class="box-item" @click="after()">
@@ -85,7 +85,8 @@
 <script>
 import wx from 'wx'
 import mixin from '@/mixin'
-import API from '@/api/httpJchan'
+import API from '@/api/httpJchan';
+import API2 from '@/api/httpShui';
 export default {
   mixins: [mixin],
   components: {},
@@ -94,6 +95,7 @@ export default {
       prePayment: 0,
       delivery: 0,
       receive: 0,
+      successCount: 0,
       commented: 0,
       refund: 0,
       no: '',
@@ -130,20 +132,21 @@ export default {
   },
   async onShow() {
 
+
     const prePayment = await API.myorder({ isPing: 0, state: 1 })
     const delivery = await API.myorder({ isPing: 0, state: 5 })
     const receive = await API.myorder({ isPing: 0, state: 6 })
-    // 获取待收货，待发货，待付款订单的个数
-    this.prePayment = prePayment.data.totalRow
-    this.delivery = delivery.data.totalRow
-    this.receive = receive.data.totalRow
-  },
-  async mounted () {
-    var that = this
-    wx.setStorage({
-      key: 'qwe',
-      data: 123
-    })
+    const successCount = await API.myorder({ isPing: 0, state: 7 })
+    try {
+
+      API2.afterService({ pageSize: 10, pageNumber: 1 })
+        .then(res => {
+          const { data: { totalRow } } = res;
+          this.refund = totalRow;
+        })
+    } catch (err) {
+      console.log(err)
+    }
     API.userDetail()
       .then(res => {
         console.log(res, 'res');
@@ -152,6 +155,19 @@ export default {
           this.integral = data.integral;
         }
       });
+    
+    // 获取待收货，待发货，待付款订单的个数
+    this.prePayment = prePayment.data.totalRow
+    this.delivery = delivery.data.totalRow
+    this.receive = receive.data.totalRow
+    this.successCount = successCount.data.totalRow
+  },
+  async mounted () {
+    var that = this
+    wx.setStorage({
+      key: 'qwe',
+      data: 123
+    })
     // 获取用户id
     wx.getStorage({
       key: 'no',

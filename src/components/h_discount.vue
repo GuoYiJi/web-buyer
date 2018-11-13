@@ -163,7 +163,13 @@ export default {
       this.$router.push({path: '/pages/home/details/details', query: {goodsId}})
     }
   },
+
   onShow() {
+    // this.page = 1;
+    // this.isDataLast = true;
+    // this.goodsList(1);
+  },
+  onPullDownRefresh() {
     this.page = 1;
     this.isDataLast = true;
     this.goodsList(1);

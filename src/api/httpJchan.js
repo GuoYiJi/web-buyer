@@ -26,7 +26,7 @@ class API {
   editddres = params => http.post('api/address/edit', params)
   deleteddres = params => http.post('api/address/delete', params)
   // 推广链接
-  prosave = params => http.post('api/form/save', params)
+  prosave = params => http.post('api/applyApp/apply', params)
   prometaList = params => http.post('api/form/metaList', params)
   // 我的收藏
   deleteMyLike = params => http.post('api/like/goods/deleteMyLike', params)

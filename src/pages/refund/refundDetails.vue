@@ -53,7 +53,7 @@
     </div>
 
     <div class="btnGroup clearfix">
-      <div class="revise" v-if="details.state == 0 || details.state == 2" @click="revise">修改申请</div>
+      <div class="revise" v-if="details.state == 0" @click="revise">修改申请</div>
       <div class="cancel" v-if="details.state == 0" @click="revokes">撤销申请</div>
       <div class="cancel contact">联系客服 <button open-type="contact">联系客服</button></div>
     </div>

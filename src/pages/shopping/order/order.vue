@@ -2,8 +2,7 @@
   <div class="index-view nav">
     <div class="head">
       <span class="delivery" :class="{active: expressWay==0}" @click="Delivery(0)">快速邮寄</span>
-      <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)">物流到付</span>
-      <span class="delivery" :class="{active: expressWay==2}" @click="Delivery(2)">到店自提</span>
+      <span class="delivery" :class="{active: expressWay==1}" @click="Delivery(1)" v-if="isGetPay">物流到付</span>
     </div>
     <div v-if="expressWay === 2">
       <div class="van-cell-group van-hairline--top-bottom">
@@ -102,7 +101,7 @@
     </div>
     <div class="foot">
       <p class="f_text">合计:
-        <span class="ft1">￥{{totalPrice - couponPrice}}</span>
+        <span class="ft1">￥{{getTotal}}</span>
       </p>
       <span class="f_btn" @click="buy()">马上支付</span>
     </div>
@@ -274,7 +273,7 @@ export default {
       totalPack: 0,
       totalPrice: 0,
       totalNum: 0,
-      expressWay: 2,
+      expressWay: 0,
       addressId: '',
       addressList: [],
       skuObj: '',
@@ -282,7 +281,7 @@ export default {
       couponId: '',
       couponList: [],
       pageNumber: 1,
-      couponPrice: '',
+      couponPrice: 0,
       sessionId: '',
       pingId: null,
       pingOrderId: null,
@@ -292,7 +291,8 @@ export default {
       selfFetchList: [],
       selfFetchVisible: false,
       selfFetchPhone: '',
-      selfFetchName: ''
+      selfFetchName: '',
+      isGetPay: false
     }
   },
   computed: {
@@ -302,6 +302,13 @@ export default {
       } else {
         return this.selfFetchList[this.selfFetchIndex];
       }
+    },
+    getTotal() {
+      let calculate = 0;
+      if (this.expressWay == 0) {
+        calculate = parseFloat(this.calculate);
+      }
+      return (parseFloat(this.totalPrice) + calculate - parseFloat(this.couponPrice)).toFixed(2);
     }
   },
   methods: {
@@ -570,7 +577,7 @@ export default {
     selectCoupon (id, price) {
       if (id === this.couponId) {
         this.couponId = '';
-        this.couponPrice = '';
+        this.couponPrice = 0;
       } else {
         this.couponId = id;
         this.couponPrice = price;
@@ -746,6 +753,12 @@ export default {
     }
   },
   async mounted () {
+    API.getShopInfo()
+      .then(res => {
+        if (res.code === 1) {
+          this.isGetPay = res.data.isGetPay !== 1;
+        }
+      })
     this.shopName = wx.getStorageSync('shopName');
     this.fetchSelfFetch();
     // 获取sessionId

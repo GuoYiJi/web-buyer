@@ -1,6 +1,6 @@
 <template>
   
-  <zan-popup type="bottom" :show="visible">
+  <zan-popup type="bottom" :show="visible" @overlay="visible = false">
     <div class="sku">
       <div class="sku-content">
         <div class="goods">
@@ -37,9 +37,18 @@
             <ul class="s_item_box" v-for="(item, index) in skuAttr[colorIndex] ? skuAttr[colorIndex].sizeArray : []" :key="index">
               <li class="s_item">{{item.sizeVal}}</li>
               <li class="s_item">
-                <span class="minus" @click="handleMinusClick(colorIndex, index)"></span>
+                
+                <div class="van-stepper">
+                  <button class="van-stepper__minus van-stepper__minus--disabled" @click="handleMinusClick(colorIndex, index)"></button>
+                  <input class="van-stepper__input" type="number" v-model="item.sizeNum" />
+                  <button class="van-stepper__plus" @click="handleAddClick(colorIndex, index)">
+                    <span class="before"></span>
+                    <span class="after"></span>
+                  </button>
+                </div>
+<!--                 <span class="minus" @click="handleMinusClick(colorIndex, index)"></span>
                 <span class="count">{{item.sizeNum}}</span>
-                <span class="add" @click="handleAddClick(colorIndex, index)"></span>
+                <span class="add" @click="handleAddClick(colorIndex, index)"></span> -->
               </li>
             </ul>
           </div>

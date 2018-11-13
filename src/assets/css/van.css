@@ -446,6 +446,11 @@
   -webkit-appearance: none;
   -webkit-text-size-adjust: 100%;
 }
+.van-button--warning {
+  background-color: #EE7527;
+  border-color: #EE7527;
+  color: #fff;
+}
 .van-button:before {
   content: " ";
   position: absolute;
@@ -470,4 +475,7 @@
   width: 100%;
   height: 100px;
   line-height: 96px;
+}
+.van-field__control {
+  vertical-align: middle;
 }

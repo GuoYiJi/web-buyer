@@ -80,7 +80,7 @@ export default class LoginSDK {
 
   login(e, cb) {
     const { wx, loginSuccess, $route } = this;
-    
+
     let appId = wx.getStorageSync('appId');
     if (!appId) {
       const account = wx.getAccountInfoSync();
@@ -104,6 +104,7 @@ export default class LoginSDK {
                 const { data: { data, code, desc } } = res;
                 if (code === 1) {
                   const { sessionId, no } = data;
+                  wx.setStorageSync(`${process.env.NODE_ENV}_sessionId`, sessionId)
                   wx.setStorage({
                     key: 'no',
                     data: no

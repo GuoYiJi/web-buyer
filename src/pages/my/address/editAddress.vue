@@ -53,23 +53,20 @@ export default {
   },
   methods: {
     async dian(item, index) {
+      console.log(item)
       if (item.isChoice) return;
 
-      const { code } = await API.editddres({
+      const { code, desc } = await API.editddres({
         isChoice: 1,
         addressId: item.id
       });
+      wx.showToast({
+        title: desc,
+        icon: 'none',
+        duratioin: 1500
+      })
       if (code === 1) {
-        const oldVal = this.pageaddresList.splice(1, 1);
-        this.pageaddresList = oldVal.concat(this.pageaddresList).map((item, index) => {
-          if (index === 0) {
-            item.isChoice = 1;
-          } else {
-            item.isChoice = 0;
-          }
-          return item;
-        });
-
+        wx.startPullDownRefresh();
       }
     },
     async toOpen(id) {

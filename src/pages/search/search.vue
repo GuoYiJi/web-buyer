@@ -26,7 +26,7 @@
           <i class="clock-icon"></i>
           <span>历史搜索记录</span>
         </div>
-        <!-- <i class="history-clear-icon" @click="handleHistoryClear"></i> -->
+        <i class="history-clear-icon" @click="handleHistoryClear"></i>
       </div>
       <div class="history__list" v-if="historyList.length">
         <span class="history__list-item" v-for="(item, index) in historyList" :key="index" @click="handleHistoryClick(item)">{{ item.message }}</span>
@@ -44,8 +44,8 @@
         <li class="sortItem sx" :class="{ 'active': hasFilter }" @click="handleFilterClick">筛选</li>
         <li class="sortItem menu" @click='showType=!showType'></li>
       </ul>
-      <div class="goodsList clearfix" v-if="goodsList.length" @click="clickItem(item)">
-        <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType">
+      <div class="goodsList clearfix" v-if="goodsList.length">
+        <div class="item" v-for="(item,index) in goodsList" :key="index" v-if="showType" @click="clickItem(item)">
           <div class="img">
             <img v-if="item.image" :src="item.image" alt="" mode="aspectFill">
             <img v-else src="../../assets/img/classify/goods.png" alt="" mode="aspectFill">
@@ -170,7 +170,13 @@
       },
       // 去商品详情
       clickItem (obj) {
-        this.$router.push({path: '/pages/home/details/details', query: {goodsId: obj.id}});
+        console.log(obj);
+        this.$router.push({
+          path: '/pages/home/details/details',
+          query: {
+            goodsId: obj.id
+          }
+        });
       },
       handleHistoryClick(item) {
         this.keyword = item.message;
@@ -211,6 +217,16 @@
       },
       handleHistoryClear() {
         API.deleteHistory()
+          .then(res => {
+            if (res.code === 1) {
+              this.historyList = [];
+            }
+            wx.showToast({
+              title: res.desc,
+              icon: 'none',
+              duration: 1500
+            })
+          })
       },
       handleModalToggle(visible) {
         this.visible = visible;

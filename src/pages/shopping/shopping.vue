@@ -24,8 +24,8 @@
           <div class="kh_text">{{shopName}}</div>
           <!--<i class="kh_img1"></i>-->
         </div>
-        <div class="k_content" v-for="(item,index) in cardList" :key="index">
-          <div class="item_1" @click="clickCheck(item.id,index)">
+        <div class="k_content" v-for="(item,index) in cardList" :key="index" @click="handleItemClick(item.id)">
+          <div class="item_1" @click.stop="clickCheck(item.id,index)">
             <i class="kc_xz" :class="{active : item.check}"></i>
           </div>
           <div class="item_2">
@@ -37,13 +37,18 @@
             <p class="uniform" v-for="(ite,i) in item.skuCode" :key="i">{{ite}}</p>
             <p class="money">¥{{item.disPrice || item.sellPrice}}</p>
             <span class="quantity">x{{item.totalNum}}</span>
-            <span class="btn" @click="editOrder(index)">编辑</span>
+            <span class="btn" @click.stop="editOrder(index)">编辑</span>
           </div>
         </div>
       </div>
       <div class="settlement-fixed">
         <div class="settlement">
-          <span class="s_btn" v-if="showBtn" @click="Buy()">结算({{selectArr.length}})</span>
+          <block v-if="showBtn">
+            <span class="total-block">合计：<text>{{ getTotal }}</text></span>
+            <span class="s_btn" @click="Buy()">
+              结算({{selectArr.length}})
+            </span>
+          </block>
           <span class="s_del" v-if="!showBtn" @click="deleteBtn()">删除({{selectArr.length}})</span>
         </div>
       </div>
@@ -97,6 +102,51 @@ export default {
       }
     }
   },
+  computed: {
+    getTotal() {
+      let totalPrice = 0;
+      this.selectArr.forEach((selectItem, selectItemIndex) => {
+        this.cardList.forEach((card, cardIndex) => {
+          if (selectItem.id === card.id) {
+
+            let price = card.disPrice || card.sellPrice
+            let num = card.totalNum
+            totalPrice += Math.floor((price * num) * 100) / 100;
+          }
+        })
+      });
+      return totalPrice.toFixed(2);
+      // let goods = []
+      // let totalPrice = 0
+      // let totalNum = 0
+      // let cardIds = []
+      // // 获取选中的商品信息,并计算价格数量
+      // for (let i = 0; i < this.selectArr.length; i++) {
+      //   for (let j = 0; j < this.cardList.length; j++) {
+      //     if (this.selectArr[i].id === this.cardList[j].id) {
+      //       let price = this.cardList[j].disPrice || this.cardList[j].sellPrice
+      //       let num = this.cardList[j].totalNum
+      //       totalPrice += Math.floor((price * num) * 100) / 100
+      //       totalNum += num
+      //       this.cardList[j].skuList.forEach(item => {
+      //         cardIds.push({ id: item.id });
+      //       })
+      //       // for (let k = 0; k < this.cardList[j].skuList.length; k++) {
+      //       //   let id = this.cardList[j].skuList[k].id
+      //       //   cardIds.push({id: this.cardList[j].id})
+      //       // }
+      //       goods.push(this.cardList[j])
+      //     }
+      //   }
+      // }
+      // let dataObj = {
+      //   goods: goods,
+      //   skuList: cardIds,
+      //   totalPrice: totalPrice.toFixed(2),
+      //   totalNum: totalNum
+      // }
+    }
+  },
   methods: {
     handleToggle(visible) {
       this.visible = visible;
@@ -106,6 +156,14 @@ export default {
     },
     toClose (name) {
       this[name] = false
+    },
+    handleItemClick(goodsId) {
+      this.$router.push({
+        path: '/pages/home/details/details',
+        query: {
+          goodsId
+        }
+      })
     },
     // 去首页
     toHome () {
@@ -355,101 +413,106 @@ export default {
     async getCard () {
       let that = this
       wx.showLoading({ title: '努力加载中' });
-      const data = await API.getCardList();
-      wx.hideLoading();
-      if (data.code === 1) {
-        // console.log('购物车列表', data)
-        let { data: list } = data;
-        if (list && list.length) {
+      try {
 
-          that.kong = false;
-          for (let k = 0; k < list.length; k++) {
-            list[k].check = false
-            let skuList = list[k].skuList
-            let skuAttr = []
-            // 定义规格数组
-            for (let i = 0; i < skuList.length; i++) {
-              let sku = skuList[i]
-              let obj = {}
-              let attrIds = sku.attrIds.split(',')
-              let attrVal = sku.skuCode.split(',')
-              obj.color = attrIds[0]
-              obj.colorVal = attrVal[0]
-              let sizeArray = []
-              let sizeObj = {}
-              sizeObj.sizeId = attrIds[1]
-              sizeObj.sizeVal = attrVal[1]
-              sizeObj.sizeNum = sku.num
-              sizeObj.newNum = sku.num
-              sizeObj.editNum = 0
-              sizeArray.push(sizeObj)
-              obj.sizeArray = sizeArray
-              let isHas = false
-              for (let j = 0; j < skuAttr.length; j++) {
-                if (skuAttr[j].color === obj.color) {
-                  skuAttr[j].sizeArray.push(sizeObj)
-                  isHas = true
-                  break
-                }
-              }
-              if (!isHas) {
-                skuAttr.push(obj)
-              }
-            }
-            list[k].skuAttr = skuAttr
-            // 处理规格数据
-            let skuCode = []
-            let totalNum = 0
-            for (let a = 0; a < skuAttr.length; a++) {
-              let sizeNums = 0;
-              for (let b = 0; b < skuAttr[a].sizeArray.length; b++) {
+        const data = await API.getCardList();
+        wx.hideLoading();
+        if (data.code === 1) {
+          // console.log('购物车列表', data)
+          let { data: list } = data;
+          if (list && list.length) {
+
+            that.kong = false;
+            for (let k = 0; k < list.length; k++) {
+              list[k].check = false
+              let skuList = list[k].skuList
+              let skuAttr = []
+              // 定义规格数组
+              for (let i = 0; i < skuList.length; i++) {
+                let sku = skuList[i]
                 let obj = {}
-                if (skuAttr[a].sizeArray[b].sizeNum === 0) {
-                  continue
-                }
-                let colorVal = skuAttr[a].colorVal
-                let sizeVal = skuAttr[a].sizeArray[b].sizeVal
-                // let colorId = skuAttr[a].color
-                // let sizeId = skuAttr[a].sizeArray[b].sizeId
-                let num = skuAttr[a].sizeArray[b].sizeNum
-                // let attrIds = colorId + ',' + sizeId
-                totalNum += Number(num)
-                sizeNums += Number(num)
-                // 处理规格文字
-                let ishas = false
-                let skuVal = ''
-                for (let c = 0; c < skuCode.length; c++) {
-                  let str = skuCode[c].substring(0, 1)
-                  if (str === colorVal) {
-                    skuCode[c] += sizeVal + '/' + num + '件;'
-                    ishas = true
+                let attrIds = sku.attrIds.split(',')
+                let attrVal = sku.skuCode.split(',')
+                obj.color = attrIds[0]
+                obj.colorVal = attrVal[0]
+                let sizeArray = []
+                let sizeObj = {}
+                sizeObj.sizeId = attrIds[1]
+                sizeObj.sizeVal = attrVal[1]
+                sizeObj.sizeNum = sku.num
+                sizeObj.newNum = sku.num
+                sizeObj.editNum = 0
+                sizeArray.push(sizeObj)
+                obj.sizeArray = sizeArray
+                let isHas = false
+                for (let j = 0; j < skuAttr.length; j++) {
+                  if (skuAttr[j].color === obj.color) {
+                    skuAttr[j].sizeArray.push(sizeObj)
+                    isHas = true
                     break
                   }
                 }
-                if (!ishas) {
-                  skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
-                  skuCode.push(skuVal)
+                if (!isHas) {
+                  skuAttr.push(obj)
                 }
               }
-              skuAttr[a].sizeNums = sizeNums;
-            }
-            list[k].skuCode = skuCode
-            list[k].totalNum = totalNum;
-          }
-
-          this.selectArr.forEach(selected => {
-            list = list.map(item => {
-              if (item.id === selected.id) {
-                item.check = true;
+              list[k].skuAttr = skuAttr
+              // 处理规格数据
+              let skuCode = []
+              let totalNum = 0
+              for (let a = 0; a < skuAttr.length; a++) {
+                let sizeNums = 0;
+                for (let b = 0; b < skuAttr[a].sizeArray.length; b++) {
+                  let obj = {}
+                  if (skuAttr[a].sizeArray[b].sizeNum === 0) {
+                    continue
+                  }
+                  let colorVal = skuAttr[a].colorVal
+                  let sizeVal = skuAttr[a].sizeArray[b].sizeVal
+                  // let colorId = skuAttr[a].color
+                  // let sizeId = skuAttr[a].sizeArray[b].sizeId
+                  let num = skuAttr[a].sizeArray[b].sizeNum
+                  // let attrIds = colorId + ',' + sizeId
+                  totalNum += Number(num)
+                  sizeNums += Number(num)
+                  // 处理规格文字
+                  let ishas = false
+                  let skuVal = ''
+                  for (let c = 0; c < skuCode.length; c++) {
+                    let str = skuCode[c].substring(0, 1)
+                    if (str === colorVal) {
+                      skuCode[c] += sizeVal + '/' + num + '件;'
+                      ishas = true
+                      break
+                    }
+                  }
+                  if (!ishas) {
+                    skuVal = colorVal + ': ' + sizeVal + '/' + num + '件;'
+                    skuCode.push(skuVal)
+                  }
+                }
+                skuAttr[a].sizeNums = sizeNums;
               }
-              return item;
+              list[k].skuCode = skuCode
+              list[k].totalNum = totalNum;
+            }
+
+            this.selectArr.forEach(selected => {
+              list = list.map(item => {
+                if (item.id === selected.id) {
+                  item.check = true;
+                }
+                return item;
+              })
             })
-          })
-          this.cardList = list
-        } else {
-          this.cardList = [];
-          this.selectArr = [];
+            this.cardList = list
+          } else {
+            this.cardList = [];
+            this.selectArr = [];
+          }
         }
+      } catch (err) {
+        console.log(err)
       }
     },
     // 定时器弹窗
@@ -668,8 +731,13 @@ export default {
         background-color: #F5F5F5
         box-sizing: border-box
       height: 98px
+      line-height: 98px
       background: #fff
       border-radius: 10px
+      .total-block
+        padding-left: 30px
+        text
+          color: #FF0000;
       .s_btn
         background: #EE7527
         display: inline-block

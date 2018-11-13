@@ -169,6 +169,7 @@ export default {
     .tabItem.active
       background: #ffffff
       border-left: 8px solid #EE7527
+      color: #EE7527
 .rightBox
   position: absolute
   top: 0

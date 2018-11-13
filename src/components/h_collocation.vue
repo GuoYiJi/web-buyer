@@ -157,6 +157,10 @@ export default {
     }
   },
   onShow() {
+    // this.pageNumber = 1;
+    // this.fetch();
+  },
+  onPullDownRefresh() {    
     this.pageNumber = 1;
     this.fetch();
   },

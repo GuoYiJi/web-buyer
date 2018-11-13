@@ -8,7 +8,7 @@
     <div class="home_opt_mod__bd">
       <block v-if="showType === 0">
         <div class="content goods-list__container goods-list__container--simple" v-if="List.length">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)">
+          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)"  v-if="item.ping">
             <div class="goods-list__item goods-list__item--list simple">
               <div class="goods-list__thumb">
                 <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
@@ -21,7 +21,7 @@
                     <span>货期:{{item.delivery}}</span>丨
                     <span>已拼:{{item.sellCount}}</span>
                   </p>
-                  <p class="price">批发价：￥{{item.sellPrice}}</p>
+                  <p class="price">拼团价：￥{{item.ping.price}}</p>
                 </div>
               </div>
               <span class="goods-list__btn">去开团</span>
@@ -31,7 +31,7 @@
       </block>
       <block v-if="showType === 1">
         <div class="goods-list__container--small" v-if="List.length">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)">
+          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)" v-if="item.ping">
             <div class="goods-list__item goods-list__item--small goods-list__item--btn4 card2">
               <div class="goods-list__thumb">
                 <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
@@ -45,7 +45,7 @@
                   <p>已拼:{{item.sellCount}}</p>
                 </div>
                 <div class="sale-info">
-                  <p class="price">￥{{item.sellPrice}}</p>
+                  <p class="price">￥{{item.ping.price}}</p>
                 </div>
               </div>
               <div class="goods-list__buy-btn-wrapper">
@@ -160,6 +160,10 @@ export default {
     },
   },
   onShow() {
+    // this.isDataLast = true;
+    // this.goodsList(1);
+  },
+  onPullDownRefresh() {
     this.isDataLast = true;
     this.goodsList(1);
   },

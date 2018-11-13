@@ -29,11 +29,13 @@ export default {
     fetch() {
       API.selectTopGoods()
         .then(res => {
-          this.data = res.data;
+          if (res.data) {
+            this.data = res.data;
+          }
         })
     }
   },
-  onShow() {
+  onPullDownRefresh() {
     this.fetch();
   },
   mounted() {

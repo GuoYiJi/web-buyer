@@ -113,14 +113,9 @@ export default {
     },
     async goodsList (page, payload) {
       if (page === 1) {
-        if (!this.isDataLast) {
-          this.List = [];
-        }
         this.lastPage = false;
       }
-      if (!this.isDataLast) {
-        this.loading = true;
-      }
+      this.loading = true;
       const data = await API.getGoods({
         labelId: 1,
         state: 1,
@@ -132,21 +127,25 @@ export default {
       })
       this.loading = false;
       this.lastPage = data.data.lastPage
-      // console.log('每日上新', data)
-      if (data.code === 1) {
-        if (this.isDataLast) {
-          this.List = data.data.list || [];
-          this.isDataLast = false;
-        } else {
+      console.log('每日上新', data)
+      debugger
+      try {
+        if (data.code === 1) {
+          if (page === 1) {
+            this.List = [];
+          }
+          console.log(data.data.list, '傻比');
           if (this.List.length !== 0) {
             this.List.push.apply(this.List, data.data.list)
           } else {
             this.List = data.data.list
           }
+          this.page = data.data.pageNumber
+          this.totalPage = data.data.totalPage
+          // console.log(this.List)
         }
-        this.page = data.data.pageNumber
-        this.totalPage = data.data.totalPage
-        // console.log(this.List)
+      } catch (err) {
+        console.log(err, '蒲林燕')
       }
     },
     getMore () {
@@ -177,8 +176,12 @@ export default {
     }
   },
   onShow() {
+    // this.page = 1;
+    // this.isDataLast = true;
+    // this.goodsList(this.page);
+  },
+  onPullDownRefresh() {
     this.page = 1;
-    this.isDataLast = true;
     this.goodsList(this.page);
   },
   onReady() {

@@ -24,13 +24,20 @@
       </div>
       <p class="title" v-text="goodsInfo.name"></p>
       <div class="text">
-        <block v-if="goodsInfo.disPrice">
-          <p class="price">折扣价:</p>
-          <p class="money">￥{{goodsInfo.disPrice}}</p>
+        <block v-if="!toNew && isPin">
+          
+          <p class="price">拼团价:</p>
+          <p class="money">￥{{goodsInfo.ping.price}}</p>
         </block>
         <block v-else>
-          <p class="price">批发价:</p>
-          <p class="money">￥{{goodsInfo.sellPrice}}</p>
+          <block v-if="goodsInfo.disPrice">
+            <p class="price">折扣价:</p>
+            <p class="money">￥{{goodsInfo.disPrice}}</p>
+          </block>
+          <block v-else>
+            <p class="price">批发价:</p>
+            <p class="money">￥{{goodsInfo.sellPrice}}</p>
+          </block>
         </block>
         <p class="goods">货期: {{goodsInfo.delivery}}&nbsp;&nbsp;&nbsp;&nbsp;销量: {{goodsInfo.sellCount==9999 ? '9999+' : goodsInfo.sellCount }}</p>
         <!--收藏-->
@@ -183,7 +190,7 @@
       </div>
     </i-modal>
     <!-- 弹窗 -->
-    <zan-popup type="bottom" :show="popupShow">
+    <zan-popup type="bottom" :show="popupShow" @overlay="popupShow = false">
       <div class="popup">
         <div class="sku-content">
           <div class="goods">
@@ -292,7 +299,7 @@
         <div class="van-cell-group van-hairline--top-bottom">
           <div class="van-cell van-field">
             <div class="van-cell__title">
-              <span>商品售价</span>
+              <span>进货价</span>
             </div>
             <div class="van-cell__value">
               <div class="van-field__body">
@@ -302,16 +309,16 @@
           </div>
           <div class="van-cell van-field van-hairline">
             <div class="van-cell__title">
-              <span>自定义价格</span>
+              <span>零售价</span>
             </div>
             <div class="van-cell__value">
               <div class="van-field__body">
-                <input class="van-field__control" placeholder="请填写价格" type="number" v-model="appCustomPrice" />
+                <input class="van-field__control" placeholder="请填写零售价" type="number" v-model="appCustomPrice" />
               </div>
             </div>
           </div>
         </div>
-        <div class="van-button van-button--default van-button--large" @click="handleCopyConfirm">
+        <div class="van-button van-button--large van-button--warning" @click="handleCopyConfirm">
           <span class="van-button__text">
             一键铺货
           </span>
@@ -771,7 +778,7 @@ export default {
             const { code, data, desc } = res;
             if (code === 1 && data && data.length) {
               this.apps = data.map(item => ({...item, select: true}));
-              this.appCustomPrice = this.goodsInfo.disPrice || this.goodsInfo.sellPrice;
+              // this.appCustomPrice = this.goodsInfo.disPrice || this.goodsInfo.sellPrice;
               this.appPopup = true;
             } else {
               wx.showToast({
@@ -801,11 +808,11 @@ export default {
       }
     },
     handleCopyConfirm() {
-      console.log(1);
+      const price = this.appCustomPrice || (this.goodsInfo.disPrice || this.goodsInfo.sellPrice);
       API.copyGoods({
         shopIds: this.apps.filter(item => item.select).map(item => item.id).join(','),
         goodsId: this.$route.query.goodsId,
-        price: this.appCustomPrice
+        price
       })
         .then(res => {
           const { code, desc } = res;

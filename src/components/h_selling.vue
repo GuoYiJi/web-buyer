@@ -201,6 +201,11 @@ export default {
     }
   },
   onShow() {
+    // this.isDataLast = true;
+    // this.page = 1;
+    // this.goodsList(this.page);
+  },
+  onPullDownRefresh() {
     this.isDataLast = true;
     this.page = 1;
     this.goodsList(this.page);

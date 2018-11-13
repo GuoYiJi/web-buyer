@@ -44,17 +44,30 @@ export default {
         this.identity != "" &&
         this.referrer != ""
       ) {
-        var prosave = await API.prosave({
-          name: this.name,
-          mobile: this.phone,
-          formMetaId: this.identity,
-          tmobile: this.referrer
-        });
-        wx.showToast({
-          title: "申请成功",
-          icon: "success",
-          duration: 2000
-        });
+        API.prosave({
+          applyName: this.name,
+          applyPhone: this.phone,
+          inviteName: this.identity,
+          invitePhone: this.referrer,
+          type: 1
+        })
+          .then(res => {
+            if (res.code === 1) {
+
+              wx.showToast({
+                title: "申请成功",
+                icon: "success",
+                duration: 2000
+              });
+              this.$router.back();
+            } else {
+              wx.showToast({
+                title: res.desc,
+                icon: 'none',
+                duration: 3000
+              })
+            }
+          })
       } else if (
         this.name == "" &&
         this.phone == "" &&
@@ -81,6 +94,9 @@ export default {
   },
   async mounted() {
     const prometaList = await API.prometaList({ type: 2 });
+  },
+  onUnload() {
+    Object.assign(this, this.$options.data());
   }
 };
 </script>

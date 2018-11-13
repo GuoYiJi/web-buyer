@@ -293,6 +293,17 @@
           </div>
         </div>
 
+        <!-- 交易完成 -->
+        <div class="submit-bar van-hairline--top van-submit-bar" v-if="details.state === 7">
+          <div class="van-submit-bar__bar">
+            
+            <div class="van-submit-bar__text">&nbsp;</div>
+            <div class="van-button van-button--danger van-button--normal" @click="handleDeleteClick">
+              <span class="van-button__text">删除订单</span>
+            </div>
+
+          </div>
+        </div>
       </block>
     </block>
   </div>
