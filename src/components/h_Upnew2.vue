@@ -1,81 +1,168 @@
-<template>
-  <div>
-    
-    <div class="home_opt_mod" v-if="false">
-      <screen @sort="handleSortChange" @filter="handleFilterChange" v-if="!hidenSort" @showtype="handleShowType" />
-      <div class="home_opt_mod__hd">
-        <span class="title_1">NEW SHOW</span>
-        <span class="title_2">今日上新，领先一步</span>
-      </div>
-      <div class="home_opt_mod__bd">
-        
-        <div class="goods-list__container goods-list__container--simple" v-if="showType === 0">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="clickItem(item)">
-            <div class="goods-list__item goods-list__item--list simple">
-              <div class="goods-list__thumb">
-                <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
-                <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
-              </div>
-              <div class="goods-list__info">
-                <p class="title zan-ellipsis--l2">{{item.name}}</p>
-                <div class="sale-info">
-                  <p>期货:{{item.delivery}}</p>
-                  <p>销量:{{item.sellCount}}</p>
-                  <p class="price">￥{{item.sellPrice}}</p>
-                </div>
-              </div>
-              <span class="goods-list__btn">立即采购</span>
-            </div>
-          </div>
-        </div>
-        <div class="goods-list__container--small" v-if="showType === 1">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="clickItem(item)">
-            <div class="goods-list__item goods-list__item--small goods-list__item--btn4 card2">
-              <div class="goods-list__thumb">
-                <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
-                <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
-              </div>
-              <div class="goods-list__info has-title has-subtitle has-price has-btn">
-                <p class="title zan-ellipsis">{{item.name}}</p>
-                <div class="sub-title">
-                  <p>期货:{{item.delivery}}</p>
-                  <p>销量:{{item.sellCount}}</p>
-                </div>
-                <div class="sale-info">
-                  <p class="price">￥{{item.sellPrice}}</p>
-                </div>
-              </div>
-              <div class="goods-list__buy-btn-wrapper">
-                <span class="goods-list__buy-btn-4">立即采购</span>
-              </div>
-              
-            </div>
-          </div>
-        </div>
+<style lang="scss">
+  @import '~@/assets/scss/mixins';
+  .one-item {
+    padding: 0 rpx(8);
+    &__top {
+      display: flex;
+    }
+    .left {
+      position: relative;
+      padding-left: rpx(16);
+      width: rpx(121);
+      box-sizing: border-box;
+      .icon {
+        $w: rpx(81);
+        $h: rpx(30);
+        display: block;
+        margin-top: rpx(10);
+        width: $w;
+        height: $h;
+        background: url(~@/assets/img/new-show@2x.png) no-repeat;
+        background-size: $w $h;
+      }
+      .btn {
+        margin-top: rpx(25);
+        background: #81D8D0;
+        width: rpx(66);
+        line-height: rpx(18);
+        text-align: center;
+        font-size: rpx(10);
+        color: #333;
+      }
+      .thumb {
+        $size: rpx(121);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: $size;
+        height: $size;
+        background-color: blue;
+      }
+    }
+    .right {
+      $size: rpx(230);
+      margin-left: rpx(8);
+      width: $size;
+      height: $size;
+      background-color: red;
+    }
+    &__botton {
+      margin-top: rpx(11);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  .two-item {
+    margin-top: rpx(48);
+    padding: 0 rpx(8);
+    .thumb {
+      width: 100%;
+      height: rpx(211);
+      background-color: red;
+    }
+    .price-bar {
+      margin-top: rpx(11);
+    }
+  }
 
-        <div v-if="!List.length && lastPage">
-          <div class="no_goods">
-            <div class="no_goods_img"></div>
-            <div class="no_goods_tip">没有相关的商品结果哦~~</div>
+  .price-bar {
+    color: #1C1F26;
+    .desc {
+      font-size: rpx(11);
+    }
+    .price {
+      margin-right: rpx(4);
+      font-size: rpx(13);
+      font-weight: 600;
+    }
+  }
+  .show-now {
+    $w: rpx(50);
+    $h: rpx(12);
+    display: inline-block;
+    width: $w;
+    height: $h;
+    background: url(~@/assets/img/show-now@3x.png) no-repeat;
+    background-size: $w $h;
+  }
+  .list__items {
+    margin-top: rpx(35);
+    display: flex;
+    padding: 0 rpx(5.5);
+    flex-wrap: wrap;
+    &-item {
+      padding: 0 rpx(3.5) rpx(7);
+      flex: 0 0 33.3333%;
+      box-sizing: border-box;
+      .thumb {
+        width: 100%;
+        padding-top: 100%;
+        background-color: blue;
+      }
+    }
+  }
+  .loadmore-container {
+    text-align: center;
+  }
+  .loadmore-btn {
+    display: inline-block;
+    width: rpx(80);
+    line-height: rpx(24);
+    font-size: rpx(12);
+    color: #333;
+    text-align: center;
+    background-color: #81D8D0;
+  }
+</style>
+<template>
+
+  <div class="home_opt_mod">
+    <div class="home_opt_mod__bd">
+      <div class="one-item">
+        <div class="one-item__top">
+          <div class="left">
+            <div class="icon"></div>
+            <div class="btn">立即购买</div>
+            <div class="thumb"></div>
           </div>
+          <div class="right"></div>
         </div>
-        <div v-show="loading">
-          <zan-loading />
-        </div>
-      </div>
-      <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)">
-        <div class="loadmore" @click="getMore()">
-          <span>查看更多</span>
-          <i></i>
-        </div>
-        <div class="loadmore up" v-if="hidenSort && page > 1" @click="handleReset()">
-          <span>收起更多</span>
-          <i></i>
+        <div class="one-item__botton price-bar">
+          <span class="desc">上新价</span>
+          <span class="price">￥129.00</span>
+          <span class="show-now"></span>
         </div>
       </div>
-    </div>
-    <div class="home_opt_mod">
-      <div class="home_opt_mod__bd"></div>
+      <div class="two-item">
+        <div class="thumb"></div>
+        <div class="price-bar">
+          <span class="desc">上新价</span>
+          <span class="price">￥129.00</span>
+          <span class="show-now"></span>
+        </div>
+      </div>
+      <div class="list__items">
+        <div class="list__items-item">
+          <div class="thumb"></div>
+        </div>
+        <div class="list__items-item">
+          <div class="thumb"></div>
+        </div>
+        <div class="list__items-item">
+          <div class="thumb"></div>
+        </div>
+        <div class="list__items-item">
+          <div class="thumb"></div>
+        </div>
+        <div class="list__items-item">
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div class="loadmore-container">
+        <div class="loadmore-btn">查看更多</div>
+      </div>
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="home" v-if="isInitFetch">
-    <div class="head">
+   <!--  <div class="head">
       <div class="head__absolute">
         <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
         <div class="head__avatar">
@@ -35,7 +35,7 @@
           </div>
         </block>
       </scroll-view>
-    </div>
+    </div> -->
     <div>
       <block>
         <div class="nav">
@@ -48,11 +48,14 @@
         </div>
         <div class="content">
           <div v-if="tag == 1">
-            <colligate/>
-            <Upnew :hidenSort="true" />
-            <selling :hidenSort="true" />
-            <collocation :init-count="3" :hidenSort="true" />
-            <Collage :hidenSort="true" />
+            <!-- <colligate/> -->
+            <!-- <Upnew2 :hidenSort="true" /> -->
+            <!-- <selling :hidenSort="true" /> -->
+            <!-- <selling2 :hidenSort="true" /> -->
+            <!-- <collocation :init-count="3" :hidenSort="true" /> -->
+            <!-- <collocation2 :init-count="3" :hidenSort="true" /> -->
+            <!-- <Collage :hidenSort="true" /> -->
+            <Collage2 :hidenSort="true" />
             <discount :hidenSort="true" />
           </div>
           <div v-else-if="tag == 2">
@@ -92,9 +95,13 @@ import APIShui from '@/api/httpShui';
 import mixin from '@/mixin'
 import colligate from '@/components/h_colligate'
 import Upnew from '@/components/h_Upnew'
+import Upnew2 from '@/components/h_Upnew2'
 import selling from '@/components/h_selling'
+import selling2 from '@/components/h_selling2'
 import collocation from '@/components/h_collocation'
+import collocation2 from '@/components/h_collocation2'
 import Collage from '@/components/h_Collage'
+import Collage2 from '@/components/h_Collage2'
 import discount from '@/components/h_discount'
 import screen from '@/components/h_screen'
 export default {
@@ -102,9 +109,13 @@ export default {
   components: {
     colligate,
     Upnew,
+    Upnew2,
     selling,
+    selling2,
     collocation,
+    collocation2,
     Collage,
+    Collage2,
     discount,
     screen
   },
