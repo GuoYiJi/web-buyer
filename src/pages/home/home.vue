@@ -48,7 +48,6 @@
         </div>
         <div class="content">
           <div v-if="tag == 1">
-            <colligate/>
             <Upnew :hidenSort="true" />
             <selling :hidenSort="true" />
             <collocation :init-count="3" :hidenSort="true" />
@@ -257,7 +256,7 @@ export default {
   },
   onShareAppMessage() {
     return {
-      title: '发现一家好店，与你分享！'
+      title: '每日新款，畅销好货热卖中'
     }
   },
   async onPullDownRefresh() {
