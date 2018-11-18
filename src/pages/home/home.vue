@@ -372,7 +372,7 @@ export default {
   },
   onShareAppMessage() {
     return {
-      title: '发现一家好店，与你分享！'
+      title: '每日新款，畅销好货热卖中'
     }
   },
   async onPullDownRefresh() {

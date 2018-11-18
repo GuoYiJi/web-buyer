@@ -59,7 +59,9 @@ export default {
                 icon: "success",
                 duration: 2000
               });
-              this.$router.back();
+              setTimeout(() => {
+                this.$router.back();
+              }, 2000);
             } else {
               wx.showToast({
                 title: res.desc,
@@ -76,7 +78,7 @@ export default {
       ) {
         wx.showToast({
           title: "请填写内容",
-          icon: "loading",
+          icon: "none",
           duration: 2000
         });
       }

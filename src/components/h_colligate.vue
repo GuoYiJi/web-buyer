@@ -4,7 +4,7 @@
       <img class="img" :src="data.image" mode="aspectFill">
     </div>
     <div class="right">
-      <p class="title">邮费差价</p>
+      <p class="title">{{ data.name }}</p>
       <p class="money">￥{{ data.sellPrice }}</p>
       <p class="volume">销量：{{ data.sellCount }}</p>
       <span class="btn">立即采购</span>

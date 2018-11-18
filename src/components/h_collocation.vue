@@ -71,9 +71,13 @@
         </div>
       </div>
     </div>
-    <div class="home_opt_mod__ft" v-if="!loading && (selectMGP.length && !lastPage)" @click="handleMore">
-      <div class="loadmore" @click="handleMore">
+    <div class="home_opt_mod__ft">
+      <div class="loadmore" @click="handleMore" v-if="!loading && (List.length && !lastPage)">
         <span>查看更多</span>
+        <i></i>
+      </div>
+      <div class="loadmore up" v-if="hidenSort && page > 1" @click="handleReset()">
+        <span>收起更多</span>
         <i></i>
       </div>
     </div>
@@ -84,11 +88,16 @@ import wx from "wx";
 import scard from "@/components/group_card";
 import API from "@/api/httpJchan";
 import isOdd from 'is-odd';
+import cloneDeep from '@/assets/js/cloneDeep';
 export default {
   props: {
     initCount: {
       type: Number,
       default: 10
+    },
+    hidenSort: {
+      type: Boolean,
+      default: false
     }
   },
   components: { scard },
@@ -97,11 +106,29 @@ export default {
       lastPage: false,
       loading: false,
       pageNumber: 1,
+      page: 1,
       pageSize: 10,
-      selectMGP: []
+      List: []
     };
   },
   computed: {
+    selectMGP() {
+      return cloneDeep(this.List).map(item => {
+        item.firstGoods = {};
+        if (item.matchGoods.length) {
+          let firstGoods = item.matchGoods.splice(0, 1);
+          item.firstGoods = firstGoods[0];
+        }
+        if (!item.matchGoods.length) {
+          item.matchGoods.push({ template: true, name: '隐藏' }, { template: true, name: '隐藏' });
+        } else {
+          if (isOdd(item.matchGoods.length)) {
+            item.matchGoods.push({ template: true, name: '隐藏' });
+          }
+        }
+        return item;
+      })
+    }
   },
   methods: {
     Tiao(obj) {
@@ -111,7 +138,6 @@ export default {
       });
     },
     TiaoZhuan(obj) {
-      console.log(obj)
       this.$router.push({
         path: "/pages/home/details/details",
         query: { goodsId: obj.goodsId }
@@ -126,26 +152,11 @@ export default {
       });
       this.loading = false;
       this.lastPage = lastPage;
+      this.page = pageNumber;
       try {
 
         if (code === 1) {
-
-          this.selectMGP = list.map(item => {
-            item.firstGoods = {};
-            if (item.matchGoods.length) {
-              let firstGoods = item.matchGoods.splice(0, 1);
-              item.firstGoods = firstGoods[0];
-            }
-            if (!item.matchGoods.length) {
-              item.matchGoods.push({ template: true, name: '隐藏' }, { template: true, name: '隐藏' });
-            } else {
-              if (isOdd(item.matchGoods.length)) {
-                item.matchGoods.push({ template: true, name: '隐藏' });
-              }
-            }
-            return item;
-          })
-          console.log(this.selectMGP)
+          this.List = this.List.concat(list);
           this.pageNumber++;
         }
       } catch (err) {
@@ -153,6 +164,13 @@ export default {
       }
     },
     handleMore() {
+      this.fetch();
+    },
+    handleReset() {
+      this.List = [];
+      this.pageNumber = 1;
+      this.page = 1;
+      this.lastPage = false;
       this.fetch();
     }
   },
