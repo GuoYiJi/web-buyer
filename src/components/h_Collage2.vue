@@ -3,11 +3,6 @@
   @import '~@/assets/scss/mixins';
   .collage2 {
     .home_opt_mod__hd {
-      img {
-        display: block;
-        width: 100%;
-        height: rpx(187 * 2);
-      }
     }
     .goods__items {
       margin-top: rpx(8);
@@ -52,7 +47,7 @@
 <template>
   <div class="collage2 home_opt_mod">
     <div class="home_opt_mod__hd">
-      <img src="../assets/img/group-bg.png" alt="" />
+      <img src="../assets/img/group-bg.png" alt="" mode="aspectFit" />
     </div>
     <div class="home_opt_mod__bd">
       <div class="goods__items">
@@ -66,33 +61,6 @@
           </div>
         </div>
       </div>
-      <block v-if="false">
-        <div class="goods-list__container--small" v-if="List.length">
-          <div class="goods-list__wrapper">
-            <div class="goods-list__item goods-list__item--small goods-list__item--btn4 card2">
-              <div class="goods-list__thumb">
-                <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
-                <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
-              </div>
-              <div class="goods-list__info has-title has-subtitle has-price has-btn">
-                <p class="title zan-ellipsis">{{item.name}}</p>
-                <div class="sub-title">
-                  <p class="limit">{{item.ping.num}}人成团</p>
-                  <p>货期:{{item.delivery}}</p>
-                  <p>已拼:{{item.sellCount}}</p>
-                </div>
-                <div class="sale-info">
-                  <p class="price">￥{{item.ping.price}}</p>
-                </div>
-              </div>
-              <div class="goods-list__buy-btn-wrapper">
-                <span class="goods-list__buy-btn-4">去开团</span>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      </block>
       <div v-show="loading">
         <zan-loading />
       </div>
@@ -102,11 +70,9 @@
           <div class="no_goods_tip">没有相关的商品结果哦~~</div>
         </div>
       </div>
-    </div>
-    <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)" @click="getMore()">
-      <div class="loadmore">
-        <span>查看更多</span>
-        <i></i>
+
+      <div class="loadmore-container" v-if="!loading && (List.length && !lastPage)">
+        <div class="loadmore-btn" @click="getMore()">查看更多</div>
       </div>
     </div>
   </div>

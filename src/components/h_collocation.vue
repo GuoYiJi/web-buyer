@@ -72,7 +72,7 @@
       </div>
     </div>
     <div class="home_opt_mod__ft" v-if="!loading && (selectMGP.length && !lastPage)" @click="handleMore">
-      <div class="loadmore">
+      <div class="loadmore" @click="handleMore">
         <span>查看更多</span>
         <i></i>
       </div>
@@ -125,7 +125,7 @@ export default {
         pageNumber
       });
       this.loading = false;
-      this.lastPage = true;
+      this.lastPage = lastPage;
       try {
 
         if (code === 1) {

@@ -11,7 +11,6 @@
         margin-bottom: rpx(13);
         width: $w;
         height: $h;
-        background-color: yellow;
       }
     }
     &-right {
@@ -37,7 +36,6 @@
         $h: rpx(220);
         width: $w;
         height: $h;
-        background-color: red;
         // margin-right: rpx(8);
         &:last-child {
           position: absolute;
@@ -71,7 +69,6 @@
         $h: rpx(307);
         width: $w;
         height: $h;
-        background-color: yellow;
       }
     }
     &-right {
@@ -82,7 +79,6 @@
 
           width: 100%;
           height: rpx(130);
-          background-color: blue;
         }
         .title {
           margin-top: rpx(9);
@@ -111,12 +107,12 @@
 
   <div class="home_opt_mod selling">
     <div class="home_opt_mod__bd">
-      <div class="module1">
+      <div class="module1" @click="clickItem(oneItem)">
         <div class="module1-left">
-          <div class="thumb"></div>
+          <img class="thumb" :src="oneItem.images && oneItem.images[0]" mode="aspectFill" />
           <div class="price-bar">
             <span class="desc">上新价</span>
-            <span class="price">￥129.00</span>
+            <span class="price">￥{{ oneItem.sellPrice }}</span>
             <span class="show-now"></span>
           </div>
         </div>
@@ -125,21 +121,21 @@
             <img class="icon" src="../assets/img/how-show-for-you@3x.png" mode="aspectFit" />
           </div>
           <div class="thumbs">
-            <div class="thumbs-item"></div>
-            <div class="thumbs-item"></div>
+            <img class="thumbs-item" :src="oneItem.images && oneItem.images[1]" mode="aspectFill" />
+            <img class="thumbs-item" :src="oneItem.images && oneItem.images[2]" mode="aspectFill" />
           </div>
         </div>
       </div>
-      <div class="module2">
+      <div class="module2" @click="clickItem(twoItem)">
         <div class="module2-left">
-          <div class="thumb"></div>
+          <img class="thumb" :src="twoItem.image" mode="aspectFill" />
         </div>
         <div class="module2-right">
           <div class="goods-inner">
-            <div class="thumb"></div>
-            <div class="title"></div>
+            <img class="thumb" :src="twoItem.images && twoItem.images[1]" mode="aspectFill" />
+            <div class="title">{{ twoItem.name }}</div>
             <div>
-              <span class="price">￥89.00</span>
+              <span class="price">￥{{ twoItem.sellPrice }}</span>
               <span class="show-now"></span>
             </div>
           </div>
@@ -147,24 +143,17 @@
         <img class="tag" src="../assets/img/the-fashions@3x.png" mode="aspectFit">
       </div>
       <div class="list__items">
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
+        <div class="list__items-item" @click="clickItem(item)" v-for="(item, index) in spliceList" :key="index">
+          <div class="thumb" :style="{ 'background-image': 'url(' + item.image + ')' }"></div>
         </div>
       </div>
-      <div class="loadmore-container">
-        <div class="loadmore-btn">查看更多</div>
+
+      <div v-show="loading">
+        <zan-loading />
+      </div>
+
+      <div class="loadmore-container" v-if="!loading && (List.length && !lastPage)">
+        <div class="loadmore-btn"  @click="getMore()">查看更多</div>
       </div>
     </div>
   </div>
@@ -173,7 +162,8 @@
 import wx from 'wx'
 import API from '@/api/httpShui'
 import isOdd from 'is-odd';
-import screen from '@/components/h_screen'
+import screen from '@/components/h_screen';
+import cloneDeep from '@/assets/js/cloneDeep';
 export default {
   props: {
     hidenSort: {
@@ -183,6 +173,34 @@ export default {
   },
   components: {
     screen
+  },
+  computed: {
+
+    oneItem() {
+      if (this.List && this.List.length) {
+        return {
+          ...this.List[0],
+          images: this.List[0].images.split(',')
+        };
+      }
+      return {
+        images: []
+      };
+    },
+    twoItem() {
+      if (this.List && this.List.length > 1) {
+        return {
+          ...this.List[1],
+          images: this.List[1].images.split(',')
+        };
+      }
+      return {
+        images: []
+      }
+    },
+    spliceList() {
+      return cloneDeep(this.List).splice(2);
+    }
   },
   data () {
     return {
@@ -222,7 +240,7 @@ export default {
       const data = await API.getGoods({
         labelId: 2,
         state: 1,
-        pageSize: 10,
+        pageSize: 5,
         pageNumber: page,
         ob: this.ob,
         ...this.goodsFilterOptions,
@@ -300,7 +318,7 @@ export default {
 @import '~@/assets/css/mixin'
 .wrapper
   padding-bottom: 60px
-  background-color: #EAEAEA
+  background-color: #fff
 .goods-list__wrapper
 .goods-thumb-h190
   height: 380px
@@ -308,9 +326,9 @@ export default {
   height: 229px * 2
 .home_opt_mod
   &__bd
-    background-color: #EAEAEA
+    background-color: #fff
   &__ft
-    background-color: #EAEAEA
+    background-color: #fff
   &__goods
     margin-bottom: -30px;
     display: flex;

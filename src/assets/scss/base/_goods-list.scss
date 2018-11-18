@@ -253,3 +253,13 @@ $thumb-size: 240px;
     }
   }
 }
+
+.theme-2 {
+  .goods-list__container--small {
+    padding: 0 rpx(4.5);
+    .goods-list__item--small {
+      padding-left: rpx(3.5);
+      padding-right: rpx(3.5);
+    }
+  }
+}

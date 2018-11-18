@@ -37,7 +37,6 @@
         bottom: 0;
         width: $size;
         height: $size;
-        background-color: blue;
       }
     }
     .right {
@@ -45,7 +44,6 @@
       margin-left: rpx(8);
       width: $size;
       height: $size;
-      background-color: red;
     }
     &__botton {
       margin-top: rpx(11);
@@ -60,7 +58,6 @@
     .thumb {
       width: 100%;
       height: rpx(211);
-      background-color: red;
     }
     .price-bar {
       margin-top: rpx(11);
@@ -99,7 +96,9 @@
       .thumb {
         width: 100%;
         padding-top: 100%;
-        background-color: blue;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        background-size: cover;
       }
     }
   }
@@ -120,48 +119,40 @@
 
   <div class="home_opt_mod">
     <div class="home_opt_mod__bd">
-      <div class="one-item">
+      <div class="one-item" @click="clickItem(oneItem)">
         <div class="one-item__top">
           <div class="left">
             <div class="icon"></div>
             <div class="btn">立即购买</div>
-            <div class="thumb"></div>
+            <img class="thumb" :src="oneItem.images && oneItem.images[0]" mode="aspectFill" alt="" />
           </div>
-          <div class="right"></div>
+          <img class="right" :src="oneItem.images && oneItem.images[1]" mode="aspectFill" alt="" />
         </div>
         <div class="one-item__botton price-bar">
           <span class="desc">上新价</span>
-          <span class="price">￥129.00</span>
+          <span class="price">￥{{ oneItem.sellPrice }}</span>
           <span class="show-now"></span>
         </div>
       </div>
-      <div class="two-item">
-        <div class="thumb"></div>
+      <div class="two-item" @click="clickItem(twoItem)">
+        <img class="thumb" :src="twoItem.image" alt="" mode="aspectFill" />
         <div class="price-bar">
           <span class="desc">上新价</span>
-          <span class="price">￥129.00</span>
+          <span class="price">￥{{ oneItem.sellPrice }}</span>
           <span class="show-now"></span>
         </div>
       </div>
       <div class="list__items">
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
-        </div>
-        <div class="list__items-item">
-          <div class="thumb"></div>
+        <div class="list__items-item" v-for="(item, index) in spliceList" :key="item.id" @click="clickItem(item)">
+          <div class="thumb" :style="{ 'background-image': 'url(' + item.image + ')' }" mode="aspectFill"></div>
         </div>
       </div>
-      <div class="loadmore-container">
-        <div class="loadmore-btn">查看更多</div>
+      
+      <div v-show="loading">
+        <zan-loading />
+      </div>
+      <div class="loadmore-container" v-if="!loading && (List.length && !lastPage)">
+        <div class="loadmore-btn" @click="getMore()">查看更多</div>
       </div>
     </div>
   </div>
@@ -170,6 +161,7 @@
 import wx from 'wx'
 import API from '@/api/httpShui'
 import screen from '@/components/h_screen'
+import cloneDeep from '@/assets/js/cloneDeep';
 export default {
   props: {
     hidenSort: {
@@ -179,6 +171,30 @@ export default {
   },
   components: {
     screen
+  },
+  computed: {
+    oneItem() {
+      if (this.List && this.List.length) {
+        return {
+          ...this.List[0],
+          images: this.List[0].images.split(',')
+        };
+      }
+      return {
+        images: []
+      };
+    },
+    twoItem() {
+      if (this.List && this.List.length > 1) {
+        return this.List[1];
+      }
+      return {
+        images: []
+      }
+    },
+    spliceList() {
+      return cloneDeep(this.List).splice(2);
+    }
   },
   data () {
     return {
@@ -206,7 +222,7 @@ export default {
       const data = await API.getGoods({
         labelId: 1,
         state: 1,
-        pageSize: 10,
+        pageSize: 5,
         pageNumber: page,
         ob: this.ob,
         ...this.goodsFilterOptions,
@@ -214,14 +230,12 @@ export default {
       })
       this.loading = false;
       this.lastPage = data.data.lastPage
-      console.log('每日上新', data)
       debugger
       try {
         if (data.code === 1) {
           if (page === 1) {
             this.List = [];
           }
-          console.log(data.data.list, '傻比');
           if (this.List.length !== 0) {
             this.List.push.apply(this.List, data.data.list)
           } else {
