@@ -1,0 +1,98 @@
+.home.theme-2 {
+  background: #fff;
+  .search-box {
+    padding: rpx(8) rpx(20);
+    box-sizing: border-box;
+    .input {
+      padding: 0 rpx(20);
+      height: rpx(40);
+      align-items: center;
+      background-color: #F7F7F7;
+      border-radius: rpx(20);
+      overflow: hidden;
+      .search-icon {
+        position: relative;
+        left: auto;
+      }
+      .input-box {
+        padding: 0;
+        margin-left: rpx(12);
+        font-size: rpx(15);
+      }
+    }
+  }
+  .head__avatar {
+    display: none!important;
+  }
+  .head {
+    padding-top: 133%!important;
+  }
+  .home_opt_mod {
+    padding-bottom: rpx(48);
+    border-top: 0;
+    &__hd {
+      height: auto;
+      img {
+        display: block;
+        width: rpx(375);
+        height: rpx(187);
+      }
+    }
+    &__bd {
+      padding-bottom: 0;
+    }
+  }
+  .coupon-box {
+    padding: rpx(12) 0 rpx(24);
+    .coupon-img {
+      margin: 0 rpx(4);
+      &:first-child {
+        margin-left: rpx(8);
+      }
+      &:last-child {
+        margin-right: rpx(8);
+      }
+      .yhqk {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        width: rpx(138);
+        height: rpx(66);
+        background: url(~@/assets/img/coupon-bg@2x.png) no-repeat;
+        background-position: 50% 50%;
+        background-size: cover;
+        .money {
+          padding-left: rpx(11);
+          display: block;
+          text-align: left;
+        }
+        .whole {
+          margin-left: rpx(11);
+          display: block;
+          text-align: left;
+          span {
+            display: inline-block;
+          }
+        }
+        .btn {
+          position: absolute;
+          left: auto;
+          right: rpx(12);
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: rpx(16);
+          line-height: rpx(22);
+          color: #fff;
+          font-weight: 600;
+          width: rpx(16);
+          background-color: transparent;
+          border-radius: 0;
+          height: auto;
+          word-wrap: break-word;
+        }
+      }
+    }
+  }
+}

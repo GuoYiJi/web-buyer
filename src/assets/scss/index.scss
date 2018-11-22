@@ -1,4 +1,5 @@
-@import './base/goods-list',
+@import './mixins',
+        './base/goods-list',
         './base/promo-module',
         './base/filter-goods-modal',
         './base/order-goods',
@@ -9,4 +10,5 @@
         './base/sku',
         './base/coupon',
         './base/search-bar',
-        './base/van-coupon';
+        './base/van-coupon',
+        './theme2';

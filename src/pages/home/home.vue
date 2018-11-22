@@ -1,85 +1,262 @@
+<style type="text/sass" lang="sass">
+@import '~@/assets/css/mixin'
+
+.search-box
+  padding: 30px 0
+  background: #fff
+  width: 100%
+  .input
+    display: flex
+    padding: 0px 35px
+    .search
+      +bg-img('home/search.png')
+      +icon(38px)
+      margin-top: 7px
+    .search-icon
+      position: absolute
+      left: 60px
+    .input-box
+      background-color: #f5f5f5
+      border-radius: 4px
+      width: 100%
+      text-align: left
+      padding: 8px 85px
+      border: none
+      color: #999999
+.coupon-box
+
+  width: 100%
+  height: 126px
+  padding-bottom: 30px
+  overflow: hidden
+  background: #fff
+  scroll-view
+    width: 100%
+    white-space: nowrap;
+  .coupon-img
+    position: relative
+    display: inline-block
+    margin: 0 5px
+    &:first-child
+      margin-left: 24px
+    &:last-child
+      margin-right: 24px
+    .mask-checked
+      position: absolute
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: flex
+      align-items: center
+      justify-content: center
+      z-index: 5
+      background-color: rgba(0, 0, 0, .3)
+    .yhqk
+      box-sizing: border-box
+      +bg-img('home/yhq.png')
+      height: 126px
+      color: #fff
+      margin: 0 10px
+      padding: 5px 10px 0
+      position: relative
+      .money
+        display: inline-block
+        padding-left: 10px
+        font-size: 24px
+        text-align: center
+        .money1
+          font-size: 48px
+      .whole
+        margin-left: 10px
+        display: inline-block
+        font-size: 20px
+        text-align: center
+        span
+          display: block;
+      .btn
+        margin: 0 auto;
+        font-size: 20px
+        width: 150px
+        height: 35px
+        display: block
+        color: #ff7272
+        background: #fff
+        border-radius: 10px
+        text-align: center
+        line-height: 35px
+        top: 80px
+        left: 35px
+    .yhqk.active
+      background: rgba(0,0,0,.8)
+</style>
 <template>
-  <div class="home" v-if="isInitFetch">
-    <div class="head">
-      <div class="head__absolute">
-        <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
-        <div class="head__avatar">
-          <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
-          <p class="text">{{ Warehouse.name }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="search-box">
-      <div class="input">
-        <p class="search-icon">
-          <i class="search"></i>
-        </p>
-        <p class="input-box" @click="toSearch()">请搜索商品</p>
-      </div>
-    </div>
-    <div class="coupon-box" v-if="coupon.length">
-      <scroll-view scroll-x>
-        <block v-for="(item,index) in coupon" :key="index">
-          <div class="coupon-img">
-            <div class="yhqk" @click="btn(item)">
-              <p class="money">￥<span class="money1">{{item.price}}</span></p>
-              <p class="whole">全程满 <br/>
-                <span class="whole1">{{item.limitCount}}</span>使用
-              </p>
-              <div>
-                <span class="btn">立即领取</span>
-              </div>
-              <div class="mask-checked" v-if="item.isReceived === 'true'">已领取</div>
-              
+  <div>
+    <div v-if="currentStyle === '默认'">
+      
+      <div class="home" v-if="isInitFetch">
+        <div class="head">
+          <div class="head__absolute">
+            <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
+            <div class="head__avatar">
+              <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
+              <p class="text">{{ Warehouse.name }}</p>
             </div>
           </div>
-        </block>
-      </scroll-view>
-    </div>
-    <div>
-      <block>
-        <div class="nav">
-          <scroll-view class="list" scroll-x>
-            <div v-for="(item, idx) in navData" :key="idx" class="item" :class="[tag == item.id && 'active']" @click="handleNav(item.id)">
-              <img class="img" :src="item.img">
-              <p class="text">{{item.text}}</p>
-            </div>
+        </div>
+        <div class="search-box">
+          <div class="input">
+            <p class="search-icon">
+              <i class="search"></i>
+            </p>
+            <p class="input-box" @click="toSearch()">请搜索商品</p>
+          </div>
+        </div>
+        <div class="coupon-box" v-if="coupon.length">
+          <scroll-view scroll-x>
+            <block v-for="(item,index) in coupon" :key="index">
+              <div class="coupon-img">
+                <div class="yhqk" @click="btn(item)">
+                  <p class="money">￥<span class="money1">{{item.price}}</span></p>
+                  <p class="whole">全程满 <br/>
+                    <span class="whole1">{{item.limitCount}}</span>使用
+                  </p>
+                  <div>
+                    <span class="btn">立即领取</span>
+                  </div>
+                  <div class="mask-checked" v-if="item.isReceived === 'true'">已领取</div>
+                  
+                </div>
+              </div>
+            </block>
           </scroll-view>
         </div>
-        <div class="content">
-          <div v-if="tag == 1">
-            <Upnew :hidenSort="true" />
-            <selling :hidenSort="true" />
-            <collocation :init-count="3" :hidenSort="true" />
-            <Collage :hidenSort="true" />
-            <discount :hidenSort="true" />
-          </div>
-          <div v-else-if="tag == 2">
-            <Upnew/>
-          </div>
-          <div v-else-if="tag == 3">
-            
-            <selling/>
-          </div>
-          <div v-else-if="tag == 4">
-            <collocation/>
-          </div>
-          <div v-else-if="tag == 5">
-            <Collage/>
-          </div>
-          <div v-else-if="tag == 6">
-            <discount/>
+        <div>
+          <block>
+            <div class="nav">
+              <scroll-view class="list" scroll-x>
+                <div v-for="(item, idx) in navData" :key="idx" class="item" :class="[tag == item.id && 'active']" @click="handleNav(item.id)">
+                  <img class="img" :src="item.img">
+                  <p class="text">{{item.text}}</p>
+                </div>
+              </scroll-view>
+            </div>
+            <div class="content">
+              <div v-if="tag == 1">
+                <Upnew :hidenSort="true" />
+                <selling :hidenSort="true" />
+                <collocation :init-count="3" :hidenSort="true" />
+                <Collage :hidenSort="true" />
+                <discount :hidenSort="true" />
+              </div>
+              <div v-else-if="tag == 2">
+                <Upnew/>
+              </div>
+              <div v-else-if="tag == 3">
+                
+                <selling/>
+              </div>
+              <div v-else-if="tag == 4">
+                <collocation/>
+              </div>
+              <div v-else-if="tag == 5">
+                <Collage/>
+              </div>
+              <div v-else-if="tag == 6">
+                <discount/>
+              </div>
+            </div>
+          </block>
+          <div v-if="loading">
+            <zan-loading />
           </div>
         </div>
-      </block>
-      <div v-if="loading">
-        <zan-loading />
+        <div class="toTop" v-show="top">
+          <div class="top" @click="toTop()">
+            <i class="top_img"></i>
+            <p class="top_text">顶部</p>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="toTop" v-show="top">
-      <div class="top" @click="toTop()">
-        <i class="top_img"></i>
-        <p class="top_text">顶部</p>
+    <div v-if="currentStyle === '模板1'">
+      
+      <div class="home theme-2" v-if="isInitFetch">
+
+        <div class="search-box">
+          <div class="input">
+            <p class="search-icon">
+              <icon type="search" size="20" />
+            </p>
+            <p class="input-box" @click="toSearch()">请搜索商品</p>
+          </div>
+        </div>
+        <div class="head">
+          <div class="head__absolute">
+            <img v-if="coverImg" :src="coverImg" mode="aspectFill" lazy-load>
+            <div class="head__avatar">
+              <img class="tx" :src="Warehouse.img" mode="aspectFill" lazy-load>
+              <p class="text">{{ Warehouse.name }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="coupon-box" v-if="coupon.length">
+          <scroll-view scroll-x>
+           <!--  <block v-for="(item,index) in coupon" :key="index">
+              <div class="coupon-img">
+                <div class="yhqk" @click="btn(item)">
+                  <p class="money">￥<span class="money1">{{item.price}}</span></p>
+                  <p class="whole">全程满 <br/>
+                    <span class="whole1">{{item.limitCount}}</span>使用
+                  </p>
+                  <div>
+                    <span class="btn">立即领取</span>
+                  </div>
+                  <div class="mask-checked" v-if="item.isReceived === 'true'">已领取</div>
+                  
+                </div>
+              </div>
+            </block> -->
+            <block v-for="(item,index) in coupon" :key="index">
+              <div class="coupon-img">
+                <div class="yhqk" @click="btn(item)">
+                  <p class="money">￥<span class="money1">{{item.price}}</span></p>
+                  <p class="whole">
+                    <span>全程满</span>
+                    <span class="whole1">{{item.limitCount}} <text>使用</text></span>
+                  </p>
+                  <div>
+                    <div class="btn"><div>领</div><div>取</div></div>
+                  </div>
+                  <div class="mask-checked" v-if="item.isReceived === 'true'">已领取</div>
+                  
+                </div>
+              </div>
+            </block>
+          </scroll-view>
+        </div>
+        <div>
+          <block>
+            <div class="content">
+              <div v-if="tag == 1">
+                <Upnew2 :hidenSort="true" />
+                <selling2 :hidenSort="true" />
+                <collocation2 :init-count="3" :hidenSort="true" />
+                <Collage2 :hidenSort="true" />
+                <discount2 :hidenSort="true" />
+              </div>
+            </div>
+          </block>
+          <div v-if="loading">
+            <zan-loading />
+          </div>
+        </div>
+        <div class="toTop" v-show="top">
+          <div class="top" @click="toTop()">
+            <i class="top_img"></i>
+            <p class="top_text">顶部</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -91,20 +268,30 @@ import APIShui from '@/api/httpShui';
 import mixin from '@/mixin'
 import colligate from '@/components/h_colligate'
 import Upnew from '@/components/h_Upnew'
+import Upnew2 from '@/components/h_Upnew2'
 import selling from '@/components/h_selling'
+import selling2 from '@/components/h_selling2'
 import collocation from '@/components/h_collocation'
+import collocation2 from '@/components/h_collocation2'
 import Collage from '@/components/h_Collage'
+import Collage2 from '@/components/h_Collage2'
 import discount from '@/components/h_discount'
+import discount2 from '@/components/h_discount2'
 import screen from '@/components/h_screen'
 export default {
   mixins: [mixin],
   components: {
     colligate,
     Upnew,
+    Upnew2,
     selling,
+    selling2,
     collocation,
+    collocation2,
     Collage,
+    Collage2,
     discount,
+    discount2,
     screen
   },
   data () {
@@ -119,6 +306,7 @@ export default {
       duration: 1000,
       tag: 1,
       isFetch: false,
+      styleNames: ['默认', '模板1'],
       tabs: [
       ],
       navData: [
@@ -155,6 +343,17 @@ export default {
       ],
       coupon: [],
       selectMGP: []
+    }
+  },
+
+  computed: {
+    currentStyle() {
+      const index = this.styleNames.findIndex(e => e === this.Warehouse.styleName);
+      if (index !== -1) {
+        return this.styleNames[index];
+      }
+      return this.styleNames[this.styleNames.length - 1];
+
     }
   },
   onPageScroll (e) {
@@ -334,92 +533,6 @@ export default {
       border-radius: 8px
       font-size: 28px
       color: #000
-  .search-box
-    padding: 30px 0
-    background: #fff
-    width: 100%
-    .input
-      display: flex
-      padding: 0px 35px
-      .search
-        +bg-img('home/search.png')
-        +icon(38px)
-        margin-top: 7px
-      .search-icon
-        position: absolute
-        left: 60px
-      .input-box
-        background-color: #f5f5f5
-        border-radius: 4px
-        width: 100%
-        text-align: left
-        padding: 8px 85px
-        border: none
-        color: #999999
-  .coupon-box
-
-    width: 100%
-    height: 126px
-    padding-bottom: 30px
-    overflow: hidden
-    background: #fff
-    scroll-view
-      width: 100%
-      white-space: nowrap;
-    .coupon-img
-      position: relative
-      display: inline-block
-      margin: 0 5px
-      &:first-child
-        margin-left: 24px
-      &:last-child
-        margin-right: 24px
-      .mask-checked
-        position: absolute
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        display: flex
-        align-items: center
-        justify-content: center
-        z-index: 5
-        background-color: rgba(0, 0, 0, .3)
-      .yhqk
-        box-sizing: border-box
-        +bg-img('home/yhq.png')
-        height: 126px
-        color: #fff
-        margin: 0 10px
-        padding: 5px 10px 0
-        position: relative
-        .money
-          display: inline-block
-          padding-left: 10px
-          font-size: 24px
-          text-align: center
-          .money1
-            font-size: 48px
-        .whole
-          margin-left: 10px
-          display: inline-block
-          font-size: 20px
-          text-align: center
-        .btn
-          margin: 0 auto;
-          font-size: 20px
-          width: 150px
-          height: 35px
-          display: block
-          color: #ff7272
-          background: #fff
-          border-radius: 10px
-          text-align: center
-          line-height: 35px
-          top: 80px
-          left: 35px
-      .yhqk.active
-        background: rgba(0,0,0,.8)
   .active
     color: #F67C2F
   .nav

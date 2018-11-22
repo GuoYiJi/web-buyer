@@ -3,6 +3,7 @@ var webpack = require('webpack')
 var config = require('../config')
 var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
@@ -11,7 +12,6 @@ var path = require('path')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // add hot-reload related code to entry chunks
 // Object.keys(baseWebpackConfig.entry).forEach(function (name) {
@@ -21,13 +21,13 @@ var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({
-      sourceMap: false,
+      sourceMap: config.dev.cssSourceMap,
       extract: true
     })
   },
   // cheap-module-eval-source-map is faster for development
   // devtool: '#cheap-module-eval-source-map',
-  devtool: false,
+  devtool: '#source-map',
   output: {
     path: config.build.assetsRoot,
     // filename: utils.assetsPath('js/[name].[chunkhash].js'),
@@ -39,9 +39,8 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
-
     new UglifyJsPlugin({
-      sourceMap: false
+      sourceMap: true
     }),
 
     // copy from ./webpack.prod.conf.js

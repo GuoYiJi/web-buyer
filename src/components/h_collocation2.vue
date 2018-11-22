@@ -1,14 +1,30 @@
+<style lang="scss">
+  @import '~@/assets/scss/mixins';
+  .right-box {
+
+    .shop-img {
+      height: rpx(167);;
+    }
+    .goods-title {
+      font-size: rpx(15);
+      line-height: rpx(20);
+    }
+    .desc {
+      font-size: rpx(12);
+      line-height: rpx(20);
+    }
+    .item-img .price {
+      font-size: rpx(14);
+      line-height: rpx(20);
+    }
+  }
+</style>
 <template>
-  <div class="home_opt_mod"  v-if="!(!selectMGP.length && lastPage)">
-    <div class="home_opt_mod__hd">
-      
-      <span class="title_1">NEW SHOW</span>
-      <span class="title_2"> 推荐搭配，高人一等 </span>
-    </div>
+  <div class="home_opt_mod" v-if="!(!List.length && lastPage)">
     <div class="home_opt_mod__bd">
       
       <div class="content">
-        <div v-for="(item, index) in selectMGP" :key="index" class="xK">
+        <div v-for="(item, index) in selectMGP" :key="item.id" class="xK">
           <scroll-view scroll-x="true" style="width: 100%">
             <div class="scroll-x">
               <div class="left-box">
@@ -21,38 +37,35 @@
                     <img class="shop-img" :src="item.firstGoods.image" mode="aspectFill" />
                   </div>
                   <div class="goods-title zan-ellipsis">{{item.firstGoods.name}}</div>
-                  <div class="desc"> 货期:{{item.firstGoods.delivery}}丨销量:{{item.firstGoods.sellCount}}</div>
+                  <div class="desc">{{item.firstGoods.delivery}}丨销量:{{item.firstGoods.sellCount}}</div>
                   <div class="price">
-                    <strong>售价:￥{{item.firstGoods.sellPrice}}</strong>
+                    <strong>￥{{item.firstGoods.sellPrice}}</strong>
                   </div>
-                  <i class="M-img"></i>
                 </div>
               </div>
               <div class="right-box">
                 <div>
                   <div class="item-img" v-for="(ite, inx) in item.matchGoods" :key="inx" v-if="inx < (item.matchGoods.length / 2)" @click="TiaoZhuan(ite)">
-                    <div class="border">
+                    <div>
                       <img class="shop-img" :src="ite.image" alt="" mode="aspectFill">
                     </div>
                     <div class="goods-title zan-ellipsis">{{ite.name}}</div>
-                    <div class="desc"> 货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</div>
+                    <div class="desc">{{ite.delivery}}丨销量:{{ite.sellCount}}</div>
                     <div class="price">
-                      <strong>售价:￥{{ite.sellPrice}}</strong>
+                      <strong>￥{{ite.sellPrice}}</strong>
                     </div>
-                    <i class="I-img"></i>
                   </div>
                 </div>
                 <div>
                   <div class="item-img" v-for="(ite, inx) in item.matchGoods" :key="inx" v-if="inx >= (item.matchGoods.length / 2)" :style="{ 'opacity': ite.template ? 0 : 1 }" @click="TiaoZhuan(ite)">
-                    <div class="border">
+                    <div>
                       <img class="shop-img" :src="ite.image" alt="" mode="aspectFill">
                     </div>
                     <div class="goods-title zan-ellipsis">{{ite.name}}</div>
-                    <div class="desc"> 货期:{{ite.delivery}}丨销量:{{ite.sellCount}}</div>
+                    <div class="desc">{{ite.delivery}}丨销量:{{ite.sellCount}}</div>
                     <div class="price">
-                      <strong>售价:￥{{ite.sellPrice}}</strong>
+                      <strong>￥{{ite.sellPrice}}</strong>
                     </div>
-                    <i class="I-img"></i>
                   </div>
                 </div>
               </div>
@@ -64,21 +77,9 @@
       <div v-show="loading">
         <zan-loading />
       </div>
-      <div v-if="!selectMGP.length && lastPage">
-        <div class="no_goods">
-          <div class="no_goods_img"></div>
-          <div class="no_goods_tip">没有相关的商品结果哦~~</div>
-        </div>
-      </div>
-    </div>
-    <div class="home_opt_mod__ft">
-      <div class="loadmore" @click="handleMore" v-if="!loading && (List.length && !lastPage)">
-        <span>查看更多</span>
-        <i></i>
-      </div>
-      <div class="loadmore up" v-if="hidenSort && page > 1" @click="handleReset()">
-        <span>收起更多</span>
-        <i></i>
+      
+      <div class="loadmore-container" v-if="!loading && (selectMGP.length && !lastPage)">
+        <div class="loadmore-btn" @click="handleMore">查看更多</div>
       </div>
     </div>
   </div>
@@ -94,10 +95,6 @@ export default {
     initCount: {
       type: Number,
       default: 10
-    },
-    hidenSort: {
-      type: Boolean,
-      default: false
     }
   },
   components: { scard },
@@ -106,9 +103,8 @@ export default {
       lastPage: false,
       loading: false,
       pageNumber: 1,
-      page: 1,
-      pageSize: 10,
-      List: []
+      List: [],
+      pageSize: 10
     };
   },
   computed: {
@@ -138,6 +134,7 @@ export default {
       });
     },
     TiaoZhuan(obj) {
+      console.log(obj)
       this.$router.push({
         path: "/pages/home/details/details",
         query: { goodsId: obj.goodsId }
@@ -152,11 +149,14 @@ export default {
       });
       this.loading = false;
       this.lastPage = lastPage;
-      this.page = pageNumber;
       try {
 
         if (code === 1) {
-          this.List = this.List.concat(list);
+          if (pageNumber === 1) {
+            this.List = list;
+          } else {
+            this.List = this.List.concat(list);
+          }
           this.pageNumber++;
         }
       } catch (err) {
@@ -165,21 +165,15 @@ export default {
     },
     handleMore() {
       this.fetch();
-    },
-    handleReset() {
-      this.List = [];
-      this.pageNumber = 1;
-      this.page = 1;
-      this.lastPage = false;
-      this.fetch();
     }
   },
   onShow() {
     // this.pageNumber = 1;
     // this.fetch();
   },
-  onPullDownRefresh() {    
+  onPullDownRefresh() {
     this.pageNumber = 1;
+    this.lastPage = false;
     this.fetch();
   },
   async onReady() {
@@ -191,17 +185,19 @@ export default {
 <style type='text/sass' lang="sass" scoped>
 @import '~@/assets/css/mixin'
 .xK
-  border-bottom: 10px solid #ccc
-  scroll-view
-    padding: 60px 0
+  margin-bottom: 34px;
   &:first-child
     scroll-view
       padding-top: 0
   &:last-child
     border-bottom: 0
+    margin-bottom: 0;
     scroll-view
       padding-bottom: 0
 .home_opt_mod
+  border-top: 0;
+  &__bd
+    padding-top: 20px !important;
   .scroll-x
     display: flex
     width: 100%
@@ -275,7 +271,7 @@ export default {
           +singleFile
           strong
             font-size: 30px
-            color: #FF0000
+            color: #FF6700
     .right-box
       background-color: #ffffff
       white-space: nowrap;
@@ -323,5 +319,5 @@ export default {
           color: #333333
           strong
             font-size: 24px
-            color: #FF0000
+            color: #FF6700
 </style>

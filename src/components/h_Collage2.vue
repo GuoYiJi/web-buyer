@@ -1,75 +1,42 @@
+<style lang="scss">
+
+  @import '~@/assets/scss/mixins';
+
+  .collage2 {
+    .home_opt_mod {
+      &__bd {
+        padding-top: 20px !important;
+      }
+    }
+  }
+</style>
 <template>
-  <div class="home_opt_mod" v-if="!(!List.length && lastPage)">
-    <screen @sort="handleSortChange" @filter="handleFilterChange" v-if="!hidenSort" @showtype="handleShowType" />
+  <div class="collage2 home_opt_mod" v-if="!(!List.length && lastPage)">
     <div class="home_opt_mod__hd">
-      <span class="title_1">NEW SHOW</span>
-      <span class="title_2">拼团优惠，源于一派</span>
+      <img src="https://huiti-img.oss-cn-shanghai.aliyuncs.com/img/wxc4472416927400e1.o6zAJszuDUOj1lV2gxjAk-CZxyJs.u5GsCoThPcF76c68804ce26518afced8152df6cd2dad.png" alt="" mode="aspectFit" />
     </div>
     <div class="home_opt_mod__bd">
-      <block v-if="showType === 0">
-        <div class="content goods-list__container goods-list__container--simple" v-if="List.length">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)"  v-if="item.ping">
-            <div class="goods-list__item goods-list__item--list simple">
-              <div class="goods-list__thumb">
-                <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
-              </div>
-              <div class="goods-list__info">
-                <p class="title zan-ellipsis--l2">{{item.name}}</p>
-                <div class="sale-info">
-                  <p class="limit">{{item.ping.num}}人成团</p>
-                  <p>
-                    <span>货期:{{item.delivery}}</span>丨
-                    <span>已拼:{{item.sellCount}}</span>
-                  </p>
-                  <p class="price">拼团价：￥{{item.ping.price}}</p>
-                </div>
-              </div>
-              <span class="goods-list__btn">去开团</span>
+
+      <div class="goods-list__container--small">
+        <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)" v-if="item.ping">
+          <div class="goods-list__item goods-list__item--small goods-list__item--btn3 card2">
+            <div class="goods-list__thumb">
+              <img class="goods-thumb-h190" :src="item.image" mode="aspectFill">
+            </div>
+            <div class="goods-list__info has-title has-subtitle has-price has-btn">
+              <p class="title zan-ellipsis">{{item.name}}</p>
+              <p class="sale-info">
+                <span class="sale-price">￥{{item.ping.price}}<em>￥{{ item.sellPrice }}</em></span>
+              </p>
             </div>
           </div>
         </div>
-      </block>
-      <block v-if="showType === 1">
-        <div class="goods-list__container--small" v-if="List.length">
-          <div class="goods-list__wrapper" v-for="(item,index) in List" :key="index" @click="pinDetails(item)" v-if="item.ping">
-            <div class="goods-list__item goods-list__item--small goods-list__item--btn4 card2">
-              <div class="goods-list__thumb">
-                <img v-if="item.image" class="img" :src="item.image" mode="aspectFill">
-                <!-- <img v-else class="img" src="../assets/img/classify/goods.png"> -->
-              </div>
-              <div class="goods-list__info has-title has-subtitle has-price has-btn">
-                <p class="title zan-ellipsis">{{item.name}}</p>
-                <div class="sub-title">
-                  <p class="limit">{{item.ping.num}}人成团</p>
-                  <p>货期:{{item.delivery}}</p>
-                  <p>已拼:{{item.sellCount}}</p>
-                </div>
-                <div class="sale-info">
-                  <p class="price">￥{{item.ping.price}}</p>
-                </div>
-              </div>
-              <div class="goods-list__buy-btn-wrapper">
-                <span class="goods-list__buy-btn-4">去开团</span>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      </block>
+      </div>
       <div v-show="loading">
         <zan-loading />
       </div>
-      <div v-if="!List.length && lastPage">
-        <div class="no_goods">
-          <div class="no_goods_img"></div>
-          <div class="no_goods_tip">没有相关的商品结果哦~~</div>
-        </div>
-      </div>
-    </div>
-    <div class="home_opt_mod__ft" v-if="!loading && (List.length && !lastPage)" @click="getMore()">
-      <div class="loadmore">
-        <span>查看更多</span>
-        <i></i>
+      <div class="loadmore-container" v-if="!loading && (List.length && !lastPage)">
+        <div class="loadmore-btn" @click="getMore()">查看更多</div>
       </div>
     </div>
   </div>
@@ -111,19 +78,15 @@ export default {
 
       if (page === 1) {
         this.page = 1;
-        if (!this.isDataLast) {
-          this.List = [];
-        }
         this.nodata = false;
         this.lastPage = false;
-      }
-      if (!this.isDataLast) {
-        this.loading = true;
+        this.List = [];
       }
       const data = await API.getPinGoods({
         pageSize: 10,
         pageNumber: page,
         ob: this.ob,
+        state: 1,
         ...this.goodsFilterOptions
       })
       this.loading = false;
@@ -134,11 +97,7 @@ export default {
           this.nodata = true;
           return;
         }
-        if (this.isDataLast) {
-          this.isDataLast = false;
-        } else {
-          this.List = this.List.concat(list);
-        }
+        this.List = this.List.concat(list);
         this.page++;
         // console.log(this.List)
       }
@@ -164,7 +123,6 @@ export default {
     // this.goodsList(1);
   },
   onPullDownRefresh() {
-    this.isDataLast = true;
     this.goodsList(1);
   },
   onReady() {

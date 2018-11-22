@@ -1,0 +1,16 @@
+
+  @function rpx($val) {
+    @return $val * 2px;
+  }
+
+  /**
+ * 文件超出几行进行裁切 ...
+ * @param {Number} $num [几行]
+ */
+@mixin setCropText($num) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $num;
+}

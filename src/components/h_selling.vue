@@ -1,6 +1,6 @@
 <template>
 
-  <div class="home_opt_mod">
+  <div class="home_opt_mod" v-if="!nodata">
     <screen @sort="handleSortChange" @filter="handleFilterChange" v-if="!hidenSort" @showtype="handleShowType" />
     <div class="home_opt_mod__hd">
       <div class="title_1">NEW SHOW</div>
